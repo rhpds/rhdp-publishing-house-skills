@@ -26,7 +26,7 @@ Automation has four sub-phases tracked in the manifest:
 
 Sub-phases run in order: requirements first (captures the full automation scope upfront),
 then catalog item (creates the AgnosticV catalog informed by those requirements — skipped
-for field source deployments), then automation code (writes from the approved requirements),
+for self-published projects), then automation code (writes from the approved requirements),
 then testing (human deploys and verifies the automation works on a real environment).
 
 ## Infrastructure Type Routing

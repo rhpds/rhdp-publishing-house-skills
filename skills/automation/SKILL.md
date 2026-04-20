@@ -146,8 +146,8 @@ automation:
 
 With the automation requirements approved, we now know the full infrastructure
 scope — operators, multi-user config, provision data — needed to build the catalog.
-If the project uses an existing Field Source Content catalog item instead, this
-sub-phase can be skipped.
+If the project is self-published (`deployment_mode: self_published`), this
+sub-phase is skipped automatically.
 
 ### Step 7b-1: Gather Context from PH Spec and Automation Manifest
 
@@ -234,8 +234,8 @@ automation:
 ## Phase 7c: Automation Code
 
 Write the automation code from the approved automation manifest. If the catalog item
-(7b) was skipped (Field Source Content path), proceed directly from approved requirements
-(7a) to code.
+(7b) was skipped (self-published projects skip this step), proceed directly from
+approved requirements (7a) to code.
 
 ### Step 7c-1: Write Automation Code
 
@@ -397,8 +397,8 @@ After completing each sub-phase, inform the user:
 > "Automation requirements documented and approved.
 > Manifest: `publishing-house/spec/automation-manifest.yaml`
 >
-> Next: Create the AgnosticV catalog item (7b), or 'skip catalog item' if using an
-> existing Field Source Content catalog."
+> Next: Create the AgnosticV catalog item (7b). Self-published projects skip this step
+> automatically."
 
 **After 7b (Catalog Item):**
 > "AgnosticV catalog item created and validated.
@@ -429,8 +429,8 @@ Users can skip individual sub-phases:
   automation code directly without a manifest. Not recommended — requirements drive
   both catalog and code decisions.
 - **"skip catalog item"** — Set `substeps.catalog_item: skipped`. Project uses an
-  existing Field Source Content catalog item, or user manages AgV config outside
-  Publishing House. Automation code is built from the approved requirements manifest.
+  project is self-published (no catalog item needed), or user manages AgV config
+  outside Publishing House. Automation code is built from the approved requirements manifest.
 - **"skip automation code"** — Set `substeps.automation_code: skipped`. Automation
   handled externally.
 - **"skip testing"** — Set `substeps.testing: skipped`. Not recommended — automation
