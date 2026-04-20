@@ -46,19 +46,30 @@ Proceed to the full routing logic below (Step 1 onward).
 
 ## Step 1: Project Discovery (Silent)
 
-1. Check whether `publishing-house/manifest.yaml` exists in the **current working directory only**. Do NOT search parent directories, subdirectories, or any other location.
-2. If not found, ask the user — do not search:
-   > "I don't see a Publishing House project in this directory. Do you have an existing one elsewhere, or are you starting something new?"
-   - **Existing project:** Ask for the path, `cd` to that directory, proceed to Step 2.
+Find the project manifest using this search order — stop as soon as you find a match:
+
+1. **Walk up from CWD** — check each parent directory for `publishing-house/manifest.yaml` until you reach the filesystem root. This handles the common case: user is inside a project subdirectory (e.g. `content/modules/`) or has the project open in an IDE.
+
+2. **Scan one level of subdirectories** — if walking up found nothing, check immediate subdirectories of CWD for `publishing-house/manifest.yaml`. This handles the case where the user is in a workspace root containing multiple projects.
+
+3. **Multiple found** — if step 2 finds more than one manifest, list them by project name and ask:
+   > "I found multiple Publishing House projects. Which one do you want to work on?"
+   > 1. OCP Getting Started (ex-ocp4-getting-started/)
+   > 2. DataSphere Workshop (ex-datasphere/)
+
+4. **None found** — ask the user:
+   > "I couldn't find a Publishing House project. Do you have one at a specific path, or are you starting something new?"
+   - **Existing project:** User provides path → read manifest there → proceed to Step 2.
    - **New project:** Ask ONE question first:
      > "What are you building? (e.g. 'OpenShift getting started workshop' or 'DataSphere demo')"
-     Use the answer to suggest a short repo name (e.g. `ocp-getting-started`, `datasphere-demo`), then show the setup commands:
+     Use the answer to suggest a short repo name (e.g. `ocp-getting-started`, `datasphere-demo`), confirm with the user, then show setup commands:
      ```
      gh repo create <org>/<suggested-name> --template rhpds/rhdp-publishing-house-template --private --clone
      cd <suggested-name>
      ```
-     Confirm the name with the user before showing the command. Then say: "Run those commands, then come back and run `/rhdp-publishing-house` to start intake."
-3. If manifest exists, proceed to Step 2.
+     Say: "Run those, then come back and run `/rhdp-publishing-house` to start intake."
+
+Once a manifest is located, **set the project root** (the directory containing `publishing-house/`) as the working context for all subsequent file reads and writes in this session.
 
 ## Step 2: Read State and Present Status
 
