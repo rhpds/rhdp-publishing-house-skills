@@ -47,14 +47,17 @@ Proceed to the full routing logic below (Step 1 onward).
 ## Step 1: Project Discovery (Silent)
 
 1. Look for `publishing-house/manifest.yaml` in the current working directory.
-2. If not found, ask the user: "I don't see a Publishing House project here. Do you have one elsewhere, or should I help you start a new one?"
-   - If user provides a path, change to that directory.
-   - If user wants to start new, instruct them to clone the template repo:
+2. If not found, ask the user:
+   > "I don't see a Publishing House project here. Do you have an existing one elsewhere, or are you starting something new?"
+   - **Existing project:** Ask for the path, change to that directory, proceed to Step 2.
+   - **New project:** Ask ONE question first:
+     > "What are you building? (e.g. 'OpenShift getting started workshop' or 'DataSphere demo')"
+     Use the answer to suggest a short repo name (e.g. `ocp-getting-started`, `datasphere-demo`), then show the setup commands:
      ```
-     gh repo create <org>/<repo-name> --template rhdp-publishing-house/template --private --clone
-     cd <repo-name>
+     gh repo create <org>/<suggested-name> --template rhpds/rhdp-publishing-house-template --private --clone
+     cd <suggested-name>
      ```
-     Then re-run `/rhdp-publishing-house` once the repo is ready.
+     Confirm the name with the user before showing the command. Then say: "Run those commands, then come back and run `/rhdp-publishing-house` to start intake."
 3. If manifest exists, proceed to Step 2.
 
 ## Step 2: Read State and Present Status
