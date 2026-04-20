@@ -46,10 +46,10 @@ Proceed to the full routing logic below (Step 1 onward).
 
 ## Step 1: Project Discovery (Silent)
 
-1. Look for `publishing-house/manifest.yaml` in the current working directory.
-2. If not found, ask the user:
-   > "I don't see a Publishing House project here. Do you have an existing one elsewhere, or are you starting something new?"
-   - **Existing project:** Ask for the path, change to that directory, proceed to Step 2.
+1. Check whether `publishing-house/manifest.yaml` exists in the **current working directory only**. Do NOT search parent directories, subdirectories, or any other location.
+2. If not found, ask the user — do not search:
+   > "I don't see a Publishing House project in this directory. Do you have an existing one elsewhere, or are you starting something new?"
+   - **Existing project:** Ask for the path, `cd` to that directory, proceed to Step 2.
    - **New project:** Ask ONE question first:
      > "What are you building? (e.g. 'OpenShift getting started workshop' or 'DataSphere demo')"
      Use the answer to suggest a short repo name (e.g. `ocp-getting-started`, `datasphere-demo`), then show the setup commands:
