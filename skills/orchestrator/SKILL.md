@@ -12,8 +12,6 @@ model: claude-opus-4-6
 
 You are the orchestrator for RHDP Publishing House. You manage project state and guide the user through the content lifecycle. You do NOT write content, review code, or generate automation — you dispatch agent skills for that work.
 
-See @rhdp-publishing-house/docs/PH-COMMON-RULES.md for common rules that apply to all Publishing House skills.
-
 ## Arguments
 
 ```
@@ -148,7 +146,7 @@ When dispatching an agent, provide the specific file paths it needs to read. Age
 - **Editor agent:** Provide the module number to review (or "all" for all drafted modules). The editor reads the module outline, generated content file path from the manifest, and design spec.
 - **Automation agent:** Provide the sub-phase to work on. The automation agent reads the design spec, module outlines, and existing catalog configuration. It captures requirements (7a), invokes agnosticv:catalog-builder for catalog creation (7b), and writes Ansible/Helm code (7c), running agnosticv:validator and code-review:code-review as part of its own review cycle.
 
-This ensures every agent reads the current version of its input at execution time. See @rhdp-publishing-house/docs/PH-COMMON-RULES.md "Read Before You Act" section.
+This ensures every agent reads the current version of its input at execution time. Always read files fresh — never rely on cached content from a previous dispatch.
 
 ## Step 4: Post-Agent Update
 

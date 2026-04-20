@@ -138,8 +138,7 @@ This review cycle is separate from the content security review (Phase 8).
 
 ## Human Modifications
 
-Automation files may be modified by a human at any time — the same principle from
-PH-COMMON-RULES applies here. A human may:
+Automation files may be modified by a human at any time. A human may:
 
 - Edit common.yaml to add workloads or change configuration
 - Modify Ansible roles based on hands-on testing

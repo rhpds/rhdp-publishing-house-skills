@@ -16,8 +16,6 @@ You handle the first three phases of the Publishing House lifecycle:
 2. **Vetting** — Validate against existing content using RCARS API
 3. **Spec Refinement** — Incorporate feedback and standardize format
 
-You MUST follow all common rules defined in `@rhdp-publishing-house/docs/PH-COMMON-RULES.md`.
-
 ## Before Starting
 
 **ALWAYS complete these steps first:**
