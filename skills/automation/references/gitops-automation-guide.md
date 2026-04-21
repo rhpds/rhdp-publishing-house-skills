@@ -1,8 +1,7 @@
 # GitOps Automation Guide
 
-How to create GitOps repos that automate RHDP lab/demo environments using
-Helm + ArgoCD. Based on the RHDP GitOps template at
-`https://github.com/rhpds/ci-template-gitops`.
+How to create GitOps automation for RHDP lab/demo environments using
+Helm + ArgoCD. Follows the patterns in `https://github.com/rhpds/ci-template-gitops`.
 
 ## When to Use GitOps vs Ansible
 
@@ -10,74 +9,85 @@ Helm + ArgoCD. Based on the RHDP GitOps template at
 |----------------|------------------|
 | Environment is fully declarative (K8s manifests) | Tasks require imperative logic (wait loops, conditionals) |
 | Changes should be continuously reconciled | One-time setup is sufficient |
-| Multiple environments need the same config | Simple operator install + configure |
-| Lab involves GitOps concepts (ArgoCD is the point) | Lab doesn't involve GitOps |
+| Lab teaches GitOps concepts (ArgoCD is the point) | Lab doesn't involve GitOps |
+| `self_published` deployment mode | `rhdp_published` with complex ordering needs |
 
-Many labs use both — Ansible for initial cluster setup (operators, auth) and GitOps
-for application workloads that benefit from continuous reconciliation.
+Many `rhdp_published` labs use both — Ansible for initial cluster setup (operators, auth)
+and GitOps for application workloads that benefit from continuous reconciliation.
 
 ## Architecture: Three Layers
 
-The GitOps template uses an app-of-apps pattern with three layers:
-
 ```
-cluster/infra/bootstrap/      → Operators and cluster infrastructure (deployed once)
-         ↓ spawns
-cluster/platform/bootstrap/   → Shared services for all users (deployed once)
+cluster/infra/       → Operators and cluster infrastructure (deployed once per cluster)
+         ↓ spawns (rhdp_published only)
+cluster/platform/    → Shared services for all users (deployed once per cluster)
 
-tenant/bootstrap/             → Per-user lab workloads (deployed per user)
+tenant/              → Per-user lab workloads (deployed per user)
 ```
 
-### Infra Layer (`cluster/infra/bootstrap/`)
+**For `self_published`:** Only `cluster/infra/` and `tenant/` are relevant. Platform
+layer is skipped. The two layers are deployed simultaneously by separate Field Source
+CI workloads — ArgoCD eventual consistency handles any ordering (operators install,
+then tenant resources sync automatically on retry).
 
-- Installs operators (subscriptions, operator groups)
-- Creates ArgoCD AppProjects (infra, platform, tenants)
-- Spawns the platform bootstrap Application
-- Returns cluster-level provision data to RHDP
+**For `rhdp_published`:** All three layers are available. Platform is spawned by the
+infra bootstrap. Two separate AgnosticV CIs (cluster + tenant) invoke the role in order.
 
-### Platform Layer (`cluster/platform/bootstrap/`)
+## Repo Structure
 
-- Configures operators installed by infra layer
-- Deploys shared services (e.g., GitLab, shared databases)
-- Never created directly — spawned by infra bootstrap
+Generate these directories in `automation/`:
 
-### Tenant Layer (`tenant/bootstrap/`)
+```
+automation/
+├── cluster/
+│   └── infra/
+│       ├── Chart.yaml              # "bootstrap-infra" umbrella chart
+│       ├── values.yaml             # All workload config; deployer.* injected at deploy time
+│       └── templates/
+│           ├── application-<operator>.yaml   # One ArgoCD Application per operator
+│           └── configmap-provisiondata.yaml  # Cluster-level provision data (if needed)
+├── tenant/
+│   ├── bootstrap/
+│   │   ├── Chart.yaml
+│   │   ├── values.yaml
+│   │   └── templates/
+│   │       ├── application-<lab>.yaml        # ArgoCD Application per workload
+│   │       └── configmap-provisiondata.yaml  # Tenant-level provision data
+│   └── labs/
+│       └── <project-id>/           # The lab's own Helm chart
+│           ├── Chart.yaml
+│           ├── values.yaml
+│           └── templates/
+│               ├── namespace.yaml
+│               ├── rbac.yaml
+│               ├── deployment.yaml
+│               ├── service.yaml
+│               ├── route.yaml
+│               └── configmap-provisiondata.yaml
+```
 
-- Per-user workloads (one ArgoCD Application per user/deployment)
-- Three patterns for deploying resources (see below)
-- Returns tenant-level provision data to RHDP
-
-## Helm Chart Patterns
-
-Each layer's bootstrap is a Helm chart that creates ArgoCD Applications.
-
-### Values Structure
+## Values Structure
 
 ```yaml
-# Anchor for git defaults (reused across workloads)
-default_settings: &git_defaults
-  repoURL: https://github.com/rhpds/<your-gitops-repo>.git
-  targetRevision: main
+# values.yaml pattern (both cluster/infra and tenant/bootstrap)
 
-# Deployer values (injected by Ansible role at deploy time)
+# Deployer values — injected by the Ansible role at deploy time from live cluster
+# Never set these in the catalog or commit them with real values
 deployer:
-  domain: apps.cluster-guid.example.com
-  apiUrl: https://api.cluster-guid.example.com:6443
-  guid: GUID
+  domain: ""      # apps.cluster-guid.example.com
+  apiUrl: ""      # https://api.cluster-guid.example.com:6443
+  guid: ""
 
-# Per-workload configuration
+# Per-workload config — all disabled by default
 myWorkload:
-  enabled: false                    # All workloads disabled by default
-  namespace: NAMESPACE-MUST-BE-SET  # Fail loud if not overridden
-  git:
-    path: tenant/labs/my-workload
-    <<: *git_defaults
+  enabled: false
+  namespace: "NAMESPACE-MUST-BE-SET"   # Fails loud if catalog doesn't override
 ```
 
-### Enable/Disable Pattern
+## Enable/Disable Pattern
 
-Every workload has an `enabled: false` default. The AgnosticV catalog enables
-specific workloads by passing `enabled: true` through Helm values.
+Every workload has `enabled: false` by default. The Field Source CI catalog enables
+specific workloads by passing values at deploy time.
 
 ```yaml
 # In ArgoCD Application template
@@ -85,18 +95,19 @@ specific workloads by passing `enabled: true` through Helm values.
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: my-workload-{{ .Values.tenant.name }}
+  name: my-workload
   namespace: openshift-gitops
+  labels:
+    demo.redhat.com/application: "field-content"
 spec:
   project: tenants
   source:
-    repoURL: {{ .Values.myWorkload.git.repoURL }}
-    targetRevision: {{ .Values.myWorkload.git.targetRevision }}
-    path: {{ .Values.myWorkload.git.path }}
+    repoURL: https://github.com/<org>/<repo>.git
+    targetRevision: main
+    path: tenant/labs/my-workload
     helm:
       values: |
         deployer: {{ .Values.deployer | toYaml | nindent 10 }}
-        tenant: {{ .Values.tenant | toYaml | nindent 10 }}
         myWorkload: {{ .Values.myWorkload | toYaml | nindent 10 }}
   destination:
     server: https://kubernetes.default.svc
@@ -107,8 +118,8 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - SkipDryRunOnMissingResource=true
-      - RespectIgnoreDifferences=true
+      - SkipDryRunOnMissingResource=true   # Handles CRDs appearing after operator install
+      - RespectIgnoreDifferences=true      # Operators mutate their own fields
     retry:
       limit: 10
       backoff:
@@ -118,112 +129,158 @@ spec:
 {{- end }}
 ```
 
+**`SkipDryRunOnMissingResource: true` is essential** for self_published projects.
+When the cluster and tenant layers deploy simultaneously, the operator CRDs don't
+exist yet when the tenant Application first syncs. This flag lets ArgoCD apply what
+it can and skip what it can't — on retry (once the operator is ready), everything syncs.
+
 ## Three Tenant Deployment Patterns
 
 ### Pattern 1: Inline Resources (Simplest)
 
-Resources rendered directly by the bootstrap chart. No sub-chart needed.
+Resources rendered directly in `tenant/bootstrap/templates/`. No sub-chart needed.
 
 ```yaml
-# tenant/bootstrap/templates/my-inline-resource.yaml
-{{- if .Values.myInlineApp.enabled }}
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: my-app
-  namespace: {{ .Values.myInlineApp.namespace }}  # ALWAYS explicit namespace
-spec:
-  replicas: 1
-  ...
----
+# tenant/bootstrap/templates/namespace.yaml
+{{- if .Values.myLab.enabled }}
 apiVersion: v1
-kind: Service
+kind: Namespace
 metadata:
-  name: my-app
-  namespace: {{ .Values.myInlineApp.namespace }}
+  name: {{ .Values.myLab.namespace }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: lab-user-edit
+  namespace: {{ .Values.myLab.namespace }}
 spec:
-  ...
+  roleRef:
+    kind: ClusterRole
+    name: edit
+  subjects:
+    - kind: User
+      name: {{ .Values.myLab.username }}
 {{- end }}
 ```
 
-**Use when:** Simple, one-off resources (a few manifests). No independent sync needed.
+**Use when:** A few RBAC or namespace resources. No independent sync status needed.
 
-**Critical:** Always set explicit `namespace` on every resource. Without it, resources
-deploy to `openshift-gitops` (the ArgoCD namespace), not the tenant namespace.
+**Critical:** Always set explicit `namespace` on every resource — without it, resources
+deploy to `openshift-gitops`.
 
-### Pattern 2: Helm Sub-chart (Basic)
+### Pattern 2: Helm Sub-chart (Standard Lab Workload)
 
-Bootstrap creates a child ArgoCD Application pointing at a separate Helm chart.
-
-```
-tenant/
-├── bootstrap/templates/application-my-app.yaml   # ArgoCD Application
-└── my-app/                                       # Helm chart
-    ├── Chart.yaml
-    ├── values.yaml
-    └── templates/
-        ├── deployment.yaml
-        ├── service.yaml
-        └── route.yaml
-```
-
-**Use when:** Multi-resource workload that benefits from independent sync status.
-
-### Pattern 3: Parameterized Helm Sub-chart (Catalog-Driven)
-
-Like Pattern 2, but all meaningful values are driven from the AgnosticV catalog.
+Bootstrap creates a child ArgoCD Application pointing at `tenant/labs/<project-id>/`.
 
 ```yaml
 # tenant/bootstrap/templates/application-my-lab.yaml
 {{- if .Values.labs.myLab.enabled }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-lab-{{ .Values.deployer.guid }}
+  namespace: openshift-gitops
 spec:
+  project: tenants
   source:
     path: tenant/labs/my-lab
     helm:
       values: |
         namespace: {{ .Values.labs.myLab.namespace | quote }}
-        message: {{ .Values.labs.myLab.message | quote }}
-        replicas: {{ .Values.labs.myLab.replicas }}
+        deployer: {{ .Values.deployer | toYaml | nindent 10 }}
 {{- end }}
 ```
 
-**Use when:** Lab workloads where the catalog controls behavior. Namespace is
-intentionally set to `NAMESPACE-MUST-BE-SET-BY-CATALOG` in defaults to fail loud
-if the catalog doesn't provide it.
+**Use when:** Multi-resource lab workload. This is the standard pattern for most labs.
+
+### Pattern 3: Parameterized Sub-chart (Catalog-Driven)
+
+Like Pattern 2, but all meaningful values come from the Field Source CI catalog at order time.
+The namespace is intentionally `NAMESPACE-MUST-BE-SET` in defaults to fail loud if not provided.
+
+**Use when:** Lab has configurable parameters (e.g., `num_users`, feature flags).
 
 ## Provision Data
 
-Return connection information to RHDP via labeled ConfigMaps:
+Surface per-user connection info to RHDP via labeled ConfigMaps:
 
 ```yaml
-# In your workload's Helm chart
+# tenant/labs/<project-id>/templates/configmap-provisiondata.yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: tenant-{{ .Values.tenant.name }}-my-app-provisiondata
-  namespace: {{ .Values.myApp.namespace }}
+  name: provisiondata-{{ .Values.deployer.guid }}
+  namespace: {{ .Values.namespace }}
   labels:
-    demo.redhat.com/tenant-{{ .Values.tenant.name }}: "true"
+    demo.redhat.com/tenant-{{ .Values.deployer.guid }}: "true"   # Required for RHDP pickup
 data:
-  provision_data: |
-    app_url: https://my-app-{{ .Values.myApp.namespace }}.{{ .Values.deployer.domain }}
+  # Showroom URL — always include
+  showroom_url: "https://showroom-{{ .Values.namespace }}.{{ .Values.deployer.domain }}"
+
+  # Per-user app URLs
+  app_url: "https://my-app-{{ .Values.namespace }}.{{ .Values.deployer.domain }}"
+  namespace: "{{ .Values.namespace }}"
+  cluster_domain: "{{ .Values.deployer.domain }}"
 ```
 
-The `demo.redhat.com/tenant-<name>` label tells the RHDP deployer to pick up this data
-and surface it to the user.
+The `demo.redhat.com/tenant-<guid>: "true"` label tells RHDP to pick up this ConfigMap's
+data and surface it to the user. Every key becomes an `{attribute}` variable in Showroom.
 
-## AgnosticV Integration
+**Always include `showroom_url`** — Showroom is the default delivery vehicle for lab guides.
 
-GitOps repos are consumed via the `ocp4_workload_gitops_bootstrap` role:
+## Field Source CI Integration (`self_published`)
 
-### Cluster-Level (Infra + Platform)
+Self-published labs use two roles deployed simultaneously. ArgoCD eventual consistency
+handles any operator → CR ordering automatically:
 
 ```yaml
-# In AgnosticV common.yaml
+# common.yaml (cluster workload — runs once per cluster)
+workloads:
+  - agnosticd.core_workloads.ocp4_workload_field_content_cluster
+
+ocp4_workload_field_content_cluster_repo_url: https://github.com/<org>/<repo>.git
+ocp4_workload_field_content_cluster_repo_revision: main
+ocp4_workload_field_content_cluster_repo_path: cluster/infra
+
+# Values passed to the cluster Helm chart
+ocp4_workload_field_content_cluster_helm_values:
+  rhbkOperator:
+    enabled: true
+    namespace: openshift-operators
+    channel: stable-v26
+```
+
+```yaml
+# common.yaml (tenant workload — runs once per user/namespace)
+workloads:
+  - agnosticd.core_workloads.ocp4_workload_field_content_tenant
+
+ocp4_workload_field_content_tenant_repo_url: https://github.com/<org>/<repo>.git
+ocp4_workload_field_content_tenant_repo_revision: main
+ocp4_workload_field_content_tenant_repo_path: tenant/bootstrap
+
+# Values passed to the tenant Helm chart
+ocp4_workload_field_content_tenant_helm_values:
+  labs:
+    myLab:
+      enabled: true
+      namespace: "lab-{{ guid }}"
+  deployer:
+    guid: "{{ guid }}"
+```
+
+**Note:** Both roles deploy ArgoCD Applications and return immediately — no health
+waiting. The Field Source CI owns the overall lifecycle; RHDP is not responsible for
+whether the ArgoCD apps eventually converge.
+
+## AgnosticV Integration (`rhdp_published`)
+
+```yaml
+# Cluster CI common.yaml
 workloads:
   - agnosticd.core_workloads.ocp4_workload_gitops_bootstrap
 
-ocp4_workload_gitops_bootstrap_repo_url: https://github.com/rhpds/<your-gitops-repo>.git
+ocp4_workload_gitops_bootstrap_repo_url: https://github.com/<org>/<repo>.git
 ocp4_workload_gitops_bootstrap_repo_revision: main
 ocp4_workload_gitops_bootstrap_repo_path: cluster/infra/bootstrap
 ocp4_workload_gitops_bootstrap_application_name: bootstrap-infra
@@ -232,25 +289,14 @@ ocp4_workload_gitops_bootstrap_application_project: infra
 ocp4_workload_gitops_bootstrap_helm_values:
   myOperator:
     enabled: true
-  platformValues:
-    mySharedService:
-      enabled: true
 ```
 
-### Tenant-Level (Per User)
-
 ```yaml
+# Tenant CI common.yaml
 workloads:
-  - agnosticd.core_workloads.ocp4_workload_tenant_namespace
   - agnosticd.core_workloads.ocp4_workload_gitops_bootstrap
 
-# Namespace setup (must happen BEFORE GitOps bootstrap)
-ocp4_workload_tenant_namespace_username: "user-{{ guid }}"
-ocp4_workload_tenant_namespace_suffixes:
-  - suffix: my-lab
-
-# GitOps bootstrap
-ocp4_workload_gitops_bootstrap_repo_url: https://github.com/rhpds/<your-gitops-repo>.git
+ocp4_workload_gitops_bootstrap_repo_url: https://github.com/<org>/<repo>.git
 ocp4_workload_gitops_bootstrap_repo_revision: main
 ocp4_workload_gitops_bootstrap_repo_path: tenant/bootstrap
 ocp4_workload_gitops_bootstrap_application_name: "bootstrap-{{ guid }}"
@@ -259,49 +305,15 @@ ocp4_workload_gitops_bootstrap_application_project: tenants
 ocp4_workload_gitops_bootstrap_helm_values:
   tenant:
     name: "{{ guid }}"
-    user:
-      name: "{{ ocp4_workload_tenant_keycloak_username }}"
   labs:
     myLab:
       enabled: true
       namespace: "user-{{ guid }}-my-lab"
 ```
 
-Namespace suffixes must match the namespace values in the Helm chart.
-
-## Creating a New GitOps Repo
-
-1. Clone the template: `gh repo create rhpds/<lab-name>-gitops --template rhpds/ci-template-gitops --private --clone`
-2. Remove the examples you don't need from `tenant/bootstrap/templates/`
-3. Add your workload chart under `tenant/labs/<your-lab>/`
-4. Add an Application template in `tenant/bootstrap/templates/`
-5. Add your workload's values block to `tenant/bootstrap/values.yaml`
-6. Add provision data ConfigMap to your chart if needed
-7. Test with a dev AgnosticV catalog
-
-## Sync Policy Standards
-
-All ArgoCD Applications should use this sync policy:
-
-```yaml
-syncPolicy:
-  automated:
-    prune: true
-    selfHeal: true
-  syncOptions:
-    - CreateNamespace=true
-    - SkipDryRunOnMissingResource=true    # CRDs appear after operator install
-    - RespectIgnoreDifferences=true       # Operators mutate their own fields
-  retry:
-    limit: 10
-    backoff:
-      duration: 5s
-      factor: 2
-      maxDuration: 3m
-```
-
 ## What to Automate vs What the Learner Does
 
-Same principle as Ansible automation — see the Ansible Automation Guide for the
-full decision framework on distinguishing pre-configured environment from learner
-exercises.
+See the automation manifest format for the full decision framework. Key rule:
+if the lab says "open the application at..." or "navigate to the console and observe...",
+those resources must be pre-deployed. If the lab says "run oc apply -f...", the learner
+does that themselves.
