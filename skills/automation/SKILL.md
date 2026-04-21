@@ -75,28 +75,29 @@ proceed to Step 7a-3 (approval).
 
 ### Step 7a-2: Generate Automation Manifest
 
-Read context to extract automation requirements:
+Read context to extract automation requirements. **Priority order: drafted content first, outlines as fallback.**
 
-**From the design spec** (`publishing-house/spec/design.md`):
-- Infrastructure type and requirements → `infrastructure` section
-- Products and technologies → candidate `operators`
-- Multi-user configuration → `infrastructure.multi_user`
-
-**From module outlines** (`publishing-house/spec/modules/`):
-- Read each module's Detailed Steps section
-- For each step, determine: does the learner do this, or must it be pre-configured?
+**From content files** (PRIMARY — read these first if they exist in `content/`):
+- Read each drafted AsciiDoc module file listed in `lifecycle.phases.writing.modules[*].content_path`
+- For each step in the content, determine: does the learner do this, or must it be pre-configured?
   - "Navigate to the console and observe..." → pre-configured (automate it)
   - "Run `oc apply -f deployment.yaml`" → learner does this (do NOT automate)
   - "Open the application at https://..." → pre-configured (automate it)
   - "Edit the deployment to add a sidecar" → base deployment pre-configured, sidecar is the exercise
   - "Troubleshoot why the pod is failing" → broken state pre-configured (automate it as `broken_resources`)
-- Extract infrastructure requirements and operator dependencies
+- Check for UserInfo `{attribute}` placeholders — these indicate provision data needs
+- Check for hostnames, URLs, and service names that must exist before the lab starts
 - Note which module each requirement comes from (`source_module`)
 
-**From content files** (if they exist in `content/`):
-- Read AsciiDoc for any additional detail about pre-existing resources
-- Check for UserInfo variables that indicate provision data needs
-- Check for `{attribute}` placeholders that suggest deployed services
+**From module outlines** (FALLBACK — use if content files don't exist yet):
+- Read each module's Detailed Steps section from `publishing-house/spec/modules/`
+- Apply the same learner-vs-pre-configured analysis above
+- Note: outlines are less precise than drafted content; flag requirements as "to verify when content is drafted"
+
+**From the design spec** (`publishing-house/spec/design.md`):
+- Infrastructure type and requirements → `infrastructure` section
+- Products and technologies → candidate `operators`
+- Multi-user configuration → `infrastructure.multi_user`
 
 **Determine approach:**
 
@@ -104,8 +105,14 @@ Check `project.deployment_mode`:
 
 **If `self_published`:**
 - Approach is GitOps only. Inform the user:
-  > "Self-published projects use the Field Source CI, which expects a GitOps repo. Your automation approach is GitOps (Helm + ArgoCD). If you need Ansible tasks, they can run as Ansible Runner jobs within the GitOps framework."
-- Reference the field-sourced-content-template at `https://github.com/rhpds/field-sourced-content-template` for the starter pattern, including the `examples/ansible` path for Ansible Runner within GitOps.
+  > "Self-published projects use the Field Source CI with a GitOps repo. Your automation approach is GitOps (Helm + ArgoCD)."
+- Ask ONE question to determine the deployment topology:
+  > "Does each student need their own cluster (for admin-level work like installing operators), or will students share a cluster with per-user namespaces?
+  >
+  > 1. **Per-user cluster** — each student gets their own OCP cluster. Use when the lab requires cluster-admin or would conflict across users (operator installs, cluster-level config). One user provisioned per deployment.
+  > 2. **Shared cluster** — one cluster, N namespaces. Use when the lab is namespace-scoped and students don't interfere. `num_users` parameter controls how many copies of tenant resources are deployed."
+
+  Record as `infrastructure.topology: per-user-cluster | shared-cluster` and `infrastructure.multi_user: false | true`.
 - Set `approach: gitops` in the automation manifest.
 
 **If `rhdp_published`:**
@@ -284,16 +291,18 @@ See @rhdp-publishing-house/skills/automation/references/ansible-automation-guide
 
 See @rhdp-publishing-house/skills/automation/references/gitops-automation-guide.md.
 
-- Clone from template: `gh repo create rhpds/<project-id>-gitops --template rhpds/ci-template-gitops --private --clone`
-- Create Helm charts for lab workloads under `tenant/labs/`
-- Add Application templates to `tenant/bootstrap/templates/`
-- Map manifest entries to Helm templates:
-  - `operators` → Infra layer operator charts (or use workloads_library)
-  - `applications` → Tenant Helm sub-charts (Pattern 2 or 3)
-  - `rbac` → Inline resources in bootstrap (Pattern 1)
-  - `seed_data` → ConfigMap/Secret templates in workload charts
-  - `broken_resources` → Templates with intentional misconfigurations
-  - `provision_data` → ConfigMap with `demo.redhat.com/tenant-*` label
+Generate code in `automation/` following the ci-template-gitops patterns. Do not clone the template — generate tailored code:
+- `cluster/infra/` — operator deployments (cluster-level, deployed once)
+- `tenant/bootstrap/` — per-user workloads (deployed per user or per namespace)
+- `tenant/labs/<project-id>/` — the lab's Helm chart
+
+Map manifest entries to the appropriate layer:
+  - `operators` → `cluster/infra/` Helm chart templates
+  - `applications` → `tenant/labs/<project-id>/` Helm chart (Pattern 2 or 3)
+  - `rbac` → Inline in `tenant/bootstrap/templates/` (Pattern 1) or in lab chart
+  - `seed_data` → ConfigMap/Secret templates in lab chart
+  - `broken_resources` → Templates with intentional misconfigurations in lab chart
+  - `provision_data` → ConfigMap with `demo.redhat.com/tenant-<name>: "true"` label in lab chart. **Showroom is always included** — provision_data must surface the Showroom URL and all per-user URLs so the lab guide can display them as `{attribute}` variables.
 
 **For `approach: both`:**
 
@@ -310,9 +319,9 @@ See @rhdp-publishing-house/skills/automation/references/gitops-automation-guide.
 - **Full:** Write all automation code. Run the code review cycle automatically.
   Present final results.
 
-### Step 7c-2: Safety Check
+### Step 7c-2: Safety Check and Blocker Worklog
 
-After writing automation code, run a quick safety check before proceeding:
+After writing automation code, run a quick safety check and write all blockers to the worklog.
 
 **"Don't hurt yourself" checklist:**
 - [ ] No hardcoded credentials, passwords, or API keys (use variables or vault)
@@ -325,7 +334,18 @@ After writing automation code, run a quick safety check before proceeding:
 **Re-validate catalog (if catalog item exists):**
 Re-run `agnosticv:validator` to verify workload references are consistent with the catalog configuration.
 
-**Note:** This is a safety check, not a full code review. The formal code review happens in the Code & Security Review phase — a separate gate with proper PR-based review. For `rhdp_published` projects, code review is required. For `self_published` projects, it is recommended but optional.
+**Write worklog entries for every pre-testing blocker found:**
+
+For each issue found in the checklist, write a worklog entry of type `action`. Examples:
+
+- Unpinned image tag → `"Pin image tag for <image> before testing. Currently using 'latest'. Find the digest or a stable release tag."`
+- Image doesn't exist yet → `"Build and push <image> to <registry> before testing. Image referenced in automation but not yet published."`
+- Content changes needed before editing → `"Update module-03 content: replace Postman with Hoppscotch (callback URL, UI steps). Required before editing phase."`
+- Pending handoff → `"AgnosticV catalog item pending handoff to <person>. Provide: [infrastructure type, operators, multi-user config]."`
+
+Invoke `rhdp-publishing-house:worklog` to write each entry. These become visible in "what's outstanding" and persist across sessions.
+
+**Note:** This is a safety check, not a full code review. The formal code review happens in the Code & Security Review phase. For `rhdp_published` projects, code review is required. For `self_published` projects, it is recommended but optional.
 
 ### Step 7c-3: Update Manifest
 
