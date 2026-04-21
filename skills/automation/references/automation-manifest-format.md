@@ -36,12 +36,27 @@ requirements. In that case, the agent validates the format and proceeds.
 # How this lab should be automated
 approach: ansible | gitops | both
 
-# Infrastructure base (from AgnosticV catalog or design spec)
+# Infrastructure base
 infrastructure:
-  type: ocp-cnv | ocp-aws | rhel-vms | sandbox-cluster | sandbox-tenant
+  # For rhdp_published projects (AgnosticV catalog):
+  #   ocp-cnv         — OCP on CNV (most common)
+  #   ocp-aws         — OCP on AWS
+  #   rhel-vms        — RHEL virtual machines
+  #   sandbox-cluster — RHDP Sandbox, one cluster per user
+  #   sandbox-tenant  — RHDP Sandbox, shared cluster with namespaces
+  #
+  # For self_published projects (Field Source CI):
+  #   field-per-user-cluster  — Each student gets their own OCP cluster.
+  #                             Use for admin-level labs (operator installs, cluster config).
+  #                             One user provisioned per deployment (num_users=1 effectively).
+  #   field-shared-cluster    — One cluster, N namespaces. num_users controls how many
+  #                             copies of tenant resources are deployed. Use for
+  #                             namespace-scoped labs where students don't interfere.
+  type: ocp-cnv | ocp-aws | rhel-vms | sandbox-cluster | sandbox-tenant | field-per-user-cluster | field-shared-cluster
+  topology: per-user-cluster | shared-cluster  # self_published only
   ocp_version: "4.17"             # If applicable
   multi_user: true                 # Does the lab support multiple concurrent users?
-  users_per_deployment: 25         # If multi_user
+  users_per_deployment: 25         # If multi_user; for field-shared-cluster, set by num_users at order time
 
 # Operators that must be installed BEFORE the lab starts.
 # These are operators the learner will USE, not install.
@@ -161,10 +176,11 @@ notes: |
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `type` | Yes | Infrastructure type from AgnosticV catalog |
+| `type` | Yes | Infrastructure type — see taxonomy in format header |
+| `topology` | self_published only | `per-user-cluster` or `shared-cluster` |
 | `ocp_version` | If OCP | Target OpenShift version |
 | `multi_user` | Yes | Whether the lab supports concurrent users |
-| `users_per_deployment` | If multi_user | Expected user count per deployment |
+| `users_per_deployment` | If multi_user | Expected user count; for `field-shared-cluster`, driven by `num_users` at order time |
 
 ### Operators, Applications, RBAC, Seed Data, Network, Broken Resources
 
