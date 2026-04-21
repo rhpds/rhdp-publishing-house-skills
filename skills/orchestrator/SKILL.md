@@ -117,7 +117,8 @@ Map user phrases to agent dispatch:
 | "start intake", "gather requirements"          | Dispatch `rhdp-publishing-house:intake`                                |
 | "write module N", "draft content", "start writing" | Dispatch `rhdp-publishing-house:writer` with the module number |
 | "edit module N", "review content", "technical edit" | Dispatch `rhdp-publishing-house:editor` with the module number (or "all") |
-| "build automation", "create catalog", "write ansible" | Dispatch `rhdp-publishing-house:automation` with sub-phase context |
+| "build automation", "create catalog", "write gitops" | Dispatch `rhdp-publishing-house:automation` with sub-phase context |
+| "worklog", "leave a note", "what's outstanding", "session summary" | Dispatch `rhdp-publishing-house:worklog` |
 | "security review", "check for secrets"         | Dispatch `rhdp-publishing-house:security` (Phase 4, not yet implemented) |
 | "final review", "ready to publish"             | Dispatch `rhdp-publishing-house:review` (Phase 4, not yet implemented) |
 | "what's next", "status", "where are we"        | Re-read manifest and present status (Step 2)                           |
@@ -145,12 +146,19 @@ Publishing House does not require end-to-end usage. Phases are either **required
 - **Writing** — skip if content was written manually or with another tool
 - **Automation** — skip if environment setup handled externally or not needed
 
-**Phase dependencies** (enforce these, not strict ordering):
-- Approval requires intake to be completed (need a spec to approve)
-- Writing requires approval (need an approved spec to write from)
-- Automation runs after writing (recommended) — content often changes to accommodate infrastructure, so do automation before editing to avoid editing twice
-- Editing requires content to exist in `content/` (agent-generated or manual) — runs after automation so content is finalized
-- Security review requires content to exist
+**Phase order** (enforce strictly):
+
+```
+Intake → [Vetting] → [Spec Refinement] → Approval → Writing → Automation → Editing → Code & Security Review → Final Review
+```
+
+- **Approval** requires intake to be completed
+- **Writing** requires approval — never start writing without an approved spec
+- **Automation** requires writing to be complete (or explicitly skipped) — you cannot build automation without knowing the exact steps in the lab guide; content often changes to accommodate infrastructure, so automation runs after writing and before editing
+- **Editing** requires both writing and automation to be complete (or skipped) — edit once, after content is finalized
+- **Security review** requires content to exist
+
+**After approval:** The next step is always **writing**. Do not suggest automation or editing immediately after approval.
 
 **Skipping a phase:** When a user says "skip writing" or "skip automation", set that
 phase's status to `skipped` in the manifest. Confirm first: "Skip [phase]? This means
