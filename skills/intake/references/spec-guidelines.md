@@ -14,8 +14,7 @@ A complete spec MUST have all of these:
 6. **Products & Technologies** — official Red Hat product names
 7. **Module Map** — table with module number, title, estimated duration
 8. **Prerequisites** — what the learner needs before starting
-9. **Infrastructure Requirements** — cluster type, operators, VMs, etc.
-10. **Automation Needed** — yes/no with brief description if yes
+9. **Environment** — what the learner sees when the lab starts (pre-deployed resources, no installs), plus whether automation is needed and what it must provision
 
 ## Optional Sections
 
@@ -44,8 +43,8 @@ A complete spec MUST have all of these:
 - Include version if relevant to the content
 - List upstream projects separately if the content covers them
 
-### Infrastructure Requirements
-- Be specific: "OCP 4.14+ cluster with 3 worker nodes" not just "OpenShift cluster"
-- List operators needed
-- Note any cloud provider requirements
-- Note any minimum resource requirements
+### Environment
+- **Learner view first** — describe what exists when the lab starts: "Pre-deployed: OCP cluster, RHBK via Operator, Quarkus sample app. Participants configure and use — no installs."
+- **Automation scope second** — state whether automation is needed and what it must provision: "Automation needed: Yes — RHBK Operator, Quarkus app deployment, starter realm with intentional gaps for the break/fix exercise."
+- Be specific about cluster requirements: "OCP 4.14+ cluster with 3 worker nodes" not just "OpenShift cluster"
+- If automation is not needed, say so explicitly: "Automation needed: No — all resources are pre-existing on the shared cluster."

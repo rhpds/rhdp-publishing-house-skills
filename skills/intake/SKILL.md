@@ -153,18 +153,24 @@ When user has a rough concept, ask these questions **ONE at a time** in this ord
 
 After the project repo is established, advise the user:
 
-> "Your project repo should remain **private** by default — it may contain sensitive comments, design decisions, and internal notes. The Showroom and automation repos should be **public** (or at least accessible to anyone who needs to deploy the content)."
+> "Your project repo should remain **private** — it may contain sensitive comments, design decisions, and internal notes. The Showroom and automation repos should be **public** (or accessible to anyone who needs to deploy the content)."
 
-Prompt for Showroom and automation repos:
+**Showroom is required by default.** Every project delivers a Showroom lab guide. Only skip if the user explicitly says they're not using Showroom.
 
-> "I need your Showroom content repo and automation repo URLs. These are cloned into your project workspace as subdirectories. If you haven't created them yet:
-> ```
-> gh repo create <org>/<project>-showroom --public --clone
-> gh repo create <org>/<project>-automation --public --clone
-> ```
-> Or provide existing repo URLs if you have them."
+Ask for the remote URLs of two repos:
 
-Record URLs in manifest under `integrations.showroom_repo` and `integrations.automation_repo`. Clone repos into the workspace's `content/` and `automation/` directories if not already present.
+> "I need the git remote URLs for your Showroom content repo and your automation repo. Create empty repos on GitHub first (no template needed — we'll initialize them), then give me the SSH URLs:
+> - Showroom repo: `git@github.com:<org>/<project>-showroom.git`
+> - Automation repo: `git@github.com:<org>/<project>-automation.git`"
+
+Once the user provides URLs:
+1. Record them in the manifest under `integrations.showroom_repo` and `integrations.automation_repo`
+2. Initialize each as a git submodule in the project workspace:
+   ```bash
+   git submodule add <showroom_url> content
+   git submodule add <automation_url> automation
+   ```
+3. Commit the submodule registration: `git add .gitmodules content automation && git commit -m "Add showroom and automation submodules"`
 
 ### Path C: RCARS Gap / Topic Seed
 
@@ -186,9 +192,10 @@ When user provides a content gap identified from RCARS or topic idea:
 - Type (workshop/demo)
 - Duration estimate (total and per-module)
 - Module outline (titles and summaries)
-- Infrastructure requirements (VMs, cloud, networking)
-- Automation decision (needs_automation: true/false)
 - Difficulty level
+- **Environment** — one section, two parts:
+  1. Learner view: what exists when the lab starts (pre-deployed resources, no installs required)
+  2. Automation scope: whether automation is needed and what it must provision
 
 **Module outline files must:**
 - Be named: `module-01-<short-title>.md`, `module-02-<short-title>.md`, etc.
