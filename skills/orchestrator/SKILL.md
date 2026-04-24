@@ -48,7 +48,7 @@ Proceed to the full routing logic below (Step 1 onward).
 
 ## Step 1: Project Discovery
 
-Check for `publishing-house/manifest.yaml` in the current working directory only. Do NOT scan subdirectories, walk up parent directories, or search the filesystem.
+Check if the file `publishing-house/manifest.yaml` exists in the current working directory. Use a direct file read — do NOT use glob, find, search patterns, or scan any subdirectories. The only path to check is exactly: `<CWD>/publishing-house/manifest.yaml`.
 
 **Found:** Set the current directory as the project root for all subsequent file reads and writes in this session. Proceed to Step 2.
 
