@@ -51,10 +51,13 @@ Find the project manifest. Check these two locations only — do NOT walk up par
 1. **Current working directory** — check for `publishing-house/manifest.yaml` in CWD.
 2. **Immediate subdirectories** — check one level of subdirectories of CWD for `publishing-house/manifest.yaml`.
 
-**Multiple found:** If step 2 finds more than one manifest, list them by project name and ask:
+**Multiple found:** If step 2 finds more than one manifest, list them by project name and include a "None of these" option:
 > "I found multiple Publishing House projects. Which one do you want to work on?"
 > 1. OCP Getting Started (ex-ocp4-getting-started/)
 > 2. DataSphere Workshop (ex-datasphere/)
+> 3. **None of these** — I'm working on a different project
+
+If the user selects "None of these", proceed to the **Not found** flow below.
 
 **Found:** Set the project root (the directory containing `publishing-house/`) as the working context for all subsequent file reads and writes in this session. Proceed to Step 2.
 
