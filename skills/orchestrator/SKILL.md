@@ -214,8 +214,9 @@ doc, dispatch the intake agent — it validates and normalizes the doc rather th
 from scratch. This is faster but still required.
 
 **Deployment mode behavior:**
-- For `self_published`: vetting is not available (RCARS integration pending). Code & Security Review is recommended but optional — inform the user.
+- For `self_published`: Code & Security Review is recommended but optional — inform the user.
 - For `rhdp_published`: all phases apply. Code & Security Review and Final Review are required gates.
+- **Vetting (RCARS)** is available for both deployment modes. Checking for content overlap is valuable regardless of how the content will be published.
 
 - **Post-writing decision:** When all writing modules are `drafted` or `approved`, present the user with a choice:
   > Writing is complete. The recommended next step is **automation** — infrastructure work often requires content changes (paths, hostnames, environment variables), so it's better to finalize content before editing.
