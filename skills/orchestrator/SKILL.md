@@ -46,18 +46,17 @@ Do NOT load reference docs or dispatch to other skills. This must be lightweight
 **For work queries** ("start writing", "build automation", "run the editor", "write module 3"):
 Proceed to the full routing logic below (Step 1 onward).
 
-## Step 1: Project Discovery
+## Step 1: Read the Manifest
 
-Run this exact command to check for a project in the current directory:
+Your FIRST action must be to run this exact bash command — no other command, no tool call, no file search:
 
 ```bash
 cat publishing-house/manifest.yaml 2>/dev/null || echo PH_NOT_FOUND
 ```
 
-- If the output contains `PH_NOT_FOUND`, the project was **not found** — proceed to the **Not found** section below.
-- If the output contains YAML content, the project was **found** — set the current directory as the project root for all subsequent file reads and writes in this session. Proceed to Step 2.
+**If the output is `PH_NOT_FOUND`:** There is no project here. Go directly to the **Not found** section below. Do NOT search for projects in subdirectories or anywhere else.
 
-**Do NOT run any other discovery commands.** No glob, no find, no searching subdirectories. This single command is the entire discovery step.
+**If the output is YAML content:** The project exists. Set the current directory as the project root. Proceed to Step 2.
 
 **Not found:** Present three options:
 
