@@ -55,13 +55,14 @@ Use the Read tool to read `publishing-house/manifest.yaml` in the current workin
 - **If the file exists:** Set the current directory as the project root. Proceed to Step 2.
 - **If the file does not exist:** Check immediate subdirectories for `<subdir>/publishing-house/manifest.yaml`. For example, if CWD is `~/devel/publishing-house/`, check paths like `ex-ocp4-getting-started/publishing-house/manifest.yaml`, `ex-ai-3-labs/publishing-house/manifest.yaml`, etc.
 
-**Multiple projects found:** List them by project name with a final "None of these" option:
+**Multiple projects found:** List ALL projects that have a `publishing-house/manifest.yaml` — including empty/new ones that haven't started intake yet. Show project name and phase. For new projects with no name, show "(new project — needs intake)". Always include a final "None of these" option:
 
 > I found multiple Publishing House projects. Which one do you want to work on?
 >
 > 1. OCP Getting Started (ex-ocp4-getting-started/) — phase: writing
 > 2. AI Observability (ex-ai-3-labs/) — phase: automation
-> 3. None of these — I'm working on a different project
+> 3. (ex-ph-sample/) — new project, needs intake
+> 4. None of these — I'm working on a different project
 
 If the user picks a project, set that subdirectory as the project root and proceed to Step 2. If they pick "None of these", proceed to the **Not found** flow.
 
