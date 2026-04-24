@@ -48,15 +48,12 @@ Proceed to the full routing logic below (Step 1 onward).
 
 ## Step 1: Read the Manifest
 
-Your FIRST action must be to run this exact bash command — no other command, no tool call, no file search:
+Your FIRST action must be to use the **Read tool** to read the file `publishing-house/manifest.yaml` (relative to the current working directory).
 
-```bash
-cat publishing-house/manifest.yaml 2>/dev/null || echo PH_NOT_FOUND
-```
+- **If the Read tool succeeds:** The project exists. Set the current directory as the project root. Proceed to Step 2.
+- **If the Read tool returns an error** (file not found): Go directly to the **Not found** section below.
 
-**If the output is `PH_NOT_FOUND`:** There is no project here. Go directly to the **Not found** section below. Do NOT search for projects in subdirectories or anywhere else.
-
-**If the output is YAML content:** The project exists. Set the current directory as the project root. Proceed to Step 2.
+**Do NOT use Bash, Glob, find, or any search tool in this step. One Read tool call. That is it.**
 
 **Not found:** Present three options:
 
