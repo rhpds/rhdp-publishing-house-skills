@@ -13,28 +13,20 @@ Or add the plugin directory to your Claude Code settings to load it automaticall
 
 ## Usage
 
-Run from anywhere — inside a project directory, a workspace root, or an IDE:
+Run from your project directory:
 
 ```
 /rhdp-publishing-house
 ```
 
-The orchestrator finds your project (walks up from the current directory), syncs the repo, and picks up where you left off.
-
-To start a new project, create one from the template first:
-
-```bash
-gh repo create my-new-lab \
-  --template rhpds/rhdp-publishing-house-template \
-  --private --clone
-```
+The orchestrator checks the current directory and immediate subdirectories for your project, syncs the repo, and picks up where you left off. If no project is found, it offers to locate it by path, clone it from a remote, or walk you through creating a new one from the template.
 
 ## Skills
 
 | Skill | Description |
 |-------|-------------|
-| `/rhdp-publishing-house` | Orchestrator — discovers project, syncs repo, reads state, routes to agents |
-| `/rhdp-publishing-house:intake` | Spec generation, RCARS vetting, spec refinement, repo setup |
+| `/rhdp-publishing-house` | Orchestrator — discovers project, syncs repo, reads state, manages repo setup at phase gates, routes to agents |
+| `/rhdp-publishing-house:intake` | Spec generation, RCARS vetting, spec refinement |
 | `/rhdp-publishing-house:writer` | Content writing (wraps Showroom skills, module-by-module) |
 | `/rhdp-publishing-house:editor` | Technical editing and quality review (wraps showroom:verify-content) |
 | `/rhdp-publishing-house:automation` | Automation requirements, catalog, code, and testing gate |

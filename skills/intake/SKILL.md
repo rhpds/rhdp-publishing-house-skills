@@ -151,26 +151,7 @@ When user has a rough concept, ask these questions **ONE at a time** in this ord
 
 ### Repo Setup
 
-After the project repo is established, advise the user:
-
-> "Your project repo should remain **private** — it may contain sensitive comments, design decisions, and internal notes. The Showroom and automation repos should be **public** (or accessible to anyone who needs to deploy the content)."
-
-**Showroom is required by default.** Every project delivers a Showroom lab guide. Only skip if the user explicitly says they're not using Showroom.
-
-Ask for the remote URLs of two repos:
-
-> "I need the git remote URLs for your Showroom content repo and your automation repo. Create empty repos on GitHub first (no template needed — we'll initialize them), then give me the SSH URLs:
-> - Showroom repo: `git@github.com:<org>/<project>-showroom.git`
-> - Automation repo: `git@github.com:<org>/<project>-automation.git`"
-
-Once the user provides URLs:
-1. Record them in the manifest under `integrations.showroom_repo` and `integrations.automation_repo`
-2. Initialize each as a git submodule in the project workspace:
-   ```bash
-   git submodule add <showroom_url> content
-   git submodule add <automation_url> automation
-   ```
-3. Commit the submodule registration: `git add .gitmodules content automation && git commit -m "Add showroom and automation submodules"`
+**Do NOT create Showroom or automation repos during intake.** The orchestrator handles repo creation at phase gates — Showroom is set up before the first writing dispatch, and automation before the first automation code dispatch. Intake only needs to capture the project requirements and generate the spec.
 
 ### Path C: RCARS Gap / Topic Seed
 
@@ -221,8 +202,8 @@ project:
   autonomy: "supervised" # or semi, full
 
 integrations:
-  showroom_repo: "https://github.com/org/project-showroom"
-  automation_repo: "https://github.com/org/project-automation"
+  showroom_repo: null   # Set by orchestrator before writing phase
+  automation_repo: null  # Set by orchestrator before automation phase
 
 lifecycle:
   current_phase: "vetting"
