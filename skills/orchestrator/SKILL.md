@@ -48,10 +48,12 @@ Proceed to the full routing logic below (Step 1 onward).
 
 ## Step 1: Find the Project
 
+Do NOT run git pull or any other commands before completing this step.
+
 Use the Read tool to read `publishing-house/manifest.yaml` in the current working directory.
 
 - **If the file exists:** Set the current directory as the project root. Proceed to Step 2.
-- **If the file does not exist:** Check immediate subdirectories (one level deep) for `publishing-house/manifest.yaml`.
+- **If the file does not exist:** Check immediate subdirectories for `<subdir>/publishing-house/manifest.yaml`. For example, if CWD is `~/devel/publishing-house/`, check paths like `ex-ocp4-getting-started/publishing-house/manifest.yaml`, `ex-ai-3-labs/publishing-house/manifest.yaml`, etc.
 
 **Multiple projects found:** List them by project name with a final "None of these" option:
 
@@ -369,7 +371,7 @@ lifecycle:
 
 ## Session Start
 
-When starting a session (after Project Discovery finds a manifest):
+After Step 1 finds a project and sets the project root, run these steps before proceeding to Step 2. Do NOT run these before Step 1 completes — the project root must be known first.
 
 1. **Sync the repo** — pull latest changes so you're working on current state:
    ```bash
