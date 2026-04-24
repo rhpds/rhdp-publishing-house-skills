@@ -48,9 +48,16 @@ Proceed to the full routing logic below (Step 1 onward).
 
 ## Step 1: Project Discovery
 
-Check if the file `publishing-house/manifest.yaml` exists in the current working directory. Use a direct file read — do NOT use glob, find, search patterns, or scan any subdirectories. The only path to check is exactly: `<CWD>/publishing-house/manifest.yaml`.
+Run this exact command to check for a project in the current directory:
 
-**Found:** Set the current directory as the project root for all subsequent file reads and writes in this session. Proceed to Step 2.
+```bash
+cat publishing-house/manifest.yaml 2>/dev/null || echo PH_NOT_FOUND
+```
+
+- If the output contains `PH_NOT_FOUND`, the project was **not found** — proceed to the **Not found** section below.
+- If the output contains YAML content, the project was **found** — set the current directory as the project root for all subsequent file reads and writes in this session. Proceed to Step 2.
+
+**Do NOT run any other discovery commands.** No glob, no find, no searching subdirectories. This single command is the entire discovery step.
 
 **Not found:** Present three options:
 
