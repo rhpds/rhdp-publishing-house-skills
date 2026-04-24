@@ -48,22 +48,9 @@ Proceed to the full routing logic below (Step 1 onward).
 
 ## Step 1: Project Discovery
 
-Find the project manifest. Check these two locations only — do NOT walk up parent directories or search the filesystem:
+Check for `publishing-house/manifest.yaml` in the current working directory only. Do NOT scan subdirectories, walk up parent directories, or search the filesystem.
 
-1. **Current working directory** — check for `publishing-house/manifest.yaml` in CWD.
-2. **Immediate subdirectories** — check one level of subdirectories of CWD for `publishing-house/manifest.yaml`.
-
-**Multiple found:** If step 2 finds more than one manifest, list them as a numbered text list. Always include a final "None of these" option:
-
-> I found multiple Publishing House projects. Which one do you want to work on?
->
-> 1. OCP Getting Started (ex-ocp4-getting-started/)
-> 2. DataSphere Workshop (ex-datasphere/)
-> 3. None of these — I'm working on a different project
-
-If the user picks "None of these", proceed to the **Not found** flow below.
-
-**Found:** Set the project root (the directory containing `publishing-house/`) as the working context for all subsequent file reads and writes in this session. Proceed to Step 2.
+**Found:** Set the current directory as the project root for all subsequent file reads and writes in this session. Proceed to Step 2.
 
 **Not found:** Present three options:
 
