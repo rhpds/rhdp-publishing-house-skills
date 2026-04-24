@@ -19,7 +19,7 @@ Run from your project directory:
 /rhdp-publishing-house
 ```
 
-The orchestrator checks the current directory and immediate subdirectories for your project, syncs the repo, and picks up where you left off. If no project is found, it offers to locate it by path, clone it from a remote, or walk you through creating a new one from the template.
+The orchestrator checks the current directory for your project manifest, syncs the repo, and picks up where you left off. If no project is found, it offers to locate it by path, clone it from a remote, or walk you through creating a new one from the template.
 
 ## Skills
 
