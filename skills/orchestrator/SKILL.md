@@ -221,6 +221,85 @@ from scratch. This is faster but still required.
 
 - If user requests an agent that hasn't been implemented yet (security, review agents), inform them: "The <agent name> agent is not yet available. It will be built in a future phase of the Publishing House plugin. For now, you can complete <phase> manually and update the manifest when done."
 
+## Pre-Dispatch Gates
+
+Before dispatching to an agent, check whether prerequisites are met. If not, walk the user through setup before dispatching.
+
+### Before dispatching to Writer
+
+Check `integrations.showroom_repo` in the manifest. If it is not null, the Showroom repo is already linked — proceed to dispatch.
+
+If null, the user needs to create a Showroom content repo first. Present instructions with manual steps first, `gh` CLI shortcut second. Use the project ID from `project.id` in the manifest for the suggested repo name:
+
+> **Your project needs a Showroom content repo before we can start writing.**
+>
+> Go to https://github.com/rhpds/showroom_template_nookbag and click **Use this template → Create a new repository**. Name it something like `<project-id>-showroom`, set it to **Public**, and create it.
+>
+> **Or with `gh`:**
+> ```
+> gh repo create <org>/<project-id>-showroom --template rhpds/showroom_template_nookbag --public
+> ```
+>
+> Once it's created, give me the SSH URL (e.g., `git@github.com:<org>/<repo-name>.git`).
+
+Once the user provides the SSH URL:
+
+1. Run `git submodule add <url> content` in the project root.
+2. Update `integrations.showroom_repo` in the manifest with the SSH URL.
+3. Commit and push:
+   ```bash
+   git add .gitmodules content publishing-house/manifest.yaml
+   git commit -m "Add Showroom content repo as submodule"
+   git push
+   ```
+4. Tell the user: "Done — your Showroom content is now linked at `content/`. Everything you write there gets pushed to your Showroom repo."
+5. Proceed to dispatch the writer agent.
+
+### Before dispatching to Automation (substep 7c)
+
+Check `integrations.automation_repo` in the manifest. If it is not null, the automation repo is already linked — proceed to dispatch.
+
+If null, the instructions depend on the automation approach in the manifest. Check `lifecycle.phases.automation.substeps` or the automation manifest at `publishing-house/spec/automation-manifest.yaml` for the `approach` field.
+
+**GitOps approach:**
+
+> **Your project needs an automation repo before we can start writing code.**
+>
+> Go to https://github.com/rhpds/ci-template-gitops and click **Use this template → Create a new repository**. Name it something like `<project-id>-automation`, set it to **Public**, and create it.
+>
+> **Or with `gh`:**
+> ```
+> gh repo create <org>/<project-id>-automation --template rhpds/ci-template-gitops --public
+> ```
+>
+> Once it's created, give me the SSH URL.
+
+**Ansible approach:**
+
+> **Your project needs an automation repo before we can start writing code.**
+>
+> Create a new empty repository named something like `<project-id>-automation`, set it to **Public**.
+>
+> **With `gh`:**
+> ```
+> gh repo create <org>/<project-id>-automation --public
+> ```
+>
+> Or create it manually on your git host. Once it's created, give me the SSH URL.
+
+Once the user provides the SSH URL:
+
+1. Run `git submodule add <url> automation` in the project root.
+2. Update `integrations.automation_repo` in the manifest with the SSH URL.
+3. Commit and push:
+   ```bash
+   git add .gitmodules automation publishing-house/manifest.yaml
+   git commit -m "Add automation repo as submodule"
+   git push
+   ```
+4. Tell the user: "Done — your automation code is now linked at `automation/`. Everything you write there gets pushed to your automation repo."
+5. Proceed to dispatch the automation agent.
+
 ## Dispatch Context
 
 When dispatching an agent, provide the specific file paths it needs to read. Agents must read these fresh — do not paste file contents into the dispatch.
