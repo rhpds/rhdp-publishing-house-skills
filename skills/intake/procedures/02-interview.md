@@ -14,7 +14,28 @@ If the user provides existing documents (design doc, Google Doc, outline, meetin
 
 ## Detect Entry Path
 
-Ask the user ONE question with three clear options:
+First check if `project.description` exists in `publishing-house/spec.yaml` and is non-empty.
+
+**If a description exists**, show it and offer four options:
+
+> I see this project description:
+>
+> *"{project.description}"*
+>
+> How would you like to proceed?
+>
+> 1. Use this description as our starting point
+> 2. I have a spec or design doc (file, URL, or paste)
+> 3. I have a different idea I want to develop
+> 4. I have a Jira issue with requirements
+
+- Option 1 → Path B (Idea), but pre-seeded: treat the description as the user's initial
+  answer to "Tell me about your idea." Extract what you can, then follow up on gaps.
+- Option 2 → Path A
+- Option 3 → Path B (fresh — ignore the description)
+- Option 4 → Path C
+
+**If no description exists**, fall back to the original three options:
 
 > How would you like to start?
 >
