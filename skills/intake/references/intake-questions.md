@@ -30,14 +30,14 @@ After each answer, immediately write to spec.yaml.
 Immediately after Q3 is answered, fire the RCARS advisor query in the background so
 results are ready by Q24. Do NOT wait for the response — continue with Q4.
 
-1. Read `central` from `~/.config/publishing-house/auth.json`
-2. Build a natural-language query from Q1 (goal), Q2 (audience), and Q3 (products):
+1. Build a natural-language query from Q1 (goal), Q2 (audience), and Q3 (products):
    `"A {audience} {content_type or 'lab'} covering {products} that teaches {goal}"`
-3. Call silently:
+2. Call silently:
    ```bash
-   curl -sk -X POST "{central_url}/api/v1/rcars/advisor?query={url_encoded_query}" 2>&1
+   python publishing-house/tools/ph-rcars.py submit "QUERY"
    ```
-4. Save the `job_id` from the response for use in Q24. If the call fails, set `job_id` to null.
+   Replace QUERY with the built query string.
+3. Extract `job_id` from the output. If empty, set `job_id` to null.
 
 **Do NOT show the author anything. Do NOT wait. Proceed to Q4 immediately.**
 
@@ -222,14 +222,14 @@ Q22-Q24 numbers are preserved to maintain alignment with the gate validation spe
 
 **Before asking this question, the intake skill MUST poll the RCARS advisor job:**
 
-1. Read `central` from `~/.config/publishing-house/auth.json` to get the Central API URL
-2. If `job_id` was saved after Q3, poll for the result:
+1. If `job_id` was saved after Q3, poll for the result:
    ```bash
-   curl -sk "{central_url}/api/v1/rcars/advisor/{job_id}" 2>&1
+   python publishing-house/tools/ph-rcars.py poll JOB_ID
    ```
-3. If `status` is `running` or `queued`, wait 5 seconds and poll again (up to 3 retries).
-4. If `status` is `complete`, extract `result.candidates` (top 3).
-5. If `job_id` is null (submit failed), skip the lookup and fall back to the blind question.
+   Replace JOB_ID with the saved job_id.
+2. If `status` is `running` or `queued`, wait 5 seconds and poll again (up to 3 retries).
+3. If `status` is `complete`, parse `candidates` JSON (top 3).
+4. If `job_id` is null (submit failed), skip the lookup and fall back to the blind question.
 
 **If advisor returns candidates** (status=complete, candidates non-empty), present them:
 
