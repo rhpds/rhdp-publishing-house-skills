@@ -155,8 +155,6 @@ If stage is not `intake` → show:
 
 **STOP — do not proceed.**
 
-If `rejection_source`, `rejection_reasons`, or `rejection_by` are present in the output, extract them. Do NOT mention rejection data if none is present — just move on silently.
-
 ### Step 5 — Load policy and references
 
 1. Fetch validation policy:
@@ -179,14 +177,8 @@ If `rejection_source`, `rejection_reasons`, or `rejection_by` are present in the
 
 ## Dispatch
 
-After pre-flight, choose the path:
+After pre-flight, follow the intake procedures:
 
-**If rejection data is present** (from Step 4):
-→ Follow `procedures/01-rejection-handler.md`
-  - If design.md structure changed (modules, objectives, scope) → continue from `procedures/04-module-outlines.md`, then `procedures/06-approval-and-submit.md`
-  - If only spec.yaml or wording changed → continue from `procedures/06-approval-and-submit.md`
-
-**Otherwise (fresh intake):**
 1. Follow `procedures/02-interview.md`
 2. Follow `procedures/03-design-doc.md`
 3. Follow `procedures/04-module-outlines.md`
