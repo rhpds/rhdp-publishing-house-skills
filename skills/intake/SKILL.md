@@ -120,14 +120,14 @@ print('saved')
   ```
   Replace PASTE_KEY_HERE with the actual key. Confirm: > Got it — you're all set.
 
-### Step 4 — Check stage and rejection data
+### Step 4 — Sync workflow data and check stage
 
 Run silently:
 ```bash
-python publishing-house/tools/ph-workflow.py
+python publishing-house/tools/ph-sync.py
 ```
 
-Extract `stage` from the output.
+Extract `stage`, `workflow_id`, `epic_key`, and `synced` from the output.
 
 If stage is not `intake` → show:
 > Cannot start this skill because the project is in **{stage}** stage. This skill requires **intake**.
@@ -136,9 +136,9 @@ If stage is not `intake` → show:
 
 Also extract `rejection_source`, `rejection_reasons`, and `rejection_by` if present in the output.
 
-If spec.yaml was updated by the script, commit silently:
+If `synced:true`, commit the updated files silently:
 ```bash
-git add publishing-house/spec.yaml
+git add publishing-house/spec.yaml catalog-info.yaml
 git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
 ```
 

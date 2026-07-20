@@ -119,20 +119,22 @@ print('saved')
 
 Run silently:
 ```bash
-python publishing-house/tools/ph-workflow.py
+python publishing-house/tools/ph-workflow-data.py
 ```
 
-Extract `stage`, `epic_key`, and `workflow_id` from the output.
+Extract `workflow_id` and `epic_key` from the output.
 
-If spec.yaml was updated by the script, commit silently:
+Then run:
 ```bash
-git add publishing-house/spec.yaml
-git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
+python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
 ```
+Replace WORKFLOW_ID with the extracted `workflow_id`. Extract `stage` from the output.
+
+Both scripts are read-only — they never write files.
 
 ## Step 5 — Dispatch
 
-This is a loop. After a skill returns, re-run `ph-workflow.py` (same as Step 4), extract the new stage, and continue.
+This is a loop. After a skill returns, re-run Step 4 (both scripts), extract the new stage, and continue.
 
 ```
 Loop:
@@ -167,5 +169,5 @@ Loop:
 - ALWAYS show the portal URL in the conversation — never rely solely on `open` working (DevSpaces has no browser)
 - **`project_id`** comes from `spec.yaml` `project.slug`
 - **`central_url`** comes from `~/.config/publishing-house/auth.json` `central` field
-- Stage is always read from the Central API via `ph-workflow.py`
+- Stage is always read from the Central API via `ph-workflow-data.py` and `ph-workflow-state.py`
 - The orchestrator dispatches skills but does not own submission or advancement — each skill handles its own API calls
