@@ -155,7 +155,7 @@ If stage is not `intake` → show:
 
 **STOP — do not proceed.**
 
-Also extract `rejection_source`, `rejection_reasons`, and `rejection_by` if present in the output.
+If `rejection_source`, `rejection_reasons`, or `rejection_by` are present in the output, extract them. Do NOT mention rejection data if none is present — just move on silently.
 
 ### Step 5 — Load policy and references
 
