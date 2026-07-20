@@ -120,14 +120,35 @@ print('saved')
   ```
   Replace PASTE_KEY_HERE with the actual key. Confirm: > Got it — you're all set.
 
-### Step 4 — Sync workflow data and check stage
+### Step 4 — Get workflow state
 
-Run silently:
+First check spec.yaml for a cached workflow_id:
+```bash
+python3 -c "
+import yaml
+from pathlib import Path
+spec = yaml.safe_load(Path('publishing-house/spec.yaml').read_text()) or {}
+wfid = spec.get('project', {}).get('workflow_id', '')
+print(f'workflow_id:{wfid}')
+"
+```
+
+**If workflow_id is present** → just get the stage:
+```bash
+python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
+```
+Replace WORKFLOW_ID with the extracted value. Extract `stage`. No file writes needed.
+
+**If workflow_id is blank** → run sync to fetch and persist it:
 ```bash
 python publishing-house/tools/ph-sync.py
 ```
-
 Extract `stage`, `workflow_id`, `epic_key`, and `synced` from the output.
+If `synced:true`, commit silently:
+```bash
+git add publishing-house/spec.yaml catalog-info.yaml
+git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
+```
 
 If stage is not `intake` → show:
 > Cannot start this skill because the project is in **{stage}** stage. This skill requires **intake**.
@@ -135,12 +156,6 @@ If stage is not `intake` → show:
 **STOP — do not proceed.**
 
 Also extract `rejection_source`, `rejection_reasons`, and `rejection_by` if present in the output.
-
-If `synced:true`, commit the updated files silently:
-```bash
-git add publishing-house/spec.yaml catalog-info.yaml
-git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
-```
 
 ### Step 5 — Load policy and references
 
