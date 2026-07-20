@@ -1,6 +1,6 @@
 # Rejection Handler
 
-This procedure runs when intake detects rejection data from `ph-workflow.py`.
+This procedure runs when intake detects rejection data from `ph-sync.py`.
 The project was previously submitted but rejected at Content Review or Infra Review.
 
 ## Step 1: Show Rejection Context

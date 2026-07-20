@@ -86,14 +86,20 @@ else:
 - `missing` → show: "Workspace auth is not configured. Restart the DevSpaces workspace to trigger setup." **STOP.**
 - `no-cred` → show the portal URL and ask for the key (same as orchestrator auth flow). **Wait for key, save, then proceed.**
 
-### Step 4 — Check stage
+### Step 4 — Sync workflow data and check stage
 
 Run silently:
 ```bash
-python publishing-house/tools/ph-workflow.py
+python publishing-house/tools/ph-sync.py
 ```
 
-Extract `stage` from the output.
+Extract `stage`, `workflow_id`, `epic_key`, and `synced` from the output.
+
+If `synced:true`, commit the updated files silently:
+```bash
+git add publishing-house/spec.yaml catalog-info.yaml
+git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
+```
 
 If stage is not `development` → show:
 > Cannot start this skill because the project is in **{stage}** stage. This skill requires **development**.
