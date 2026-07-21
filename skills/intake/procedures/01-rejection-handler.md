@@ -51,37 +51,71 @@ Present a brief summary so the author knows what they're working with.
 
 ## Step 4: Guided Resolution
 
-Walk through each **unresolved** reason one at a time:
-
-1. Show the reason text
-2. Show the relevant section of design.md or spec.yaml that relates to it
-3. Ask the author how they want to address it
-4. Apply the fix (update design.md, spec.yaml, or module outlines as needed)
-5. Mark the reason as `resolved: true` in spec.yaml
-6. Commit the change
-
-To mark a reason resolved, update spec.yaml directly — find the matching rejection_id
-and reason id, set `resolved: true`.
+Walk through each **unresolved** reason one at a time.
 
 **Do NOT re-run the full interview.** The spec already exists. Only fix what was rejected.
 
-## Step 5: Commit and Determine Re-entry Point
+For each unresolved reason:
 
-After all unresolved reasons are addressed:
+1. Show the reason text
+2. Show the relevant section of spec.yaml, design.md, or module outlines that relates to it
+3. Discuss with the author how to address it — this is a conversation, not a find-and-replace
+4. Apply the agreed fix to spec.yaml
+5. Mark the reason as `resolved: true` in spec.yaml (find the matching rejection_id and reason id)
+
+To mark a reason resolved, update spec.yaml directly — set `resolved: true` on the matching reason.
+
+Commit after each reason:
+```bash
+git add publishing-house/spec.yaml
+git diff --cached --quiet || git commit -m "fix: resolve rejection reason — {brief description}" 2>/dev/null || true
+```
+
+## Step 5: Update Design Doc
+
+After all reasons are resolved in spec.yaml, the design doc must reflect the changes.
+
+**Do NOT do a find-and-replace.** Read the full design doc, understand what changed in spec.yaml, and rewrite the affected sections so the design doc is coherent with the new spec values.
+
+For example, if `cloud_provider` changed from `aws` to `cnv`:
+- The Infrastructure Requirements section needs rewriting (not just swapping a word)
+- The Environment section may describe AWS-specific services that no longer apply
+- Cluster sizing assumptions may change
+- Automation approach may differ
+
+1. Read `publishing-house/spec/design.md`
+2. Identify every section affected by the spec.yaml changes
+3. Rewrite those sections to be consistent with the updated spec
+4. Present the updated design doc to the author for confirmation
+5. Apply the changes after confirmation
 
 ```bash
-git add publishing-house/spec.yaml publishing-house/spec/
-git diff --cached --quiet || git commit -m "fix: address review rejection feedback" 2>/dev/null || true
+git add publishing-house/spec/design.md
+git diff --cached --quiet || git commit -m "fix: update design doc to reflect rejection changes" 2>/dev/null || true
 ```
+
+## Step 6: Update Module Outlines
+
+Module outlines may reference infrastructure, products, or assumptions that changed.
+
+1. Read each module outline in `publishing-house/spec/modules/`
+2. For each module, check if any content references values that changed (infrastructure, cloud provider, products, commands, environment details)
+3. If a module is affected, rewrite the affected sections — steps, infrastructure notes, commands, and context paragraphs should reflect the new reality
+4. Present each updated module to the author for confirmation before writing
+
+```bash
+git add publishing-house/spec/modules/
+git diff --cached --quiet || git commit -m "fix: update module outlines to reflect rejection changes" 2>/dev/null || true
+```
+
+If no modules are affected, skip this step and say so.
+
+## Step 7: Final Confirmation and Resubmit
+
+After spec.yaml, design.md, and module outlines are all consistent:
 
 Ask the author:
 
-> "All rejection feedback has been addressed. Ready to resubmit for review?"
+> "All rejection feedback has been addressed and the design doc and modules have been updated. Ready to resubmit for review?"
 
-If confirmed, determine what changed and where to rejoin:
-
-- **If design.md structure changed** (modules added/removed, learning objectives rewritten, scope changed):
-  → Continue from `procedures/04-module-outlines.md` to update affected outlines, then `procedures/06-approval-and-submit.md`
-
-- **If only spec.yaml changed** (infra settings, audience, duration) or design.md wording changed (no structural impact):
-  → Continue from `procedures/06-approval-and-submit.md` to resubmit
+If confirmed → continue from `procedures/06-approval-and-submit.md` to resubmit.
