@@ -176,11 +176,12 @@ If stage is not `intake` → show:
 
 ## Dispatch
 
-After pre-flight, check the `unresolved_rejections` count from `ph-sync.py` output:
+**CRITICAL: You MUST check `unresolved_rejections` from Step 4 output BEFORE doing anything else.**
 
-**If `unresolved_rejections` > 0:**
+**If `unresolved_rejections` > 0 → STOP. Do NOT run the interview. Do NOT submit.**
 1. Follow `procedures/01-rejection-handler.md` — address unresolved feedback first
 2. The rejection handler determines the re-entry point (module outlines or submit)
+3. Do NOT skip the rejection handler even if the spec looks complete
 
 **If `unresolved_rejections` is 0 (fresh intake or all rejections resolved):**
 1. Follow `procedures/02-interview.md`
