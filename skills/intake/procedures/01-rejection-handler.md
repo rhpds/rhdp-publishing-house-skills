@@ -73,49 +73,18 @@ git diff --cached --quiet || git commit -m "fix: resolve rejection reason — {b
 
 ## Step 5: Update Design Doc
 
-After all reasons are resolved in spec.yaml, the design doc must reflect the changes.
+The design doc must reflect the spec.yaml changes. This is not a find-and-replace — the design doc needs to be reworked so it reads coherently with the updated spec values.
 
-**Do NOT do a find-and-replace.** Read the full design doc, understand what changed in spec.yaml, and rewrite the affected sections so the design doc is coherent with the new spec values.
-
-For example, if `cloud_provider` changed from `aws` to `cnv`:
-- The Infrastructure Requirements section needs rewriting (not just swapping a word)
-- The Environment section may describe AWS-specific services that no longer apply
-- Cluster sizing assumptions may change
-- Automation approach may differ
-
-1. Read `publishing-house/spec/design.md`
-2. Identify every section affected by the spec.yaml changes
-3. Rewrite those sections to be consistent with the updated spec
-4. Present the updated design doc to the author for confirmation
-5. Apply the changes after confirmation
-
-```bash
-git add publishing-house/spec/design.md
-git diff --cached --quiet || git commit -m "fix: update design doc to reflect rejection changes" 2>/dev/null || true
-```
+Follow `procedures/03-design-doc.md` to update the design doc. The procedure will read the current spec.yaml values, identify sections that are inconsistent, rewrite them, and confirm with the author.
 
 ## Step 6: Update Module Outlines
 
-Module outlines may reference infrastructure, products, or assumptions that changed.
+Module outlines may reference infrastructure, products, commands, or assumptions that changed in the spec.
 
-1. Read each module outline in `publishing-house/spec/modules/`
-2. For each module, check if any content references values that changed (infrastructure, cloud provider, products, commands, environment details)
-3. If a module is affected, rewrite the affected sections — steps, infrastructure notes, commands, and context paragraphs should reflect the new reality
-4. Present each updated module to the author for confirmation before writing
+Follow `procedures/04-module-outlines.md` to update affected module outlines. The procedure will check each module against the updated spec and design doc, rewrite affected sections, and confirm with the author.
 
-```bash
-git add publishing-house/spec/modules/
-git diff --cached --quiet || git commit -m "fix: update module outlines to reflect rejection changes" 2>/dev/null || true
-```
+## Step 7: Submit
 
-If no modules are affected, skip this step and say so.
+All rejection feedback is resolved and the design doc and modules are consistent.
 
-## Step 7: Final Confirmation and Resubmit
-
-After spec.yaml, design.md, and module outlines are all consistent:
-
-Ask the author:
-
-> "All rejection feedback has been addressed and the design doc and modules have been updated. Ready to resubmit for review?"
-
-If confirmed → continue from `procedures/06-approval-and-submit.md` to resubmit.
+Follow `procedures/06-approval-and-submit.md` to resubmit for review.
