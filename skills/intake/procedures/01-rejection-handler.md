@@ -57,19 +57,22 @@ Loop through each **unresolved** reason one at a time.
 
 **Do NOT mark reasons as resolved yet.** That happens after everything is updated and confirmed.
 
+As you work through reasons, build a **change tracker** — a list of what changed and where, used to drive Steps 6–7.
+
 For each unresolved reason:
 
 1. Show the reason text
-2. Determine what it affects — it may be a spec.yaml field, a design.md section, a module outline, or a combination
+2. Classify what it affects:
+   - **Spec** — a spec.yaml field (cloud_provider, sizing, products, topology, etc.)
+   - **Content** — design.md prose or module outline content (learning objectives, steps, prerequisites)
+   - **Both** — spec field change that also affects content
 3. Show the relevant section(s) from the affected file(s)
 4. Discuss with the author how to address it
-5. Apply the agreed fix to the appropriate file(s):
-   - **Spec change** (e.g. cloud_provider, sizing, products) → update spec.yaml
-   - **Content change** (e.g. "learning objectives are too vague", "missing prerequisites") → update the module outline or design.md directly
-   - **Both** (e.g. "wrong infrastructure and module steps don't match") → update both
-6. Move to the next reason
+5. If spec.yaml needs updating → apply the fix to spec.yaml now
+6. Record the change in the tracker: `{reason} → {what changed} → {affects: spec / design / modules / all}`
+7. Move to the next reason
 
-Do NOT commit yet — all changes are applied first.
+Do NOT update design.md or module outlines yet — that happens in Step 6 using the tracker. Only spec.yaml is updated in this step.
 
 ## Step 5: Confirm Resolution
 
@@ -84,13 +87,18 @@ After all reasons have been addressed, summarize what changed and where:
 - **If no** or has more changes → go back to the relevant reason in Step 4
 - **If yes** → commit and continue
 
-## Step 6: Cascade Updates
+## Step 6: Update Design Doc and Modules
 
-Changes in one file may require updates to others for consistency. Check and update as needed:
+Use the change tracker from Step 4 to determine what needs updating.
 
-- **If spec.yaml changed** → follow `procedures/03-design-doc.md` (Re-intake After Rejection section) to update the design doc, then follow `procedures/04-module-outlines.md` (Re-intake After Rejection section) to update affected module outlines
-- **If design.md changed** (directly or via spec cascade) → follow `procedures/04-module-outlines.md` (Re-intake After Rejection section) to update affected module outlines
-- **If only module outlines changed** → no cascade needed
+**If any change affects design.md** (spec changes that cascade, or direct content feedback):
+→ Follow `procedures/03-design-doc.md` (Re-intake After Rejection section). Use the tracker to tell it exactly what changed and why.
+
+**If any change affects module outlines** (spec changes that cascade, design changes that cascade, or direct content feedback):
+→ Follow `procedures/04-module-outlines.md` (Re-intake After Rejection section). Use the tracker to identify which modules are affected and what to fix.
+
+**If only spec.yaml changed with no impact on design or modules** (e.g. a metadata-only field):
+→ Skip this step.
 
 Commit all changes:
 ```bash
