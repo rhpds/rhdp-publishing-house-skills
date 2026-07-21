@@ -6,18 +6,18 @@
 
 Run silently:
 ```bash
-command -v python3 >/dev/null 2>&1 && echo "PYTHON:python3" || command -v python >/dev/null 2>&1 && echo "PYTHON:python" || echo "PYTHON:none"
+command -v python >/dev/null 2>&1 && echo "PYTHON:python" || command -v python3 >/dev/null 2>&1 && echo "PYTHON:python3" || echo "PYTHON:none"
 ```
 
 Extract the python command from the `PYTHON:` line. If `none` → show: "No python found. Install Python 3 and try again." **STOP.**
 
-Use this command (`python3` or `python`) for **all** python calls in this skill session. The remaining steps in pre-flight use `python3` in code blocks — substitute with whichever was detected.
+Use this command (`python` or `python3`) for **all** python calls in this skill session. The remaining steps in pre-flight use `python` in code blocks — substitute with whichever was detected.
 
 ## Step 1 — Verify this is a Publishing House project
 
 Run silently:
 ```bash
-python3 -c "
+python -c "
 from pathlib import Path
 ci = Path('catalog-info.yaml')
 spec = Path('publishing-house/spec.yaml')
@@ -45,7 +45,7 @@ else:
 
 Run silently:
 ```bash
-python3 -c "
+python -c "
 import yaml
 from pathlib import Path
 spec = yaml.safe_load(Path('publishing-house/spec.yaml').read_text()) or {}
@@ -60,7 +60,7 @@ Extract `project_id`. If empty → show error: "`project.slug` is missing in `sp
 
 Run silently:
 ```bash
-python3 -c "
+python -c "
 import json, os, yaml
 f = os.path.expanduser('~/.config/publishing-house/auth.json')
 if os.path.exists(f):
@@ -106,13 +106,13 @@ Extract `central_url` from the `central:` line.
 
   Then try to open the browser (works locally, silently fails in DevSpaces):
   ```bash
-  python3 -c "import subprocess; subprocess.Popen(['open', 'CENTRAL_URL'])" 2>/dev/null || true
+  python -c "import subprocess; subprocess.Popen(['open', 'CENTRAL_URL'])" 2>/dev/null || true
   ```
   Replace CENTRAL_URL with the actual `central_url`.
 
   Wait for the author to paste the key. Once received, save it:
   ```bash
-  python3 -c "
+  python -c "
 import json, os
 key = 'PASTE_KEY_HERE'
 path = os.path.expanduser('~/.config/publishing-house/auth.json')
