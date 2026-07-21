@@ -111,7 +111,7 @@ results are ready by Q24. Do NOT wait for the response — continue with Q4.
 - If the user confirms your proposal without changes, apply the proposed values.
 
 **Control plane sizing (auto-derived, do not ask the user):**
-- `control_plane_instance_count`: always 3
+- `control_plane_instance_count`: 1 if sno, 3 if multinode
 - `control_plane_cpu`: 32 if sno, 16 if multinode
 - `control_plane_ram_gb`: 128 if sno, 64 if multinode
 
