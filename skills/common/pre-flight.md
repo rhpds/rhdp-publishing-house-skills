@@ -2,6 +2,17 @@
 
 **ALWAYS complete these steps before any skill-specific work.**
 
+## Step 0 — Detect python
+
+Run silently:
+```bash
+command -v python3 >/dev/null 2>&1 && echo "PYTHON:python3" || command -v python >/dev/null 2>&1 && echo "PYTHON:python" || echo "PYTHON:none"
+```
+
+Extract the python command from the `PYTHON:` line. If `none` → show: "No python found. Install Python 3 and try again." **STOP.**
+
+Use this command (`python3` or `python`) for **all** python calls in this skill session. The remaining steps in pre-flight use `python3` in code blocks — substitute with whichever was detected.
+
 ## Step 1 — Verify this is a Publishing House project
 
 Run silently:
