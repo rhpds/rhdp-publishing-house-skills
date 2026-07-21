@@ -60,44 +60,45 @@ Loop through each **unresolved** reason one at a time.
 For each unresolved reason:
 
 1. Show the reason text
-2. Show the relevant section of spec.yaml that relates to it
-3. Discuss with the author how to address it — this is a conversation, not a find-and-replace
-4. Apply the agreed fix to spec.yaml
-5. Move to the next reason
+2. Determine what it affects — it may be a spec.yaml field, a design.md section, a module outline, or a combination
+3. Show the relevant section(s) from the affected file(s)
+4. Discuss with the author how to address it
+5. Apply the agreed fix to the appropriate file(s):
+   - **Spec change** (e.g. cloud_provider, sizing, products) → update spec.yaml
+   - **Content change** (e.g. "learning objectives are too vague", "missing prerequisites") → update the module outline or design.md directly
+   - **Both** (e.g. "wrong infrastructure and module steps don't match") → update both
+6. Move to the next reason
 
-Do NOT commit yet — all spec.yaml changes are applied in memory first.
+Do NOT commit yet — all changes are applied first.
 
 ## Step 5: Confirm Resolution
 
-After all reasons have been addressed, summarize the changes:
+After all reasons have been addressed, summarize what changed and where:
 
-> **Here's what changed in the spec:**
-> 1. {reason text} → {what was changed}
-> 2. {reason text} → {what was changed}
+> **Here's what was changed:**
+> 1. {reason text} → {what was changed and in which file}
+> 2. {reason text} → {what was changed and in which file}
 >
 > **Are you happy with these changes?**
 
 - **If no** or has more changes → go back to the relevant reason in Step 4
-- **If yes** → commit and continue:
+- **If yes** → commit and continue
 
+## Step 6: Cascade Updates
+
+Changes in one file may require updates to others for consistency. Check and update as needed:
+
+- **If spec.yaml changed** → follow `procedures/03-design-doc.md` (Re-intake After Rejection section) to update the design doc, then follow `procedures/04-module-outlines.md` (Re-intake After Rejection section) to update affected module outlines
+- **If design.md changed** (directly or via spec cascade) → follow `procedures/04-module-outlines.md` (Re-intake After Rejection section) to update affected module outlines
+- **If only module outlines changed** → no cascade needed
+
+Commit all changes:
 ```bash
-git add publishing-house/spec.yaml
-git diff --cached --quiet || git commit -m "fix: address rejection feedback in spec" 2>/dev/null || true
+git add publishing-house/spec.yaml publishing-house/spec/
+git diff --cached --quiet || git commit -m "fix: address rejection feedback" 2>/dev/null || true
 ```
 
-## Step 6: Update Design Doc
-
-The design doc must reflect the spec.yaml changes. This is not a find-and-replace — the design doc needs to be reworked so it reads coherently with the new values.
-
-Follow `procedures/03-design-doc.md` (Re-intake After Rejection section) to update the design doc.
-
-## Step 7: Update Module Outlines
-
-Module outlines may reference infrastructure, products, commands, or assumptions that changed.
-
-Follow `procedures/04-module-outlines.md` (Re-intake After Rejection section) to update affected module outlines.
-
-## Step 8: Mark Resolved and Submit
+## Step 7: Mark Resolved and Submit
 
 Mark every addressed rejection reason as `resolved: true` in spec.yaml.
 
