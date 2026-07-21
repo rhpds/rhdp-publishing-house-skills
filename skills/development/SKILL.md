@@ -69,7 +69,7 @@ Extract `project_id`. If empty → **STOP.**
 Run silently:
 ```bash
 python3 -c "
-import json, os
+import json, os, yaml
 f = os.path.expanduser('~/.config/publishing-house/auth.json')
 if os.path.exists(f):
     d = json.load(open(f))
@@ -78,12 +78,29 @@ if os.path.exists(f):
     print(f'cred:{cred[:8]}' if cred else 'no-cred')
     print(f'central:{central}')
 else:
-    print('missing')
+    central = ''
+    try:
+        ci = yaml.safe_load(open('catalog-info.yaml'))
+        for link in ci.get('metadata', {}).get('links', []):
+            if link.get('title') == 'Central':
+                central = link['url']
+                break
+    except Exception:
+        pass
+    if central:
+        os.makedirs(os.path.dirname(f), exist_ok=True)
+        with open(f, 'w') as fh:
+            json.dump({'central': central}, fh, indent=2)
+        os.chmod(f, 0o600)
+        print('no-cred')
+        print(f'central:{central}')
+    else:
+        print('no-central')
 "
 ```
 
 - Has `cred:` and `central:` → proceed.
-- `missing` → show: "Workspace auth is not configured. Restart the DevSpaces workspace to trigger setup." **STOP.**
+- `no-central` → show: "Cannot find Central API URL. Check that `catalog-info.yaml` has a **Central** link." **STOP.**
 - `no-cred` → show the portal URL and ask for the key (same as orchestrator auth flow). **Wait for key, save, then proceed.**
 
 ### Step 4 — Get workflow state
