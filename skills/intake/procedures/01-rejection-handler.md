@@ -55,20 +55,19 @@ Walk through each **unresolved** reason one at a time.
 
 **Do NOT re-run the full interview.** The spec already exists. Only fix what was rejected.
 
+**Do NOT mark reasons as resolved yet.** That happens in Step 7 after everything is updated.
+
 For each unresolved reason:
 
 1. Show the reason text
 2. Show the relevant section of spec.yaml, design.md, or module outlines that relates to it
 3. Discuss with the author how to address it — this is a conversation, not a find-and-replace
 4. Apply the agreed fix to spec.yaml
-5. Mark the reason as `resolved: true` in spec.yaml (find the matching rejection_id and reason id)
 
-To mark a reason resolved, update spec.yaml directly — set `resolved: true` on the matching reason.
-
-Commit after each reason:
+Commit the spec changes:
 ```bash
 git add publishing-house/spec.yaml
-git diff --cached --quiet || git commit -m "fix: resolve rejection reason — {brief description}" 2>/dev/null || true
+git diff --cached --quiet || git commit -m "fix: address rejection feedback in spec" 2>/dev/null || true
 ```
 
 ## Step 5: Update Design Doc
@@ -83,8 +82,13 @@ Module outlines may reference infrastructure, products, commands, or assumptions
 
 Follow `procedures/04-module-outlines.md` to update affected module outlines. The procedure will check each module against the updated spec and design doc, rewrite affected sections, and confirm with the author.
 
-## Step 7: Submit
+## Step 7: Mark Resolved and Submit
 
-All rejection feedback is resolved and the design doc and modules are consistent.
+Now that spec.yaml, design.md, and module outlines are all consistent, mark every addressed rejection reason as `resolved: true` in spec.yaml.
+
+```bash
+git add publishing-house/spec.yaml
+git diff --cached --quiet || git commit -m "fix: mark rejection reasons as resolved" 2>/dev/null || true
+```
 
 Follow `procedures/06-approval-and-submit.md` to resubmit for review.
