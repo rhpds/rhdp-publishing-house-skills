@@ -21,140 +21,44 @@ self-sufficient — it works whether dispatched by the orchestrator or invoked d
 
 **Do NOT use** MCP tools. All external interactions go through `publishing-house/tools/` scripts.
 
-## Pre-flight
+## Steps 1–3 — Pre-flight
 
-**ALWAYS complete these steps first.**
+Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
 
-### Step 1 — Verify this is a Publishing House project
+### Step 4 — Get workflow data
 
-Run silently:
+Fetch workflow data (includes rejection info if any):
 ```bash
-python3 -c "
-from pathlib import Path
-ci = Path('catalog-info.yaml')
-spec = Path('publishing-house/spec.yaml')
-if ci.exists() and spec.exists():
-    print('ok')
-elif not ci.exists():
-    print('no-catalog')
-else:
-    print('no-spec')
-"
+python publishing-house/tools/ph-workflow-data.py
 ```
+Extract `workflow_id` and `epic_key` from the output.
 
-- `ok` → proceed.
-- `no-catalog` → show:
-  > This doesn't look like a Publishing House project — `catalog-info.yaml` is missing.
-  >
-  > Projects must be created through the **RHDH Developer Hub** template. Open RHDH, choose the **Publishing House Content Project** template, and fill in the form.
+### Step 5 — Sync data to files
 
-  **STOP.**
-- `no-spec` → show: "`publishing-house/spec.yaml` is missing. This repo may not have been scaffolded correctly." **STOP.**
-
-### Step 2 — Read project identity
-
-Run silently:
-```bash
-python3 -c "
-import yaml
-from pathlib import Path
-spec = yaml.safe_load(Path('publishing-house/spec.yaml').read_text()) or {}
-pid = spec.get('project', {}).get('slug', '')
-print(f'project_id:{pid}')
-"
-```
-
-Extract `project_id`. If empty → show error: "`project.slug` is missing in `spec.yaml`." **STOP.**
-
-### Step 3 — Check auth
-
-Run silently:
-```bash
-python3 -c "
-import json, os, yaml
-f = os.path.expanduser('~/.config/publishing-house/auth.json')
-if os.path.exists(f):
-    d = json.load(open(f))
-    cred = d.get('credential', '')
-    central = d.get('central', '')
-    print(f'cred:{cred[:8]}' if cred else 'no-cred')
-    print(f'central:{central}')
-else:
-    central = ''
-    try:
-        ci = yaml.safe_load(open('catalog-info.yaml'))
-        for link in ci.get('metadata', {}).get('links', []):
-            if link.get('title') == 'Central':
-                central = link['url']
-                break
-    except Exception:
-        pass
-    if central:
-        os.makedirs(os.path.dirname(f), exist_ok=True)
-        with open(f, 'w') as fh:
-            json.dump({'central': central}, fh, indent=2)
-        os.chmod(f, 0o600)
-        print('no-cred')
-        print(f'central:{central}')
-    else:
-        print('no-central')
-"
-```
-
-Extract `central_url` from the `central:` line.
-
-- Has `cred:` and `central:` → proceed.
-- `no-central` → show: "Cannot find Central API URL. Check that `catalog-info.yaml` has a **Central** link." **STOP.**
-- `no-cred` → show:
-
-  > **You need a Publishing House API key.**
-  >
-  > Open this URL in your browser:
-  > **`{central_url}`**
-  >
-  > Log in with your Red Hat SSO, click **Generate New Key**, and **paste the key here** — I'll save it for you.
-
-  Then try to open the browser:
-  ```bash
-  python3 -c "import subprocess; subprocess.Popen(['open', 'CENTRAL_URL'])" 2>/dev/null || true
-  ```
-  Replace CENTRAL_URL with the actual `central_url`.
-
-  Wait for the author to paste the key. Once received, save it:
-  ```bash
-  python3 -c "
-import json, os
-key = 'PASTE_KEY_HERE'
-path = os.path.expanduser('~/.config/publishing-house/auth.json')
-d = json.load(open(path)) if os.path.exists(path) else {}
-d['credential'] = key
-os.makedirs(os.path.dirname(path), exist_ok=True)
-with open(path, 'w') as f:
-    json.dump(d, f, indent=2)
-os.chmod(path, 0o600)
-print('saved')
-"
-  ```
-  Replace PASTE_KEY_HERE with the actual key. Confirm: > Got it — you're all set.
-
-### Step 4 — Sync workflow data
-
-Run sync to fetch current workflow state, persist workflow_id/epic_key if not already set, and pull any rejections:
+Sync workflow data to local files (writes rejections to spec.yaml, persists workflow_id/epic_key):
 ```bash
 python publishing-house/tools/ph-sync.py
 ```
-Extract `stage`, `workflow_id`, `epic_key`, and `unresolved_rejections` from the output. Commit any changes:
+Extract `unresolved_rejections` from the output. Commit any changes:
 ```bash
 git add publishing-house/spec.yaml catalog-info.yaml
 git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
 ```
+
+### Step 6 — Get workflow state
+
+Get the current workflow stage:
+```bash
+python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
+```
+Replace WORKFLOW_ID with the `workflow_id` from Step 4. Extract `stage`.
 
 If stage is not `intake` → show:
 > Cannot start this skill because the project is in **{stage}** stage. This skill requires **intake**.
 
 **STOP — do not proceed.**
 
-### Step 5 — Load policy and references
+### Step 7 — Load policy and references
 
 1. Fetch validation policy:
    ```bash
@@ -176,9 +80,9 @@ If stage is not `intake` → show:
 
 ## Dispatch
 
-**CRITICAL: You MUST check `unresolved_rejections` from Step 4 output BEFORE doing anything else.**
+Stage is confirmed as `intake`. Now check `unresolved_rejections` from Step 5.
 
-**If `unresolved_rejections` > 0 → STOP. Do NOT run the interview. Do NOT submit.**
+**If `unresolved_rejections` > 0 → Do NOT run the interview. Do NOT submit.**
 1. Follow `procedures/01-rejection-handler.md` — address unresolved feedback first
 2. The rejection handler determines the re-entry point (module outlines or submit)
 3. Do NOT skip the rejection handler even if the spec looks complete

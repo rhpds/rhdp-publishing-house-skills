@@ -21,106 +21,31 @@ self-sufficient — it works whether dispatched by the orchestrator or invoked d
 
 **Do NOT use** MCP tools. All external interactions go through `publishing-house/tools/` scripts.
 
-## Pre-flight
+## Steps 1–3 — Pre-flight
 
-**ALWAYS complete these steps first.**
+Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
 
-### Step 1 — Verify this is a Publishing House project
+### Step 4 — Get workflow data
 
-Run silently:
+Fetch workflow data:
 ```bash
-python3 -c "
-from pathlib import Path
-ci = Path('catalog-info.yaml')
-spec = Path('publishing-house/spec.yaml')
-if ci.exists() and spec.exists():
-    print('ok')
-elif not ci.exists():
-    print('no-catalog')
-else:
-    print('no-spec')
-"
+python publishing-house/tools/ph-workflow-data.py
 ```
+Extract `workflow_id` and `epic_key` from the output.
 
-- `ok` → proceed.
-- `no-catalog` → show:
-  > This doesn't look like a Publishing House project — `catalog-info.yaml` is missing.
+### Step 5 — Get workflow state
 
-  **STOP.**
-- `no-spec` → show: "`publishing-house/spec.yaml` is missing." **STOP.**
-
-### Step 2 — Read project identity
-
-Run silently:
 ```bash
-python3 -c "
-import yaml
-from pathlib import Path
-spec = yaml.safe_load(Path('publishing-house/spec.yaml').read_text()) or {}
-pid = spec.get('project', {}).get('slug', '')
-print(f'project_id:{pid}')
-"
+python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
 ```
-
-Extract `project_id`. If empty → **STOP.**
-
-### Step 3 — Check auth
-
-Run silently:
-```bash
-python3 -c "
-import json, os, yaml
-f = os.path.expanduser('~/.config/publishing-house/auth.json')
-if os.path.exists(f):
-    d = json.load(open(f))
-    cred = d.get('credential', '')
-    central = d.get('central', '')
-    print(f'cred:{cred[:8]}' if cred else 'no-cred')
-    print(f'central:{central}')
-else:
-    central = ''
-    try:
-        ci = yaml.safe_load(open('catalog-info.yaml'))
-        for link in ci.get('metadata', {}).get('links', []):
-            if link.get('title') == 'Central':
-                central = link['url']
-                break
-    except Exception:
-        pass
-    if central:
-        os.makedirs(os.path.dirname(f), exist_ok=True)
-        with open(f, 'w') as fh:
-            json.dump({'central': central}, fh, indent=2)
-        os.chmod(f, 0o600)
-        print('no-cred')
-        print(f'central:{central}')
-    else:
-        print('no-central')
-"
-```
-
-- Has `cred:` and `central:` → proceed.
-- `no-central` → show: "Cannot find Central API URL. Check that `catalog-info.yaml` has a **Central** link." **STOP.**
-- `no-cred` → show the portal URL and ask for the key (same as orchestrator auth flow). **Wait for key, save, then proceed.**
-
-### Step 4 — Sync workflow data
-
-Run sync to fetch current workflow state, persist workflow_id/epic_key if not already set, and pull any rejections:
-```bash
-python publishing-house/tools/ph-sync.py
-```
-Extract `stage`, `workflow_id`, and `epic_key` from the output. Commit any changes:
-```bash
-git add publishing-house/spec.yaml catalog-info.yaml
-git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
-```
+Replace WORKFLOW_ID with the `workflow_id` from Step 4. Extract `stage`.
 
 If stage is not `development` → show:
-> Cannot start this skill because the project is in **{stage}** stage. This skill requires **development**.
+> This skill cannot start because the workflow is currently in **{stage}**. The development skill requires the project to be in the **development** stage.
 
 **STOP — do not proceed.**
 
-### Step 5 — Read project context
+### Step 6 — Read project context
 
 1. Read `publishing-house/spec.yaml` for project metadata and spec data
 2. Read `publishing-house/spec/design.md` for the design spec
