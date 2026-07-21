@@ -66,9 +66,9 @@ The following are authored during intake and stored in `approval_checklist` in s
 
 | Field | Where | What |
 |---|---|---|
-| `prerequisites_verifiable` | `approval_checklist.content_lead` | Can lab auto-validate prereqs? (true/false) |
-| `assessment_strategy` | `approval_checklist.content_lead` | How success is measured per module |
-| `differentiation` | `approval_checklist.content_lead` | Author's narrative: how this differs from existing content |
+| `prerequisites_verifiable` | `approval_checklist.content` | Can lab auto-validate prereqs? (true/false) |
+| `assessment_strategy` | `approval_checklist.content` | How success is measured per module |
+| `differentiation` | `approval_checklist.content` | Author's narrative: how this differs from existing content |
 
 Auto-computed by Central (not authored):
 - `rcars_overlap_pct` — highest relevance_score from RCARS advisor candidates (or null)

@@ -137,31 +137,13 @@ print('saved')
   ```
   Replace PASTE_KEY_HERE with the actual key. Confirm: > Got it — you're all set.
 
-### Step 4 — Get workflow state
+### Step 4 — Sync workflow data
 
-First check spec.yaml for a cached workflow_id:
-```bash
-python3 -c "
-import yaml
-from pathlib import Path
-spec = yaml.safe_load(Path('publishing-house/spec.yaml').read_text()) or {}
-wfid = spec.get('project', {}).get('workflow_id', '')
-print(f'workflow_id:{wfid}')
-"
-```
-
-**If workflow_id is present** → just get the stage:
-```bash
-python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
-```
-Replace WORKFLOW_ID with the extracted value. Extract `stage`. No file writes needed.
-
-**If workflow_id is blank** → run sync to fetch and persist it:
+Run sync to fetch current workflow state, persist workflow_id/epic_key if not already set, and pull any rejections:
 ```bash
 python publishing-house/tools/ph-sync.py
 ```
-Extract `stage`, `workflow_id`, `epic_key`, and `synced` from the output.
-If `synced:true`, commit silently:
+Extract `stage`, `workflow_id`, `epic_key`, and `unresolved_rejections` from the output. Commit any changes:
 ```bash
 git add publishing-house/spec.yaml catalog-info.yaml
 git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
@@ -194,8 +176,13 @@ If stage is not `intake` → show:
 
 ## Dispatch
 
-After pre-flight, follow the intake procedures:
+After pre-flight, check the `unresolved_rejections` count from `ph-sync.py` output:
 
+**If `unresolved_rejections` > 0:**
+1. Follow `procedures/01-rejection-handler.md` — address unresolved feedback first
+2. The rejection handler determines the re-entry point (module outlines or submit)
+
+**If `unresolved_rejections` is 0 (fresh intake or all rejections resolved):**
 1. Follow `procedures/02-interview.md`
 2. Follow `procedures/03-design-doc.md`
 3. Follow `procedures/04-module-outlines.md`

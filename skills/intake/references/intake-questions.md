@@ -96,22 +96,26 @@ results are ready by Q24. Do NOT wait for the response — continue with Q4.
 ## Q12: Infrastructure Requirements
 
 > **Let me confirm the infrastructure needs.** Based on what you described:
+> - **Cluster type:** Multinode or SNO (Single Node OpenShift)?
 > - **Base infrastructure:** [propose: ocp4-cluster, ocp-workloads, or cloud-vms-base]
-> - **Sizing:** [propose worker count and resources — e.g. 6 workers, 8 vCPU, 32GB RAM, 100GB disk]
+> - **Sizing:** [propose worker count and resources — e.g. multinode with 6 workers, 8 vCPU, 32GB RAM, 100GB disk]
 > - **Cloud provider:** CNV (default) or AWS?
 > - **Automation approach:** Ansible, GitOps (Helm + ArgoCD), or combo?
 >
 > **Does this sound right, or should I adjust anything?**
 
-**After the user confirms**, if `worker_count` is 0, ask this follow-up:
+**Rules for cluster_type and worker_count:**
 
-> **With zero worker nodes, is this a Single Node OpenShift (SNO) deployment?** SNO runs everything on one control-plane node. If you need separate workers later, we can switch to multinode.
+- If the user says **SNO**, **single node**, or **Single Node OpenShift**: set `cluster_type: sno` and `worker_count: 0`. Workers must always be 0 for SNO.
+- If the user says **multinode** or specifies any worker count > 0: set `cluster_type: multinode`.
+- If the user confirms your proposal without changes, apply the proposed values.
 
-- If yes (or user confirmed 0 workers without objecting): set `cluster_type: sno`
-- If no (user says they want workers): ask for the worker count and set `cluster_type: multinode`
-- If `worker_count` > 0: set `cluster_type: multinode` automatically (no follow-up needed)
+**Control plane sizing (auto-derived, do not ask the user):**
+- `control_plane_instance_count`: always 3
+- `control_plane_cpu`: 32 if sno, 16 if multinode
+- `control_plane_ram_gb`: 128 if sno, 64 if multinode
 
-- **spec.yaml fields:** `spec.environment.cloud_provider` (cnv | aws), `spec.environment.cluster_type` (sno | multinode), `worker_count`, `worker_cpu`, `worker_ram_gb`, `worker_disk_gb`
+- **spec.yaml fields:** `spec.environment.cloud_provider` (cnv | aws), `spec.environment.cluster_type` (sno | multinode), `control_plane_instance_count`, `control_plane_cpu`, `control_plane_ram_gb`, `worker_count`, `worker_cpu`, `worker_ram_gb`, `worker_disk_gb`
 - **Used in:** design.md Infrastructure Requirements section
 
 ## Q13: Reference Material
@@ -208,14 +212,14 @@ Q22-Q24 numbers are preserved to maintain alignment with the gate validation spe
 > For example: a check script that verifies a cluster is already connected, or a pre-flight that confirms credentials exist.
 
 - **design.md section:** `## Prerequisites` (captures the list of prerequisites)
-- **spec.yaml field:** `approval_checklist.content_lead.prerequisites_verifiable` (true | false — answers whether validation is possible)
+- **spec.yaml field:** `approval_checklist.content.prerequisites_verifiable` (true | false — answers whether validation is possible)
 
 ## Q23: Assessment Strategy
 
 > **How will we know the learner successfully completed each module?**
 > For each module, describe how success is validated: a verification script, a visible result in the UI, a quiz question, or trust-based (learner self-reports).
 
-- **spec.yaml field:** `approval_checklist.content_lead.assessment_strategy`
+- **spec.yaml field:** `approval_checklist.content.assessment_strategy`
 - **Validation:** Required. "Trust-based" is acceptable but must be explicit.
 
 ## Q24: Differentiation from Existing Content
@@ -260,9 +264,9 @@ Q22-Q24 numbers are preserved to maintain alignment with the gate validation spe
 
 **spec.yaml fields:**
 
-- `approval_checklist.content_lead.differentiation` — author's response (required, non-empty)
-- `approval_checklist.content_lead.rcars_overlap_pct` — highest `relevance_score` from candidates (or null)
-- `approval_checklist.content_lead.rcars_top_matches` — list from candidates, mapped as:
+- `approval_checklist.content.differentiation` — author's response (required, non-empty)
+- `approval_checklist.content.rcars_overlap_pct` — highest `relevance_score` from candidates (or null)
+- `approval_checklist.content.rcars_top_matches` — list from candidates, mapped as:
   ```yaml
   rcars_top_matches:
     - title: "[display_name]"
