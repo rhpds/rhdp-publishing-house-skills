@@ -48,7 +48,7 @@ Loop:
   intake       → dispatch rhdp-publishing-house:intake
   development  → dispatch rhdp-publishing-house:development
   content_review / infra_review → show review status, STOP
-  ready        → show ready status, STOP
+  testing      → show testing status, STOP
   published    → show published status, STOP
 ```
 
@@ -64,8 +64,8 @@ Loop:
 **development:**
 > Development is now active. What do you need help with?
 
-**ready:**
-> Final gate. Reviewer needs to sign off.
+**testing:**
+> Development is complete. The project is undergoing testing before release.
 
 **published:**
 > This project is published.

@@ -8,7 +8,7 @@ or "granted" — it sounds patronizing. Present what Central did and what the op
 | Vetting | "Vetting complete — RCARS checked for overlapping content." |
 | Reviews | "Three parallel reviews are in progress: Content Review, Infra Review, and Development Review. All three must complete before advancing to Development." |
 | Development | "Development is now active." |
-| Ready | "Final gate. Reviewer needs to sign off." |
+| Testing | "Development is complete. The project is undergoing testing before release." |
 | Published | "Project is published." |
 
 Never say "approved," "granted," or "blessed." Present the facts and the next steps.
