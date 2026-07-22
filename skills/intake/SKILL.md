@@ -25,35 +25,29 @@ self-sufficient — it works whether dispatched by the orchestrator or invoked d
 
 Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
 
-### Step 4 — Get workflow data
+### Steps 4–6 — Get workflow state, sync, and gate check
 
-Fetch workflow data (includes rejection info if any):
+**RULE: These steps MUST run every time the intake skill is invoked, even if this skill was already running in the same session.** Never skip these steps. Never reuse results from a previous run. The workflow state may have changed (e.g., a rejection arrived).
+
+**Step 4** — Get workflow data:
 ```bash
 python publishing-house/tools/ph-workflow-data.py
 ```
 Extract `workflow_id` and `epic_key` from the output.
 
-### Step 5 — Sync data to files
-
-Sync workflow data to local files (writes rejections to spec.yaml, persists workflow_id/epic_key):
+**Step 5** — Sync workflow data to local files (fetches rejections from SonataFlow, writes them to spec.yaml):
 ```bash
 python publishing-house/tools/ph-sync.py
 ```
-Extract `unresolved_rejections` from the output. Commit any changes:
+Extract `stage` and `unresolved_rejections` from the output. Commit any changes:
 ```bash
 git add publishing-house/spec.yaml catalog-info.yaml
 git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
 ```
 
-### Step 6 — Get workflow state
+**Step 6** — Gate check:
 
-Get the current workflow stage:
-```bash
-python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
-```
-Replace WORKFLOW_ID with the `workflow_id` from Step 4. Extract `stage`.
-
-If stage is not `intake` → show:
+If `stage` (from ph-sync.py) is not `intake` → show:
 > Cannot start this skill because the project is in **{stage}** stage. This skill requires **intake**.
 
 **STOP — do not proceed.**
