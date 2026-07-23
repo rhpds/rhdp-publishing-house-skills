@@ -85,7 +85,7 @@ Stage is confirmed as `intake`. Now check `unresolved_rejections` from Step 5.
 1. Follow `procedures/02-interview.md`
 2. Follow `procedures/03-design-doc.md`
 3. Follow `procedures/04-module-outlines.md`
-4. If RCARS vetting results exist → follow `procedures/05-spec-refinement.md`
+4. Re-read `publishing-house/spec.yaml`. If `approval_checklist.content.rcars_top_matches` is present and non-empty → follow `procedures/05-spec-refinement.md`
 5. Follow `procedures/06-approval-and-submit.md`
 
 After `06-approval-and-submit.md` completes, **return to the orchestrator** (if dispatched) or **STOP** (if invoked directly).
