@@ -102,7 +102,7 @@ If offline → assume `intake` stage and proceed.
 
 5. Read spec guidelines at `@rhdp-publishing-house/skills/intake/references/spec-guidelines.md`
 
-6. Read module outline template at the project's `publishing-house/spec/module-outline-template.md`
+6. Read the module outline template from the project repo at `publishing-house/spec/module-outline-template.md`
 
 ## Dispatch
 
