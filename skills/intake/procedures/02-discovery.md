@@ -58,7 +58,7 @@ question list — extract them naturally from the conversation and follow up on 
 ## Behavioral Notes
 
 - Ask follow-up questions when answers are vague. "Teach OpenShift" is not a goal — probe for specifics.
-- Push back on too many learning objectives. 3-5 is ideal; more than 7 is a warning sign.
+- Scale learning objectives to duration. Guideline: up to 3 objectives per 45 minutes of content. A 45-minute demo might have 2-3; a 2-hour lab might have 6-8; a 4-hour lab could have 10+. Too few for the duration means objectives are too broad; too many means they're too granular.
 - If the author describes module content in detail, capture it — it feeds directly into Phase 2.
 - Use what the author gives you. Don't substitute your own ideas for theirs.
 - If one answer also covers a later data point, mark it as captured and don't re-ask.
