@@ -47,13 +47,19 @@ If `status` is `running` or `queued`, wait 5 seconds and poll again (up to 3 ret
 
 **If no candidates** (empty list or all relevance_score < 50):
 
-> "I checked the RHDP catalog — no close matches found. This looks like genuinely new
-> territory. What would you say makes this lab unique?"
+> "I checked the RHDP catalog — no close matches found. This looks like new territory.
+> Moving on to module outlines."
+
+No question needed — the differentiation is self-evident if nothing similar exists.
 
 **If advisor failed or timed out:**
 
-> "RCARS advisor wasn't available. How would you describe what makes this lab different
-> from existing content on similar topics?"
+> "RCARS advisor wasn't available this run. We'll skip vetting for now — this will
+> run again at submission. Moving on to module outlines."
+
+Do NOT ask the author to explain differentiation when RCARS fails. That's a platform
+problem, not the author's problem. The differentiation field will be populated when
+RCARS is available (either in a later session or at submission).
 
 ## Handle Adjustments
 

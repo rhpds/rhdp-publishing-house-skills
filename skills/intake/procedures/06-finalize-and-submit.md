@@ -13,11 +13,15 @@ Ask the remaining approval checklist questions. These are the fields reviewers n
 
 Write to `approval_checklist.content.prerequisites_verifiable` (true/false).
 
-**Assessment strategy:**
-> "How will we know the learner successfully completed each module? For each module:
-> verification script, visible result in the UI, quiz question, or trust-based."
+**Assessment strategy (optional — ask only for Zero-Touch labs):**
+
+If `project.showroom_type` is `zero_touch`, ask:
+> "Since this is a Zero-Touch lab, how should each module be validated? Per module:
+> solve/validate button, verification script, or automated check."
 
 Write to `approval_checklist.content.assessment_strategy`.
+
+If classic showroom or demo → skip this question.
 
 **Differentiation:**
 If `approval_checklist.content.differentiation` is already populated from Phase 3
@@ -25,10 +29,9 @@ If `approval_checklist.content.differentiation` is already populated from Phase 
 > "Based on our RCARS discussion, here's the differentiation statement: *'{differentiation}'*
 > Does this capture it, or would you adjust the wording?"
 
-If empty (RCARS was skipped or offline), ask:
-> "How does this lab specifically differ from existing content on similar topics?"
-
-Write to `approval_checklist.content.differentiation`.
+If empty (RCARS was skipped or offline) → leave it empty. Do NOT ask the author to
+explain differentiation without RCARS context. The field will be populated when RCARS
+vetting runs (either in a later session or when Central validates at submission).
 
 ## Step 2: Generate jira.yaml
 
