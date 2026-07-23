@@ -1,28 +1,34 @@
-# Approval and Submit
+# Finalize and Submit
 
-This procedure handles the final steps: update spec.yaml with structured data,
-generate supporting files, get author approval, commit, push, and submit to Central API.
+Phase 6 of the intake flow. Complete the approval checklist, generate supporting files,
+validate, and submit to Central API.
 
-## Step 1: Update spec.yaml
+## Step 1: Approval Checklist
 
-Update `publishing-house/spec.yaml` with structured data from the interview and spec:
+Ask the remaining approval checklist questions. These are the fields reviewers need.
 
-```yaml
-spec:
-  title: "[Project Name from design.md]"
-  learning_objectives:
-    - "[Objective 1]"
-  modules:
-    - title: "Module 1 Title"
-      duration_min: 20
-  environment:
-    ocp_version: "4.18"
-    topology: "shared-cluster"
-  duration_hours: 2.5
-  audience: "intermediate"
-```
+**Prerequisites verifiable:**
+> "What must the learner know or have done before starting Module 1? And can the lab
+> automatically validate those prerequisites when the learner starts?"
 
-Also update infra fields (Q12-Q18) and approval_checklist fields (Q22-Q24) gathered during intake.
+Write to `approval_checklist.content.prerequisites_verifiable` (true/false).
+
+**Assessment strategy:**
+> "How will we know the learner successfully completed each module? For each module:
+> verification script, visible result in the UI, quiz question, or trust-based."
+
+Write to `approval_checklist.content.assessment_strategy`.
+
+**Differentiation:**
+If `approval_checklist.content.differentiation` is already populated from Phase 3
+(RCARS vetting), present it for confirmation:
+> "Based on our RCARS discussion, here's the differentiation statement: *'{differentiation}'*
+> Does this capture it, or would you adjust the wording?"
+
+If empty (RCARS was skipped or offline), ask:
+> "How does this lab specifically differ from existing content on similar topics?"
+
+Write to `approval_checklist.content.differentiation`.
 
 ## Step 2: Generate jira.yaml
 
@@ -102,53 +108,16 @@ print('jira.yaml written')
 Generate a draft `publishing-house/spec/automation-manifest.yaml` from the spec data.
 This is a DRAFT — the automation procedure will refine it during development.
 
-**How to derive each field:**
+Derive each field from what's already in spec.yaml and design.md:
+- **approach:** ansible (default for most OCP labs), gitops (if lab teaches GitOps), both
+- **infrastructure.type:** From topology + cloud provider (e.g., `per-student` + CNV → `ocp-cnv`)
+- **operators:** Infer from Products & Technologies — operators the learner USES but doesn't install
+- **external_services:** From `spec.environment.external_services`
 
-- **approach:** Infer from products and learning objectives:
-  - If lab teaches GitOps/ArgoCD/Helm as the subject → `gitops`
-  - If Ansible/AAP is the primary subject → `ansible`
-  - Default for most OCP labs → `ansible`
-  - If automation is mixed → `both`
+## Step 4: Generate mkdocs.yml
 
-- **infrastructure.type:** From topology + cloud provider:
-  - `per-student` or `cnv-pool` + CNV → `ocp-cnv`
-  - `per-student` + AWS → `ocp-aws`
-  - `shared-cluster` + sandbox → `sandbox-tenant`
-  - Default → `ocp-cnv`
+Generate `mkdocs.yml` at the repo root for RHDH TechDocs rendering.
 
-- **infrastructure.ocp_version:** From `spec.environment.ocp_version`
-- **infrastructure.multi_user:** `true` if max_concurrent_users > 1
-- **infrastructure.users_per_deployment:** From `spec.environment.max_concurrent_users`
-
-- **operators:** Infer from Products & Technologies section — operators the learner USES but doesn't install themselves:
-  - For each: add `reason` and `source_module`
-  - **Rule:** If the learner's exercise is to INSTALL the operator, do NOT list it
-  - **Rule:** If the operator must exist BEFORE the learner starts, list it
-
-- **external_services:** From `spec.environment.external_services` list
-
-- **provision_data:** Infer from products — URLs and credentials learners need
-
-Write the generated manifest to `publishing-house/spec/automation-manifest.yaml`.
-
-## Step 4: Author Approval Checkpoint
-
-Ask the author explicitly — do NOT proceed without confirmation:
-
-> Here's what was designed for your lab. Take a moment to review `publishing-house/spec/design.md` and the module outlines in `publishing-house/spec/modules/`.
->
-> **Are you happy with the design and ready to submit for review?**
-> - Type **yes** (or "looks good", "proceed") to submit
-> - Or give feedback and I'll update the spec
-
-**Wait for the author's response. Do NOT auto-proceed.**
-
-- **If feedback** → update the spec and re-validate, then ask again
-- **If yes/looks good/proceed** → immediately execute Steps 5–8 WITHOUT asking again
-
-## Step 5: Generate mkdocs.yml and TechDocs annotation
-
-Generate `mkdocs.yml` at the repo root so RHDH TechDocs can render the spec as documentation.
 Run silently:
 ```bash
 python3 -c "
@@ -194,7 +163,18 @@ print('mkdocs.yml created')
 "
 ```
 
-The `backstage.io/techdocs-ref` annotation is already in `catalog-info.yaml` from the project template.
+## Step 5: Author Checkpoint
+
+> "Your spec is ready for submission. Take a moment to review
+> `publishing-house/spec/design.md` and the module outlines in
+> `publishing-house/spec/modules/`.
+>
+> **Are you happy with this and ready to submit for review?**"
+
+**Wait for the author's response. Do NOT auto-proceed.**
+
+- **If feedback** → update the spec, re-validate, ask again
+- **If approved** → immediately execute Steps 6-8 WITHOUT asking again
 
 ## Step 6: Commit and push
 
@@ -208,13 +188,21 @@ git push
 
 ## Step 7: Submit intake to Central API
 
+**If offline → defer:**
+> "Your spec is complete and committed. When the platform is available, run
+> `/rhdp-publishing-house` again to submit through the review gate."
+>
+> **STOP.**
+
+**If online:**
+
 ```bash
 python publishing-house/tools/ph-intake.py 2>&1
 ```
 
 **Run this immediately. Do NOT ask the author.**
 
-The response is always the same shape:
+The response shape:
 ```json
 {"status": <int>, "stage": "<stage or null>", "error": "<msg or null>", "validation": <object or null>}
 ```
@@ -246,9 +234,7 @@ Check `project.showroom_type` in spec.yaml:
 
 ## Step 8: Report result
 
-Parse `stage` from the JSON response.
-
-- If the call succeeds → show: "Intake submitted. Stage is now **{stage}**."
-- If the call fails → show the error from the response.
+- If submission succeeded → show: "Intake submitted. Stage is now **{stage}**."
+- If submission failed → show the error from the response.
 
 **Return to the orchestrator** (if dispatched) or **STOP** (if invoked directly).

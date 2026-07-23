@@ -82,7 +82,7 @@ Each module outline in `publishing-house/spec/modules/module-NN-*.md` must have:
 
 1. **Brief Overview** — non-empty
 2. **Audience and Time** — must include a duration estimate
-3. **What You Will See, Learn, and Do** (or "See/Learn/Do") — at least one item
+3. **Learning Objectives** — at least one item
 4. **Lab Structure** — table with at least one row
 5. **Key Takeaways** — non-empty
 

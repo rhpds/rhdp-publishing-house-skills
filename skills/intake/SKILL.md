@@ -15,6 +15,16 @@ model: claude-opus-4-6
 You handle the intake phase of the Publishing House lifecycle. This skill is
 self-sufficient — it works whether dispatched by the orchestrator or invoked directly.
 
+## Core Principles
+
+1. **Template-driven.** You learn what to fill in by reading the project's `design.md` (placeholder sections) and `spec.yaml` (inline comments with valid values). You do NOT have your own template copies.
+
+2. **Conversational.** You suggest and confirm. You never read from a script or ask rigid questions in a fixed order. You have a natural conversation about the author's idea and capture structured data from it.
+
+3. **Write per phase.** Within a phase, focus on the conversation. At the end of each phase, write all captured fields to spec.yaml and design.md in one commit. Each phase is a checkpoint — if the session ends, work up to the last completed phase is saved.
+
+4. **Author reviews design.md only.** spec.yaml is written silently at each checkpoint. The author reviews and approves the human-readable design doc, not the YAML.
+
 ## Tool Boundaries
 
 **Do NOT use** Central API tools directly. You work locally: read files, write specs, update spec.yaml.
@@ -25,89 +35,153 @@ self-sufficient — it works whether dispatched by the orchestrator or invoked d
 
 Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
 
-### Steps 4–6 — Get workflow state, sync, and gate check
+### Step 4 — Get workflow data
 
-**RULE: These steps MUST run every time the intake skill is invoked, even if this skill was already running in the same session.** Never skip these steps. Never reuse results from a previous run. The workflow state may have changed (e.g., a rejection arrived).
+**RULE: This step MUST run every time the intake skill is invoked.** Never skip it. Never reuse results from a previous run. The workflow state may have changed.
 
-**Step 4** — Get workflow data:
+Fetch workflow data (includes rejection info if any):
 ```bash
 python publishing-house/tools/ph-workflow-data.py
 ```
-Extract `workflow_id` and `epic_key` from the output.
 
-**Step 5** — Sync workflow data to local files (fetches rejections from SonataFlow, writes them to spec.yaml):
+**If this fails (non-zero exit, connection error, timeout):**
+> **Offline mode.** Central API is not reachable. You can still complete the intake
+> interview, generate the design doc, and write module outlines. RCARS vetting
+> will be skipped, and submission will be deferred until the platform is available.
+
+Set `offline_mode = true` and proceed to Step 7. Skip Steps 5 and 6.
+
+**If this succeeds:** Extract `workflow_id` and `epic_key` from the output. Set `offline_mode = false`.
+
+### Step 5 — Sync data to files (skip if offline)
+
+Sync workflow data to local files (writes rejections to spec.yaml, persists workflow_id/epic_key):
 ```bash
 python publishing-house/tools/ph-sync.py
 ```
-Extract `stage` and `unresolved_rejections` from the output. Commit any changes:
+Extract `unresolved_rejections` from the output. Commit any changes:
 ```bash
 git add publishing-house/spec.yaml catalog-info.yaml
 git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
 ```
 
-**Step 6** — Gate check:
+### Step 6 — Get workflow state (skip if offline)
 
-If `stage` (from ph-sync.py) is not `intake` → show:
+Get the current workflow stage:
+```bash
+python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
+```
+Replace WORKFLOW_ID with the `workflow_id` from Step 4. Extract `stage`.
+
+If stage is not `intake` → show:
 > Cannot start this skill because the project is in **{stage}** stage. This skill requires **intake**.
 
 **STOP — do not proceed.**
 
-### Step 7 — Load policy and references
+If offline → assume `intake` stage and proceed.
+
+### Step 7 — Load policy and project files
 
 1. Fetch validation policy:
    ```bash
    python publishing-house/tools/ph-policy.py
    ```
-   If it fails, show the error and **STOP**.
+   If it fails and offline → check for `publishing-house/policy.json` as a static fallback.
+   If no policy available at all → warn but continue (validation happens at submission).
 
-2. Read `~/.config/publishing-house/policy.json`. Use these lists throughout intake:
-   - `valid_content_types` — accept only these when the author states a content type
-   - `valid_audiences` — accept only these for difficulty/audience
-   - `products` (with `aliases`) — validate product names against this list
+2. Read `~/.config/publishing-house/policy.json` if it exists. Use these lists throughout:
+   - `valid_content_types` — constrain content type choices
+   - `valid_audiences` — constrain audience choices
+   - `products` (with `aliases`) — validate product names
    - `action_verbs_valid` — learning objectives must start with one of these
    - `action_verbs_rejected` — reject objectives starting with these
 
-3. Read `publishing-house/spec.yaml` for project state and pre-populated fields
-4. Read design template at `@rhdp-publishing-house/skills/intake/references/design-template.md`
+3. Read `publishing-house/spec.yaml` — understand the structure, valid values from inline comments, and which fields are already populated
+
+4. Read `publishing-house/spec/design.md` — understand the section structure from the placeholders. This is the template you will fill in.
+
 5. Read spec guidelines at `@rhdp-publishing-house/skills/intake/references/spec-guidelines.md`
-6. Read module template at `@rhdp-publishing-house/skills/intake/references/module-outline-template.md`
+
+6. Read module outline template at the project's `publishing-house/spec/module-outline-template.md`
 
 ## Dispatch
 
-Stage is confirmed as `intake`. Now check `unresolved_rejections` from Step 5.
+### If unresolved rejections exist (from Step 5)
 
-**If `unresolved_rejections` > 0 → Do NOT run the interview. Do NOT submit.**
+**Do NOT run the interview. Do NOT submit.**
 1. Follow `procedures/01-rejection-handler.md` — address unresolved feedback first
-2. The rejection handler determines the re-entry point (module outlines or submit)
+2. The rejection handler determines the re-entry point
 3. Do NOT skip the rejection handler even if the spec looks complete
 
-**If `unresolved_rejections` is 0 (fresh intake or all rejections resolved):**
-1. Follow `procedures/02-interview.md`
-2. Follow `procedures/03-design-doc.md`
-3. Follow `procedures/04-module-outlines.md`
-4. Re-read `publishing-house/spec.yaml`. If `approval_checklist.content.rcars_top_matches` is present and non-empty → follow `procedures/05-spec-refinement.md`
-5. Follow `procedures/06-approval-and-submit.md`
+### If no rejections — detect entry path
 
-After `06-approval-and-submit.md` completes, **return to the orchestrator** (if dispatched) or **STOP** (if invoked directly).
+Read `publishing-house/spec/design.md`. Check whether it still has `[placeholder]` markers
+or contains real content.
+
+Read `publishing-house/spec.yaml`. Check whether `spec.title`, `spec.learning_objectives`,
+and `spec.modules` are populated.
+
+**If design.md is mostly placeholders AND spec fields are empty → ask:**
+
+> How would you like to start?
+>
+> 1. **I have an idea** — let's talk about it and I'll build the spec
+> 2. **I have a doc or outline** — share it and I'll convert it to our format
+> 3. **I already filled this out** — the design doc and spec are in the repo
+
+- Option 1 → Full intake: Phase 1 through Phase 6
+- Option 2 → Phase 1 variant: extract from provided doc, fill gaps, then Phase 2 onward
+- Option 3 → Gap-fill: validate what exists, fill missing fields, skip to Phase 5/6
+
+**If design.md has real content (not placeholders) → resume mode:**
+
+Determine which phases are complete:
+- design.md filled in → Phase 2 done
+- RCARS results in spec.yaml (`approval_checklist.content.rcars_top_matches` non-empty) → Phase 3 done
+- Module outline files exist in `publishing-house/spec/modules/` → Phase 4 done
+- Infrastructure fields populated in spec.yaml → Phase 5 done
+
+Show a summary of what's already captured and pick up at the next incomplete phase.
+
+## Phase Flow
+
+Show at the start:
+> "Six phases: discovery, design, RCARS vetting, module outlines, infrastructure, and submission."
+
+### Phase 1 — Discovery
+Follow `procedures/02-discovery.md`.
+After completion: "Discovery complete. Next: design doc. **(4 phases remaining)**"
+
+### Phase 2 — Design Generation
+Follow `procedures/03-design-doc.md`.
+After completion: "Design doc complete and validated. Next: RCARS vetting. **(3 phases remaining)**"
+
+### Phase 3 — RCARS Vetting
+Follow `procedures/03b-rcars-vetting.md`.
+If offline → skip with warning: "RCARS vetting skipped (offline). This will run at submission."
+After completion: "RCARS vetting complete. Next: module outlines. **(2 phases remaining)**"
+
+### Phase 4 — Module Outlines
+Follow `procedures/04-module-outlines.md`.
+After completion: "Module outlines complete. Next: infrastructure confirmation. **(1 phase remaining)**"
+
+### Phase 5 — Infrastructure Confirmation
+Follow `procedures/05-infrastructure.md`.
+
+### Phase 6 — Finalize + Submit
+Follow `procedures/06-finalize-and-submit.md`.
+
+After Phase 6 completes, **return to the orchestrator** (if dispatched) or **STOP** (if invoked directly).
 
 ## Pre-populated Fields
 
-Before asking intake questions, check spec.yaml for fields already set by the
-RHDH template or orchestrator:
+Before asking questions, check spec.yaml for fields already set by the RHDH template:
 - `project.slug` — project identifier
 - `project.owner_email` — author email
-- `project.content_type` — lab, demo, workshop, onboarding
+- `project.content_type` — lab or demo
 - `project.deployment_mode` — rhdp_published or self_published
 - `project.initiative_key` — e.g., rh1_2027
 - `project.showroom_type` — classic or zero_touch
+- `project.description` — project description from RHDH form
 
 **Skip asking about any field that already has a value.**
-
-## Key Behavioral Notes
-
-- Push back on vague objectives
-- Propose module structures and validate them
-- Identify gaps the user hasn't thought of
-- Scale question depth to project complexity
-
-**Goal: Rigorous exploration through conversation, not just filling in a template.**

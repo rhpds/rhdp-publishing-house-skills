@@ -1,0 +1,76 @@
+# Discovery
+
+Phase 1 of the intake flow. Capture the author's idea through conversation.
+
+## Entry Paths
+
+### Path A — "I have an idea"
+
+Start conversational. Ask one open-ended question:
+
+> "Tell me about your idea."
+
+Accept whatever the author provides. Extract what you can from the freeform response — goal,
+audience, products, content type, duration. Then ask targeted follow-ups for what's missing,
+one at a time.
+
+**Discover, don't interrogate.** The author's words are the spec. You are the scribe, not
+the author. If something is unclear, ask — don't fill it in.
+
+If `project.description` exists in spec.yaml and is non-empty, use it as the starting
+context: "I see this description: *'{description}'* — let's build on this."
+
+### Path B — "I have a doc or outline"
+
+The author has an existing document — Google Doc, meeting notes, outline, Jira issue — that
+is NOT in Publishing House format.
+
+1. Read whatever they provide (pasted content, file path, URL, or "paste the Jira requirements")
+2. Extract the data points below into PH format
+3. Present what was found: "Here's what I extracted — does this look right?"
+4. Ask about gaps — missing data points only
+
+### Path C — "I already filled this out"
+
+The author already filled in design.md and possibly spec.yaml directly in the repo.
+
+1. Read `publishing-house/spec/design.md` and `publishing-house/spec.yaml`
+2. Validate which data points are captured vs. still placeholders
+3. Ask about gaps only — do not re-interview
+4. Skip to Phase 5 (infrastructure confirmation) or Phase 6 (finalize) depending on completeness
+
+## Data Points to Capture
+
+These are the things you need to learn during discovery. Do NOT ask them as a rigid
+question list — extract them naturally from the conversation and follow up on gaps.
+
+- **Goal** — What will someone be able to DO after completing this? Concrete, measurable.
+- **Target audience** — Who is this for? Role, experience level, what they already know.
+- **Products and technologies** — Which Red Hat products are involved? Validate names against the policy's product list (with aliases). If a name isn't recognized, flag it: "I don't see that in the product list — the closest match is [X]. Is that what you mean?"
+- **Content type** — Lab (hands-on) or demo (presenter-led). Skip if `project.content_type` is already set in spec.yaml.
+- **Showroom type** — Classic or zero-touch. Skip if `project.showroom_type` is already set.
+- **Duration estimate** — How long should this take end to end?
+- **Reference material** — Do they have existing docs, recorded demos, blog posts, architecture diagrams? Note these for Phase 2.
+
+## Behavioral Notes
+
+- Ask follow-up questions when answers are vague. "Teach OpenShift" is not a goal — probe for specifics.
+- Push back on too many learning objectives. 3-5 is ideal; more than 7 is a warning sign.
+- If the author describes module content in detail, capture it — it feeds directly into Phase 2.
+- Use what the author gives you. Don't substitute your own ideas for theirs.
+- If one answer also covers a later data point, mark it as captured and don't re-ask.
+
+## Write Point
+
+At the end of this phase, write all captured discovery fields to `publishing-house/spec.yaml`:
+- `spec.title` (derive from the goal)
+- `spec.audience`
+- `spec.duration_hours`
+- Any other spec fields that were clearly answered
+
+```bash
+git add publishing-house/spec.yaml
+git diff --cached --quiet || git commit -m "feat: phase 1 — discovery fields captured" 2>/dev/null || true
+```
+
+Proceed to Phase 2 (design generation).
