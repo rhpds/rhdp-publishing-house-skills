@@ -17,7 +17,9 @@ A complete spec MUST have all of these (11 sections + a descriptive H1 title):
 9. **Difficulty Level** — beginner, intermediate, or advanced
 10. **Environment** — what the learner sees when the lab starts, plus automation needs
 11. **Infrastructure Requirements** — platform, sizing, AI/MaaS, external services, non-GA products
-12. **Assessment Strategy** — how success is measured per module
+
+**Optional sections** (not required by validation):
+- **Assessment Strategy** — how success is measured per module. Relevant for Zero-Touch labs with solve/validate buttons. Skip for demos and classic labs without automated checks.
 
 ## Infrastructure Requirements
 
