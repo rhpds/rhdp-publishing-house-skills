@@ -109,7 +109,7 @@ If offline → assume `intake` stage and proceed.
 ### If unresolved rejections exist (from Step 5)
 
 **Do NOT run the interview. Do NOT submit.**
-1. Follow `procedures/01-rejection-handler.md` — address unresolved feedback first
+1. Follow `procedures/00-rejection-handler.md` — address unresolved feedback first
 2. The rejection handler determines the re-entry point
 3. Do NOT skip the rejection handler even if the spec looks complete
 

@@ -20,24 +20,27 @@ the author. If something is unclear, ask — don't fill it in.
 If `project.description` exists in spec.yaml and is non-empty, use it as the starting
 context: "I see this description: *'{description}'* — let's build on this."
 
-### Path B — "I have a doc or outline"
+### Path B — "I have something written up elsewhere"
 
-The author has an existing document — Google Doc, meeting notes, outline, Jira issue — that
-is NOT in Publishing House format.
+The author has requirements in an existing document — Google Doc, meeting notes, Jira issue,
+rough outline — that is NOT in the Publishing House project repo. It needs to be converted.
 
 1. Read whatever they provide (pasted content, file path, URL, or "paste the Jira requirements")
 2. Extract the data points below into PH format
 3. Present what was found: "Here's what I extracted — does this look right?"
 4. Ask about gaps — missing data points only
 
-### Path C — "I already filled this out"
+### Path C — "The design is already in the repo"
 
-The author already filled in design.md and possibly spec.yaml directly in the repo.
+The author already filled in `publishing-house/spec/design.md` and possibly the module
+outlines directly in the project repo. They don't need an interview — they need validation
+and gap-fill.
 
 1. Read `publishing-house/spec/design.md` and `publishing-house/spec.yaml`
-2. Validate which data points are captured vs. still placeholders
-3. Ask about gaps only — do not re-interview
-4. Skip to Phase 5 (infrastructure confirmation) or Phase 6 (finalize) depending on completeness
+2. Check the four required data points for Phase 2: **goal** (spec.title non-empty), **audience** (spec.audience non-empty), **products** (Products & Technologies section filled in design.md), **content type** (project.content_type set)
+3. If any of the four are missing or still placeholders → ask about those specific gaps
+4. If all four are present → confirm: "Your design looks populated. Let me check for any gaps in infrastructure and approval fields."
+5. Skip to Phase 5 (infrastructure confirmation) or Phase 6 (finalize) depending on what's still empty
 
 ## Data Points to Capture
 
@@ -62,11 +65,14 @@ question list — extract them naturally from the conversation and follow up on 
 
 ## Write Point
 
+**Minimum to proceed:** You need at least **goal** (→ `spec.title`), **audience** (→ `spec.audience`), **products** (→ design.md Products section), and **content type** (→ `project.content_type`). Without these four, you cannot generate a design doc in Phase 2. If any are missing after the conversation, ask specifically.
+
 At the end of this phase, write all captured discovery fields to `publishing-house/spec.yaml`:
-- `spec.title` (derive from the goal)
+- `spec.title` (derived from the goal)
 - `spec.audience`
 - `spec.duration_hours`
-- Any other spec fields that were clearly answered
+- `project.content_type` (if not pre-set)
+- `project.showroom_type` (if not pre-set)
 
 ```bash
 git add publishing-house/spec.yaml

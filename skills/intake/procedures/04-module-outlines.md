@@ -41,7 +41,7 @@ For each module in the Module Map table, generate one outline file:
 
 ## Re-intake After Rejection
 
-When called after the rejection handler (01-rejection-handler.md), module outlines
+When called after the rejection handler (00-rejection-handler.md), module outlines
 already exist. Do NOT regenerate from scratch.
 
 1. Read the updated design.md to identify what changed

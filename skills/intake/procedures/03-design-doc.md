@@ -37,7 +37,7 @@ design looks good.
 
 ## Re-intake After Rejection
 
-When called after the rejection handler (01-rejection-handler.md), design.md already exists.
+When called after the rejection handler (00-rejection-handler.md), design.md already exists.
 Do NOT regenerate from scratch.
 
 1. Read `publishing-house/spec.yaml` to understand what changed during rejection resolution
