@@ -42,7 +42,7 @@ Only ask these if triggered — do not ask them by default:
 - **AAP version:** Only if AAP is in the products list.
 - **Non-GA products:** Only if any product is labeled beta, tech preview, or early access.
   If non-empty: "How will access be provided during provisioning?"
-- **Concurrent users:** Only if topology is per-student or cnv-pool.
+- **Concurrent users:** Only if topology is shared-cluster. Shared clusters need to be sized for the number of simultaneous users. Per-student and cnv-pool topologies give each learner their own environment — the number of simultaneous users is an operational decision made at scheduling time, not during intake. Do NOT ask the author how many people will be in a room or at an event.
 - **External services:** Ask once. Accept "none."
 
 ## Write Point
