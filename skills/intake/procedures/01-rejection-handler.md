@@ -76,7 +76,19 @@ Do NOT update design.md or module outlines yet — that happens in Step 6 using 
 
 ## Step 5: Confirm Resolution
 
-After all reasons have been addressed, summarize what changed and where:
+After all reasons have been addressed, **show the actual changes** so the author can verify.
+
+Run `git diff` to display what changed:
+```bash
+git diff publishing-house/spec.yaml
+```
+
+If design.md or modules were also updated, show those too:
+```bash
+git diff publishing-house/spec/
+```
+
+Then summarize:
 
 > **Here's what was changed:**
 > 1. {reason text} → {what was changed and in which file}
