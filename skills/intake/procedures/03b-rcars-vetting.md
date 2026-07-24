@@ -27,7 +27,9 @@ Extract `job_id` from the output. If empty or failed → skip RCARS with a note:
 python publishing-house/tools/ph-rcars.py poll JOB_ID
 ```
 
-If `status` is `running` or `queued`, wait 5 seconds and poll again (up to 3 retries).
+If `status` is `running` or `queued`, wait 5 seconds and poll again. Keep polling every
+5 seconds for up to 90 seconds total. The advisor typically takes 10–20 seconds but can
+be slower under load.
 
 ## Present Results
 
