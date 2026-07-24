@@ -127,4 +127,4 @@ git add publishing-house/spec.yaml
 git diff --cached --quiet || git commit -m "fix: mark rejection reasons as resolved" 2>/dev/null || true
 ```
 
-Follow `procedures/06-approval-and-submit.md` to resubmit. That procedure asks the author to confirm before submitting.
+Follow `procedures/06-finalize-and-submit.md` to resubmit. That procedure asks the author to confirm before submitting.

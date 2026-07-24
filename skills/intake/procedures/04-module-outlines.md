@@ -1,18 +1,36 @@
 # Module Outlines
 
-This procedure generates or updates module outlines from design.md.
+Phase 4 of the intake flow. Generate detailed outlines for each module.
 
-## Fresh Intake — Generate All Outlines
+## Check for Existing Outlines
+
+Check `publishing-house/spec/modules/` for existing module outline files.
+
+**If outlines already exist** (non-empty `.md` files matching `module-*.md`):
+> "I see module outlines already in the repo: [list filenames]. Want me to validate
+> them against the design, or are these ready to go?"
+
+- If author says they're ready → validate section structure, proceed
+- If author wants validation → check each outline against the spec guidelines
+
+## Generate Outlines (Fresh Intake)
 
 Module outlines MUST be generated from the written design.md — not from conversation
-context. Use the Agent tool to spawn a fresh subagent.
+context. Read the design doc and the module outline template from the project repo.
 
-Spawn with a prompt like:
+Read the module outline template at the project's `publishing-house/spec/module-outline-template.md`.
+
+For each module in the Module Map table in design.md, generate one outline file:
+- Output directory: `publishing-house/spec/modules/`
+- Naming: `module-01-<short-title>.md`, `module-02-<short-title>.md`, etc.
+- Follow the template structure exactly
+- Reflect what design.md says — do not invent content not in the spec
+
+Use the Agent tool to spawn a fresh subagent for generation to avoid context bleed:
 
 ```
 Read the design spec at <project_root>/publishing-house/spec/design.md.
-
-Read the module outline template at @rhdp-publishing-house/skills/intake/references/module-outline-template.md.
+Read the module outline template at <project_root>/publishing-house/spec/module-outline-template.md.
 
 For each module in the Module Map table, generate one outline file:
 - Output directory: <project_root>/publishing-house/spec/modules/
@@ -21,9 +39,9 @@ For each module in the Module Map table, generate one outline file:
 - Reflect what design.md says — do not invent content not in the spec.
 ```
 
-## Re-intake After Rejection — Surgical Updates
+## Re-intake After Rejection
 
-When called after the rejection handler (01-rejection-handler.md), module outlines
+When called after the rejection handler (00-rejection-handler.md), module outlines
 already exist. Do NOT regenerate from scratch.
 
 1. Read the updated design.md to identify what changed
@@ -35,4 +53,11 @@ already exist. Do NOT regenerate from scratch.
    - If scope/content changed for a module → update the relevant sections
 4. Leave untouched modules as-is
 
-After outlines are written/updated, proceed to the next procedure in the flow.
+## Write Point
+
+```bash
+git add publishing-house/spec/modules/
+git diff --cached --quiet || git commit -m "feat: phase 4 — module outlines generated" 2>/dev/null || true
+```
+
+Proceed to Phase 5 (infrastructure confirmation).

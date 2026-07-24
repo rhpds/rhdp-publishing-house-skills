@@ -25,27 +25,37 @@ self-sufficient — it works whether dispatched by the orchestrator or invoked d
 
 Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
 
-### Step 4 — Get workflow data
+### Step 4 — Workflow check
 
-Fetch workflow data:
+**RULE: This sequence runs every invocation. No exceptions. No skipping. No reusing previous results.**
+
+**4a.** Get workflow data:
 ```bash
 python publishing-house/tools/ph-workflow-data.py
 ```
-Extract `workflow_id` and `epic_key` from the output.
+If this fails → set `offline_mode = true`, skip to Step 5.
+If this succeeds → extract `workflow_id`. Set `offline_mode = false`.
 
-### Step 5 — Get workflow state
-
+**4b.** Get workflow state (skip if offline):
 ```bash
 python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
 ```
-Replace WORKFLOW_ID with the `workflow_id` from Step 4. Extract `stage`.
+If stage is not `development` → STOP. This is the only condition that stops the skill.
+If offline → assume `development`.
 
-If stage is not `development` → show:
-> This skill cannot start because the workflow is currently in **{stage}**. The development skill requires the project to be in the **development** stage.
+**4c.** Sync (skip if offline):
+```bash
+python publishing-house/tools/ph-sync.py
+```
+Extract `unresolved_rejections` from the output. Commit any changes:
+```bash
+git add publishing-house/spec.yaml catalog-info.yaml
+git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
+```
 
-**STOP — do not proceed.**
+**4d.** If `unresolved_rejections` > 0 → show the unresolved rejection reasons to the author (read from `approval_checklist.content.rejections` and `approval_checklist.infra.rejections` in spec.yaml). Help the author address each one, then continue with normal development.
 
-### Step 6 — Read project context
+### Step 5 — Read project context
 
 1. Read `publishing-house/spec.yaml` for project metadata and spec data
 2. Read `publishing-house/spec/design.md` for the design spec

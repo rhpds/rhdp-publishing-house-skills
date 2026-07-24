@@ -1,0 +1,82 @@
+# Discovery
+
+Phase 1 of the intake flow. Capture the author's idea through conversation.
+
+## Entry Paths
+
+### Path A — "I have an idea"
+
+Start conversational. Ask one open-ended question:
+
+> "Tell me about your idea."
+
+Accept whatever the author provides. Extract what you can from the freeform response — goal,
+audience, products, content type, duration. Then ask targeted follow-ups for what's missing,
+one at a time.
+
+**Discover, don't interrogate.** The author's words are the spec. You are the scribe, not
+the author. If something is unclear, ask — don't fill it in.
+
+If `project.description` exists in spec.yaml and is non-empty, use it as the starting
+context: "I see this description: *'{description}'* — let's build on this."
+
+### Path B — "I have something written up elsewhere"
+
+The author has requirements in an existing document — Google Doc, meeting notes, Jira issue,
+rough outline — that is NOT in the Publishing House project repo. It needs to be converted.
+
+1. Read whatever they provide (pasted content, file path, URL, or "paste the Jira requirements")
+2. Extract the data points below into PH format
+3. Present what was found: "Here's what I extracted — does this look right?"
+4. Ask about gaps — missing data points only
+
+### Path C — "The design is already in the repo"
+
+The author already filled in `publishing-house/spec/design.md` and possibly the module
+outlines directly in the project repo. They don't need an interview — they need validation
+and gap-fill.
+
+1. Read `publishing-house/spec/design.md` and `publishing-house/spec.yaml`
+2. Check the four required data points for Phase 2: **goal** (spec.title non-empty), **audience** (spec.audience non-empty), **products** (Products & Technologies section filled in design.md), **content type** (project.content_type set)
+3. If any of the four are missing or still placeholders → ask about those specific gaps
+4. If all four are present → confirm: "Your design looks populated. Let me check for any gaps in infrastructure and approval fields."
+5. Skip to Phase 5 (infrastructure confirmation) or Phase 6 (finalize) depending on what's still empty
+
+## Data Points to Capture
+
+These are the things you need to learn during discovery. Do NOT ask them as a rigid
+question list — extract them naturally from the conversation and follow up on gaps.
+
+- **Goal** — What will someone be able to DO after completing this? Concrete, measurable.
+- **Target audience** — Who is this for? Role, experience level, what they already know.
+- **Products and technologies** — Which Red Hat products are involved? Validate names against the policy's product list (with aliases). If a name isn't recognized, flag it: "I don't see that in the product list — the closest match is [X]. Is that what you mean?"
+- **Content type** — Lab (hands-on) or demo (presenter-led). Skip if `project.content_type` is already set in spec.yaml.
+- **Showroom type** — Classic or zero-touch. Skip if `project.showroom_type` is already set.
+- **Duration estimate** — How long should this take end to end?
+- **Reference material** — Do they have existing docs, recorded demos, blog posts, architecture diagrams? Note these for Phase 2.
+
+## Behavioral Notes
+
+- Ask follow-up questions when answers are vague. "Teach OpenShift" is not a goal — probe for specifics.
+- Scale learning objectives to duration. Guideline: up to 3 objectives per 45 minutes of content. A 45-minute demo might have 2-3; a 2-hour lab might have 6-8; a 4-hour lab could have 10+. Too few for the duration means objectives are too broad; too many means they're too granular.
+- If the author describes module content in detail, capture it — it feeds directly into Phase 2.
+- Use what the author gives you. Don't substitute your own ideas for theirs.
+- If one answer also covers a later data point, mark it as captured and don't re-ask.
+
+## Write Point
+
+**Minimum to proceed:** You need at least **goal** (→ `spec.title`), **audience** (→ `spec.audience`), **products** (→ design.md Products section), and **content type** (→ `project.content_type`). Without these four, you cannot generate a design doc in Phase 2. If any are missing after the conversation, ask specifically.
+
+At the end of this phase, write all captured discovery fields to `publishing-house/spec.yaml`:
+- `spec.title` (derived from the goal)
+- `spec.audience`
+- `spec.duration_hours`
+- `project.content_type` (if not pre-set)
+- `project.showroom_type` (if not pre-set)
+
+```bash
+git add publishing-house/spec.yaml
+git diff --cached --quiet || git commit -m "feat: phase 1 — discovery fields captured" 2>/dev/null || true
+```
+
+Proceed to Phase 2 (design generation).

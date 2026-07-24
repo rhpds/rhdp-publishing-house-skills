@@ -29,7 +29,7 @@ Run silently:
 python publishing-house/tools/ph-workflow-data.py
 ```
 
-Extract `workflow_id` and `epic_key` from the output.
+Extract `workflow_id` from the output.
 
 Then run:
 ```bash
@@ -40,6 +40,8 @@ Replace WORKFLOW_ID with the extracted `workflow_id`. Extract `stage` from the o
 Both scripts are read-only — they never write files.
 
 ## Step 5 — Dispatch
+
+**RULE: Dispatch based on `stage` only. No interpretation, no session context, no reasoning about what happened previously.** The stage returned by the API is the truth. Map it to a skill and dispatch. That is your only job.
 
 This is a loop. After a skill returns, re-run Step 4 (both scripts), extract the new stage, and continue.
 
