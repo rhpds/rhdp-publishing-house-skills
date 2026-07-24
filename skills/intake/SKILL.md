@@ -35,27 +35,25 @@ self-sufficient — it works whether dispatched by the orchestrator or invoked d
 
 Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
 
-### Step 4 — Get workflow data
+### Step 4 — Workflow check
 
-**RULE: This step MUST run every time the intake skill is invoked.** Never skip it. Never reuse results from a previous run. The workflow state may have changed.
+**RULE: This sequence runs every invocation. No exceptions. No skipping. No reusing previous results.**
 
-Fetch workflow data (includes rejection info if any):
+**4a.** Get workflow data:
 ```bash
 python publishing-house/tools/ph-workflow-data.py
 ```
+If this fails → set `offline_mode = true`, skip to Step 5.
+If this succeeds → extract `workflow_id`. Set `offline_mode = false`.
 
-**If this fails (non-zero exit, connection error, timeout):**
-> **Offline mode.** Central API is not reachable. You can still complete the intake
-> interview, generate the design doc, and write module outlines. RCARS vetting
-> will be skipped, and submission will be deferred until the platform is available.
+**4b.** Get workflow state (skip if offline):
+```bash
+python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
+```
+If stage is not `intake` → STOP. This is the only condition that stops the skill.
+If offline → assume `intake`.
 
-Set `offline_mode = true` and proceed to Step 7. Skip Steps 5 and 6.
-
-**If this succeeds:** Extract `workflow_id` and `epic_key` from the output. Set `offline_mode = false`.
-
-### Step 5 — Sync data to files (skip if offline)
-
-Sync workflow data to local files (writes rejections to spec.yaml, persists workflow_id/epic_key):
+**4c.** Sync (skip if offline):
 ```bash
 python publishing-house/tools/ph-sync.py
 ```
@@ -65,22 +63,9 @@ git add publishing-house/spec.yaml catalog-info.yaml
 git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
 ```
 
-### Step 6 — Get workflow state (skip if offline)
+**4d.** If `unresolved_rejections` > 0 → follow `procedures/00-rejection-handler.md`. After the rejection handler completes, continue with normal intake (Step 5 onward).
 
-Get the current workflow stage:
-```bash
-python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
-```
-Replace WORKFLOW_ID with the `workflow_id` from Step 4. Extract `stage`.
-
-If stage is not `intake` → show:
-> Cannot start this skill because the project is in **{stage}** stage. This skill requires **intake**.
-
-**STOP — do not proceed.**
-
-If offline → assume `intake` stage and proceed.
-
-### Step 7 — Load policy and project files
+### Step 5 — Load policy and project files
 
 1. Fetch validation policy:
    ```bash
@@ -106,14 +91,7 @@ If offline → assume `intake` stage and proceed.
 
 ## Dispatch
 
-### If unresolved rejections exist (from Step 5)
-
-**Do NOT run the interview. Do NOT submit.**
-1. Follow `procedures/00-rejection-handler.md` — address unresolved feedback first
-2. The rejection handler determines the re-entry point
-3. Do NOT skip the rejection handler even if the spec looks complete
-
-### If no rejections — detect entry path
+Rejections are already handled in Step 4d. This section determines the entry path when there are no rejections (or after the rejection handler completes).
 
 Read `publishing-house/spec/design.md`. Check whether it still has `[placeholder]` markers
 or contains real content.
