@@ -53,6 +53,28 @@ already exist. Do NOT regenerate from scratch.
    - If scope/content changed for a module → update the relevant sections
 4. Leave untouched modules as-is
 
+## Auto-Generate Design and Module Summaries
+
+After outlines are written or updated (both fresh and re-intake paths), generate summaries
+for spec.yaml so reviewers see a narrative overview without reading full markdown files.
+
+1. Read `publishing-house/spec/design.md`
+2. Read all module files from `publishing-house/spec/modules/`
+3. Generate a 2-3 sentence `design_overview` summarizing the design's problem statement, target audience, and approach
+4. For each module, generate a 1-2 sentence `overview` summarizing what the module covers and what the learner does
+5. Write into `approval_checklist.content` in spec.yaml:
+
+```yaml
+approval_checklist:
+  content:
+    design_overview: "Generated summary here..."
+    module_summaries:
+      - title: "Module 1 Title"
+        overview: "Generated 1-2 sentence overview..."
+      - title: "Module 2 Title"
+        overview: "Generated 1-2 sentence overview..."
+```
+
 ## Write Point
 
 ```bash
