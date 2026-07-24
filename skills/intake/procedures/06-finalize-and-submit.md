@@ -8,8 +8,14 @@ validate, and submit to Central API.
 Ask the remaining approval checklist questions. These are the fields reviewers need.
 
 **Prerequisites verifiable:**
-> "What must the learner know or have done before starting Module 1? And can the lab
-> automatically validate those prerequisites when the learner starts?"
+
+The prerequisites themselves are already captured in design.md (written during Phase 2).
+Do NOT ask what the prerequisites are — that's redundant.
+
+Only ask whether they can be automatically validated:
+> "Your design lists these prerequisites: [read from design.md Prerequisites section].
+> Can the lab automatically validate these when the learner starts — for example,
+> a pre-flight script that checks cluster access or credentials?"
 
 Write to `approval_checklist.content.prerequisites_verifiable` (true/false).
 
