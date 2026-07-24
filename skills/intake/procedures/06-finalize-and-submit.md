@@ -212,7 +212,7 @@ The response shape:
 
 Parse by `status`:
 
-- **201** — Success. Show: "Intake submitted. Stage is now **{stage}**."
+- **201** — Success. Show: "Intake submitted successfully. Run `/rhdp-publishing-house` to check the current stage."
 - **422** — Validation failed. `validation.results` contains the failed checks.
   - Show each failed check to the author: check ID, message, and field path
   - Help the author fix the issues
@@ -237,7 +237,7 @@ Check `project.showroom_type` in spec.yaml:
 
 ## Step 8: Report result
 
-- If submission succeeded → show: "Intake submitted. Stage is now **{stage}**."
+- If submission succeeded → show: "Intake submitted successfully. Run `/rhdp-publishing-house` to check the current stage."
 - If submission failed → show the error from the response.
 
 **Return to the orchestrator** (if dispatched) or **STOP** (if invoked directly).
