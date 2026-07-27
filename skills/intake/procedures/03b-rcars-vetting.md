@@ -35,7 +35,11 @@ be slower under load.
 
 **If advisor returns candidates** (status=complete, candidates non-empty):
 
-> "I checked the RHDP catalog against your design. Here's what the advisor found:
+Present the results as information, not a challenge. The author is not required to justify
+their lab's existence. The purpose is awareness — they should know what's already in the
+catalog so they can position their design accordingly.
+
+> "I checked the RHDP catalog against your design. Here's what exists:
 >
 > 1. **[display_name]** ([relevance_score]% relevance)
 >    *Similar because:* [why_it_fits — first sentence]
@@ -44,8 +48,13 @@ be slower under load.
 > 2. **[display_name]** ([relevance_score]% relevance)
 >    *Similar because:* [why_it_fits — first sentence]
 >
-> **How does your lab specifically differ from these?** Do you want to adjust the design
-> based on what the catalog already covers, or does this confirm your direction?"
+> Based on this, your design covers [summarize what's different — e.g., "live migration
+> on a current OCP version, which none of the existing labs address"].
+> Do you want to adjust anything in the design, or does this confirm the direction?"
+
+Do NOT ask "how does your lab differ" or "why should this exist." The skill summarizes
+the differentiation from the RCARS results itself. Do NOT reference "the advisor" as if
+it's a person — RCARS is a catalog search tool, not a reviewer.
 
 **If no candidates** (empty list or all relevance_score < 50):
 
@@ -86,7 +95,7 @@ approval_checklist:
         url: "https://catalog.demo.redhat.com/catalog?item=[ci_name]"
         relevance_score: [score]
         why_it_fits: "[why_it_fits]"
-    differentiation: "[author's response about what makes this unique]"
+    differentiation: "[derived from RCARS results — summarize what this design covers that existing catalog items don't]"
 ```
 
 ```bash
