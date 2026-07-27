@@ -2,41 +2,76 @@
 
 Phase 5 of the intake flow. Capture infrastructure requirements as a single confirm-or-adjust interaction.
 
+## Determine Platform
+
+Read `publishing-house/spec.yaml` inline comments to understand valid values.
+Determine the platform from the products discussed in discovery:
+
+| Signal | Platform |
+|--------|----------|
+| Products include OpenShift, OCP, OCP Virt, RHOAI, or any OCP operator | `platform: ocp` |
+| Products are AAP, RHEL, Satellite, or other non-OCP products | `platform: rhel-vms` |
+| Mixed (e.g., AAP + OpenShift) | `platform: ocp` (OCP is the infrastructure base) |
+
 ## Derive Defaults
 
-Read `publishing-house/spec.yaml` inline comments to understand valid values for each field.
-Derive sensible defaults from what you already know:
+Based on platform and products:
 
-| Signal from Discovery | Default |
-|----------------------|---------|
-| Products include OCP / OpenShift | `cloud_provider: cnv`, `cluster_type: multinode`, propose `ocp_version` |
-| Products include OCP Virtualization/CNV | `cloud_provider: cnv`, `cluster_type: multinode` |
-| Products include AAP (without OCP) | `cloud_provider: cnv` (VMs on RHDP infra), no `ocp_version` — AAP runs on RHEL |
-| Products include AI keywords (RHOAI, MaaS, Granite, InstructLab, Ollama, LLM, inference, model serving) | `ai_requirement: maas`, `ai_model_tier: open-source` |
+### For `platform: ocp`
+
+| Signal | Default |
+|--------|---------|
+| Products include OCP Virtualization/CNV | `cluster_type: multinode` |
+| Simple OCP lab | `cluster_type: sno` if single-user, `multinode` otherwise |
+| OCP version not specified | `ocp_version: "4.20"` (minimum) |
+
+### For `platform: rhel-vms`
+
+Propose per-student VM roles based on the products. For example:
+- AAP lab → 1 AAP controller (8 vCPU, 32GB), 2 RHEL managed nodes (2 vCPU, 8GB each)
+- AAP + Windows → add 1 Windows Server node (4 vCPU, 8GB)
+- AAP + EDA → add EDA controller resources or increase AAP controller sizing
+
+Do NOT propose OCP fields (ocp_version, cluster_type, control_plane_*, worker_*) for
+RHEL-based labs. Those fields are irrelevant.
+
+### Common defaults (both platforms)
+
+| Signal | Default |
+|--------|---------|
+| Products include AI keywords | `ai_requirement: maas`, `ai_model_tier: open-source` |
 | No AI keywords | `ai_requirement: none` |
 | No specific cloud reason | `cloud_provider: cnv` (platform default) |
 | No topology discussed | `topology: shared-cluster` |
 
-**OCP version:** Only propose an OCP version when OpenShift is one of the products the
-learner interacts with in the lab. If the lab is AAP-on-RHEL, VM-based, or otherwise
-doesn't involve OpenShift, leave `ocp_version` blank — the infra reviewer will set the
-platform version if needed. Do NOT make up reasons why OCP version is relevant when the
-lab doesn't use OpenShift.
-
 ## Present as One Profile
 
 Present a complete infrastructure profile for confirmation — not individual questions.
-Only include fields that are relevant to this lab's products:
+Only include fields relevant to the detected platform.
 
-> "Based on your products, here's what I'd suggest for infrastructure:
+**For OCP labs:**
+> "Based on your products, here's the infrastructure profile:
 >
+> - **Platform:** OCP
 > - **Cloud provider:** CNV
+> - **Cluster type:** Multinode, 6 workers (8 vCPU, 32GB RAM, 100GB disk)
+> - **OCP version:** 4.20
 > - **Topology:** Per-student
-> - [include **OCP version** ONLY if OpenShift is a product in this lab]
-> - [include other relevant fields]
 >
-> Does this look right, or should I adjust anything?
-> You can also edit `spec.yaml` directly if you prefer."
+> Does this look right, or should I adjust anything?"
+
+**For RHEL-based labs:**
+> "Based on your products, here's the infrastructure profile:
+>
+> - **Platform:** RHEL VMs (provisioned via CNV)
+> - **Per student:**
+>   - 1 AAP controller (8 vCPU, 32GB RAM)
+>   - 2 RHEL managed nodes (2 vCPU, 8GB RAM each)
+>   - 1 Windows Server (4 vCPU, 8GB RAM)
+> - **Topology:** Per-student
+> - **AAP version:** 2.5
+>
+> Does this look right, or should I adjust anything?"
 
 ## Conditional Follow-ups
 
@@ -47,11 +82,10 @@ Only ask these if triggered — do not ask them by default:
 - **AAP version:** Only if AAP is in the products list.
 - **Non-GA products:** Only if any product is labeled beta, tech preview, or early access.
   If non-empty: "How will access be provided during provisioning?"
-- **Concurrent users:** Only if topology is shared-cluster. Shared clusters need to be
-  sized for the number of simultaneous users. Per-student and cnv-pool topologies give
-  each learner their own environment — the number of simultaneous users is an operational
-  decision made at scheduling time, not during intake. Do NOT ask the author how many
-  people will be in a room or at an event.
+- **Concurrent users:** Only if topology is shared-cluster. Per-student and cnv-pool
+  topologies give each learner their own environment — the number of simultaneous users
+  is an operational decision made at scheduling time, not during intake. Do NOT ask the
+  author how many people will be in a room or at an event.
 - **External services:** Ask once. Accept "none."
 
 ## Confirmation Required
@@ -68,13 +102,14 @@ Only proceed to Phase 6 after the author confirms.
 
 - Do NOT fabricate explanations for why a field is relevant when it isn't.
 - If the author challenges a field, remove it or leave it blank. Do not invent justifications.
-- Only propose fields that are directly relevant to the products and design.
+- Only propose fields that are directly relevant to the products and platform.
 - If you're unsure whether a field applies, leave it for the infra reviewer.
+- Do NOT propose OCP fields (ocp_version, cluster_type, worker_*) for RHEL-based labs.
 
 ## Write Point
 
-Write all infrastructure fields to spec.yaml and update the Infrastructure Requirements
-section of design.md:
+Write all infrastructure fields to spec.yaml (platform-appropriate fields only) and
+update the Infrastructure Requirements section of design.md:
 
 ```bash
 git add publishing-house/spec.yaml publishing-house/spec/design.md
