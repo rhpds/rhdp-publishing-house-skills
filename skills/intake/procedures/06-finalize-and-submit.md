@@ -1,43 +1,36 @@
 # Finalize and Submit
 
-Phase 6 of the intake flow. Complete the approval checklist, generate supporting files,
-validate, and submit to Central API.
+Phase 6 of the intake flow. Present the final state, flag concerns, generate supporting
+files, and submit to Central API.
 
-## Step 1: Approval Checklist
+## Step 1: Final Review
 
-Ask the remaining approval checklist questions. These are the fields reviewers need.
+Do NOT re-ask questions that were already answered in earlier phases. Prerequisites,
+differentiation, and assessment strategy were all captured during Phases 2-5.
 
-**Prerequisites verifiable:**
+Read `publishing-house/spec.yaml` and `publishing-house/spec/design.md`. Check for any
+fields that are still empty or still have placeholder values. If everything is populated,
+present the summary. If anything is missing, call it out specifically.
 
-The prerequisites themselves are already captured in design.md (written during Phase 2).
-Do NOT ask what the prerequisites are — that's redundant.
+Present the final state to the author:
 
-Only ask whether they can be automatically validated:
-> "Your design lists these prerequisites: [read from design.md Prerequisites section].
-> Can the lab automatically validate these when the learner starts — for example,
-> a pre-flight script that checks cluster access or credentials?"
+> "Here's what we have before submitting for review:
+>
+> **Design:** `publishing-house/spec/design.md` — [title], [module count] modules, [duration]
+> **RCARS:** [differentiation statement, or "not yet vetted" if RCARS was unavailable]
+> **Infrastructure:** [cloud provider, topology, key sizing details]
+>
+> [If any fields are empty or still placeholders, list them here:]
+> **Still needed:**
+> - [field name] — [what's missing]
+>
+> Review the design doc and let me know if anything needs changing before I submit."
 
-Write to `approval_checklist.content.prerequisites_verifiable` (true/false).
+**Wait for explicit confirmation.** Do NOT auto-proceed.
 
-**Assessment strategy (optional — ask only for Zero-Touch labs):**
-
-If `project.showroom_type` is `zero_touch`, ask:
-> "Since this is a Zero-Touch lab, how should each module be validated? Per module:
-> solve/validate button, verification script, or automated check."
-
-Write to `approval_checklist.content.assessment_strategy`.
-
-If classic showroom or demo → skip this question.
-
-**Differentiation:**
-If `approval_checklist.content.differentiation` is already populated from Phase 3
-(RCARS vetting), present it for confirmation:
-> "Based on our RCARS discussion, here's the differentiation statement: *'{differentiation}'*
-> Does this capture it, or would you adjust the wording?"
-
-If empty (RCARS was skipped or offline) → leave it empty. Do NOT ask the author to
-explain differentiation without RCARS context. The field will be populated when RCARS
-vetting runs (either in a later session or when Central validates at submission).
+- **If feedback** → address it, update files, re-present
+- **If the author flags missing fields** → ask about those specific gaps only
+- **If approved** → immediately execute Steps 2-7 WITHOUT asking again
 
 ## Step 2: Generate jira.yaml
 
