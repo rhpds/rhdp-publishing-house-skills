@@ -215,8 +215,9 @@ Parse by `status`:
 - **201** — Success. Show: "Intake submitted successfully. Run `/rhdp-publishing-house` to check the current stage."
 - **422** — Validation failed. `validation.results` contains the failed checks.
   - Show each failed check to the author: check ID, message, and field path
-  - Help the author fix the issues
-  - After fixes, commit, push, and re-run `ph-intake.py`
+  - Propose specific fixes for each issue and **ask the author to confirm before making any changes**
+  - Do NOT edit files, commit, or push until the author approves the proposed fixes
+  - After the author approves and fixes are applied, commit, push, and re-run `ph-intake.py`
   - Loop until validation passes
 - **409** — Workflow is not in intake stage. Show `error` and **STOP.**
 - **404** — No workflow found. Show `error` and **STOP.**
