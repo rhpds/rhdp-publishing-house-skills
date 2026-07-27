@@ -48,13 +48,18 @@ catalog so they can position their design accordingly.
 > 2. **[display_name]** ([relevance_score]% relevance)
 >    *Similar because:* [why_it_fits — first sentence]
 >
-> Based on this, your design covers [summarize what's different — e.g., "live migration
-> on a current OCP version, which none of the existing labs address"].
-> Do you want to adjust anything in the design, or does this confirm the direction?"
+> **Summary:** [1-2 sentence synthesis of what this design covers that the existing
+> catalog items don't. Derive this from the gaps and caveats in the results.]
+>
+> This is what I'll record as the differentiation in the spec:
+> *"[the differentiation statement that will be written to spec.yaml]"*
+>
+> Does this look right? Do you want to adjust the design or the differentiation statement?"
 
-Do NOT ask "how does your lab differ" or "why should this exist." The skill summarizes
-the differentiation from the RCARS results itself. Do NOT reference "the advisor" as if
-it's a person — RCARS is a catalog search tool, not a reviewer.
+Do NOT ask "how does your lab differ" or "why should this exist." The skill synthesizes
+the differentiation from the RCARS results and the design doc — the author confirms or
+adjusts, they don't write it from scratch. Do NOT reference "the advisor" as if it's a
+person — RCARS is a catalog search tool, not a reviewer.
 
 **If no candidates** (empty list or all relevance_score < 50):
 
