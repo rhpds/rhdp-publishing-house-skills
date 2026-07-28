@@ -20,6 +20,8 @@ For each section in design.md:
 with titles and estimated durations. Explain why you structured it this way. The author may
 adjust — that's expected.
 
+**Scale learning objectives to duration.** Use the ratio of up to 3 objectives per 45 minutes of content. Do not default to 3–4 regardless of lab length — a 2-hour lab should have 6–8 objectives; a 4-hour lab 10 or more. Too few means objectives are too broad; too many means they're too granular.
+
 ## Present for Review
 
 Present the design doc to the author — the design.md content only, NOT spec.yaml:
