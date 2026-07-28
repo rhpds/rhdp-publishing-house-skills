@@ -33,81 +33,7 @@ If empty (RCARS was skipped or offline) → leave it empty. Do NOT ask the autho
 explain differentiation without RCARS context. The field will be populated when RCARS
 vetting runs (either in a later session or when Central validates at submission).
 
-## Step 2: Generate jira.yaml
-
-Generate `publishing-house/jira.yaml` from the spec data. This file is read by Central API
-after reviews complete to update the Jira epic and create child tasks. **Always overwrite
-the entire file** — on re-intake (review loopback), the previous contents are replaced.
-
-Run silently:
-```bash
-python3 -c "
-import re
-import yaml
-from pathlib import Path
-
-spec = yaml.safe_load(Path('publishing-house/spec.yaml').read_text()) or {}
-project = spec.get('project', {})
-spec_data = spec.get('spec', {})
-
-title = spec_data.get('title', '') or project.get('slug', '')
-content_type = project.get('content_type', 'lab')
-slug = project.get('slug', '')
-
-epic_summary = f'[PH] {title} — {content_type} ({slug})'
-
-def extract_brief_overview(module_dir, module_index):
-    pattern = f'module-{module_index:02d}-*.md'
-    matches = sorted(Path(module_dir).glob(pattern))
-    if not matches:
-        return ''
-    text = matches[0].read_text()
-    m = re.search(r'## Brief Overview\s*\n(.*?)(?=\n##|\Z)', text, re.DOTALL)
-    return m.group(1).strip() if m else ''
-
-modules_dir = 'publishing-house/spec/modules'
-
-tasks = [
-    {'key': 'intake', 'summary': '[PH] Intake', 'status': 'done'},
-]
-
-modules = spec_data.get('modules', [])
-for i, m in enumerate(modules, 1):
-    mod_id = m.get('id', f'module-{i:02d}')
-    mod_title = m.get('title', f'Module {i}')
-    brief = extract_brief_overview(modules_dir, i)
-    task = {
-        'key': mod_id,
-        'summary': f'[PH] Write Module {i}: {mod_title}',
-        'status': 'open',
-    }
-    if brief:
-        task['description'] = brief
-    tasks.append(task)
-
-tasks.append({'key': 'write-automation', 'summary': '[PH] Write Automation', 'status': 'open'})
-tasks.append({'key': 'write-health-check', 'summary': '[PH] Write Health Check', 'status': 'open'})
-tasks.append({'key': 'write-e2e-tests', 'summary': '[PH] Write E2E Tests', 'status': 'open'})
-
-jira = {
-    'epic': {
-        'summary': epic_summary,
-        'description_source': 'publishing-house/spec/design.md',
-    },
-    'tasks': tasks,
-}
-
-Path('publishing-house/jira.yaml').write_text(
-    '# Publishing House — Jira Structure\n'
-    '# Written by the intake skill, read by Central API after reviews complete.\n'
-    '# Overwritten on re-intake (review loopback). Central creates tasks fresh.\n\n'
-    + yaml.dump(jira, default_flow_style=False, sort_keys=False)
-)
-print('jira.yaml written')
-"
-```
-
-## Step 3: Generate Draft Automation Manifest
+## Step 2: Generate Draft Automation Manifest
 
 Generate a draft `publishing-house/spec/automation-manifest.yaml` from the spec data.
 This is a DRAFT — the automation procedure will refine it during development.
@@ -118,7 +44,7 @@ Derive each field from what's already in spec.yaml and design.md:
 - **operators:** Infer from Products & Technologies — operators the learner USES but doesn't install
 - **external_services:** From `spec.environment.external_services`
 
-## Step 4: Generate mkdocs.yml
+## Step 3: Generate mkdocs.yml
 
 Generate `mkdocs.yml` at the repo root for RHDH TechDocs rendering.
 
@@ -167,7 +93,7 @@ print('mkdocs.yml created')
 "
 ```
 
-## Step 5: Author Checkpoint
+## Step 4: Author Checkpoint
 
 > "Your spec is ready for submission. Take a moment to review
 > `publishing-house/spec/design.md` and the module outlines in
@@ -178,19 +104,19 @@ print('mkdocs.yml created')
 **Wait for the author's response. Do NOT auto-proceed.**
 
 - **If feedback** → update the spec, re-validate, ask again
-- **If approved** → immediately execute Steps 6-8 WITHOUT asking again
+- **If approved** → immediately execute Steps 5-7 WITHOUT asking again
 
-## Step 6: Commit and push
+## Step 5: Commit and push
 
 ```bash
 git add publishing-house/ mkdocs.yml catalog-info.yaml
-git commit -m "feat: intake complete — design spec, module outlines, and jira structure"
+git commit -m "feat: intake complete — design spec and module outlines"
 git push
 ```
 
 **Run this immediately. Do NOT ask the author.**
 
-## Step 7: Submit intake to Central API
+## Step 6: Submit intake to Central API
 
 **If offline → defer:**
 > "Your spec is complete and committed. When the platform is available, run
@@ -224,7 +150,7 @@ Parse by `status`:
 - **404** — No workflow found. Show `error` and **STOP.**
 - **Any other status** — Show the `error` message and **STOP.**
 
-## Step 7b: Project structure cleanup
+## Step 6b: Project structure cleanup
 
 Check `project.showroom_type` in spec.yaml:
 
@@ -237,7 +163,7 @@ Check `project.showroom_type` in spec.yaml:
   ```
 - **If `zero_touch`**: Keep `runtime-automation/` and `setup-automation/` in place.
 
-## Step 8: Report result
+## Step 7: Report result
 
 - If submission succeeded → show: "Intake submitted successfully. Run `/rhdp-publishing-house` to check the current stage."
 - If submission failed → show the error from the response.
