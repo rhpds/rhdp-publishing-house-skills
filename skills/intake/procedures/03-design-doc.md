@@ -16,6 +16,8 @@ For each section in design.md:
 2. Keep the section heading exactly as-is — the validation engine checks for these
 3. If you don't have enough information for a section, leave a clear note: "TBD — [what's needed]"
 
+**Do NOT fill in the Infrastructure Requirements section.** Leave every field in that section as `TBD — confirmed in infrastructure phase`. Do not apply defaults (e.g., do not default cloud provider to CNV). Infrastructure is determined in Phase 5 after the author's products and platform are fully understood.
+
 **Propose module structure.** Based on the discovery conversation, propose a Module Map table
 with titles and estimated durations. Explain why you structured it this way. The author may
 adjust — that's expected.
