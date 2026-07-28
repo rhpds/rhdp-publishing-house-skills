@@ -17,7 +17,6 @@ Present the final state to the author:
 > "Here's what we have before submitting for review:
 >
 > **Design:** `publishing-house/spec/design.md` — [title], [module count] modules, [duration]
-> **RCARS:** [top match and score, or "not yet vetted" if RCARS was unavailable]
 > **Infrastructure:** [cloud provider, topology, key sizing details]
 >
 > [If any fields are empty or still placeholders, list them here:]
