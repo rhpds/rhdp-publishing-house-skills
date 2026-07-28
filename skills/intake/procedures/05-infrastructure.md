@@ -86,7 +86,13 @@ Only ask these if triggered — do not ask them by default:
   topologies give each learner their own environment — the number of simultaneous users
   is an operational decision made at scheduling time, not during intake. Do NOT ask the
   author how many people will be in a room or at an event.
-- **External services:** Ask once. Accept "none."
+- **External services:** Ask explicitly. This covers ALL external services the lab environment
+  needs to reach — both during provisioning/deployment and during the student session. Do NOT
+  let the author answer "none" based only on what the student sees. Prompt them to consider:
+  container registries, package repos, license servers, external APIs, Git hosts, anything
+  the automation pulls from during setup. "None" is only correct if the environment is fully
+  air-gapped with all content pre-staged. If the author is unsure, list the likely candidates
+  based on their products and leave them to confirm.
 
 ## Confirmation Required
 

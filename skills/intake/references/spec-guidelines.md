@@ -48,7 +48,9 @@ Capture what you know now — guesstimates are fine during intake. Spec refineme
 - **Default path:** MaaS + open-source → no justification required. Frontier or GPU → justification required for infra review.
 
 ### External Services
-- List named external services (e.g., github.com, registry.access.redhat.com)
+- List ALL named external services the lab needs to reach — both during provisioning/deployment and during the student session
+- Includes: container registries, package repos, Git hosts, license servers, external APIs, anything automation pulls from at setup time
+- "None" is only valid if the environment is fully air-gapped with all content pre-staged
 - Vague entries ("internet", "any public IP") → rejected
 - Empty list → no additional justification required
 
