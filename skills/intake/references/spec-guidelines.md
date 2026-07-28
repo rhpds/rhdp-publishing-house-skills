@@ -7,7 +7,7 @@ Guidelines for evaluating and generating project specs. Used by the intake agent
 A complete spec MUST have all of these (11 sections + a descriptive H1 title):
 
 1. **H1 title** — descriptive project name (not a placeholder like `# [Project Title]`)
-2. **Problem Statement** — what gap this fills, why it's needed (2-3 sentences)
+2. **Overview** — what the lab or demo is, why it exists, and what participants will do (direct, no flowery prose)
 3. **Target Audience** — role, experience level, what they already know
 4. **Prerequisites** — what the learner needs before starting; can the lab validate them?
 5. **Learning Objectives** — action-verb list (Configure, Deploy, Create, Troubleshoot)
@@ -101,8 +101,10 @@ Each module outline in `publishing-house/spec/modules/module-NN-*.md` must have:
 - NOT: Understand, Learn, Know, Be familiar with (too vague)
 - Each objective should be testable
 
-### Problem Statement
-- Specific, not generic — reference a real persona with a real need
+### Overview
+- What the lab or demo is and why it exists (2-3 sentences)
+- Followed by a direct description of what participants will do — specific enough to understand at a glance, no interpretation required
+- No flowery language or prose
 
 ### Module Map
 - Each module should be 10-30 minutes
