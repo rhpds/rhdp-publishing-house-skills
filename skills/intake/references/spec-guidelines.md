@@ -41,16 +41,16 @@ Capture what you know now — guesstimates are fine during intake. Spec refineme
 
 ### AI / MaaS
 - `ai_requirement`: maas | gpu | none
-- `ai_model_tier`: open-source (default, auto-approved) | frontier (requires justification)
+- `ai_model_tier`: open-source (default, no justification required) | frontier (requires justification)
 - `ai_model_name`: specific model if known
 - `ai_justification`: required if frontier or gpu — explain why open-source is insufficient
 - **AI keyword triggers (Phase 5):** AI, RHOAI, OpenShift AI, MaaS, Granite, InstructLab, Ollama, LLM, inference, model serving
-- **Default path:** MaaS + open-source → auto-approved. Frontier or GPU → routes to human infra review.
+- **Default path:** MaaS + open-source → no justification required. Frontier or GPU → justification required for infra review.
 
 ### External Services
 - List named external services (e.g., github.com, registry.access.redhat.com)
 - Vague entries ("internet", "any public IP") → rejected
-- Empty list → auto-approved
+- Empty list → no additional justification required
 
 ### AAP
 - Version required if "Ansible Automation Platform" in products
@@ -58,7 +58,7 @@ Capture what you know now — guesstimates are fine during intake. Spec refineme
 ### Non-GA Products
 - List non-GA products/versions
 - Include access plan: how will access be provided during provisioning?
-- Empty list → auto-approved; non-empty → routes to infra review
+- Empty list → no additional justification required; non-empty → routes to infra review
 
 Not all fields must be known at intake. "TBD but estimating ~X" is fine.
 
