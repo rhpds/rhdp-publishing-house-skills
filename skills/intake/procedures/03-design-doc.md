@@ -47,7 +47,22 @@ Do NOT regenerate from scratch.
 
 ## Write Point
 
-Write design.md and update corresponding spec.yaml fields:
+Write design.md and update corresponding spec.yaml fields.
+
+When writing `spec.modules`, assign each module a stable `id` — `module-01`, `module-02`, etc.
+These IDs are permanent: if modules are later reordered, renamed, or removed, the ID stays
+with the content it was assigned to. Example:
+
+```yaml
+spec:
+  modules:
+  - id: module-01
+    title: "Getting Started with OpenShift"
+    duration_min: 30
+  - id: module-02
+    title: "Deploying Applications"
+    duration_min: 45
+```
 
 ```bash
 git add publishing-house/spec/design.md publishing-house/spec.yaml
