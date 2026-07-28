@@ -51,14 +51,12 @@ catalog so they can position their design accordingly.
 > **Summary:** [1-2 sentence synthesis of what this design covers that the existing
 > catalog items don't. Derive this from the gaps and caveats in the results.]
 >
-> This is what I'll record as the differentiation in the spec:
-> *"[the differentiation statement that will be written to spec.yaml]"*
->
-> Does this look right? Do you want to adjust the design or the differentiation statement?"
+> Do you want to adjust anything in the design based on this?"
 
-Do NOT ask "how does your lab differ" or "why should this exist." The skill synthesizes
-the differentiation from the RCARS results and the design doc — the author confirms or
-adjusts, they don't write it from scratch. Do NOT reference "the advisor" as if it's a
+Do NOT ask "how does your lab differ" or "why should this exist." Do NOT present a
+"differentiation statement" for the author to review or confirm — the catalog gap summary
+is recorded internally in spec.yaml. The author's only decision here is whether the RCARS
+findings change anything about the design. Do NOT reference "the advisor" as if it's a
 person — RCARS is a catalog search tool, not a reviewer.
 
 **If no candidates** (empty list or all relevance_score < 50):
@@ -100,7 +98,7 @@ approval_checklist:
         url: "https://catalog.demo.redhat.com/catalog?item=[ci_name]"
         relevance_score: [score]
         why_it_fits: "[why_it_fits]"
-    differentiation: "[derived from RCARS results — summarize what this design covers that existing catalog items don't]"
+    catalog_gap: "[derived from RCARS results — summarize what this design covers that existing catalog items don't]"
 ```
 
 ```bash

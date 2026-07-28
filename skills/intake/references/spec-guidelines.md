@@ -68,7 +68,7 @@ The following are authored during intake and stored in `approval_checklist` in s
 
 | Field | Where | What |
 |---|---|---|
-| `differentiation` | `approval_checklist.content` | Author's narrative: how this differs from existing content |
+| `catalog_gap` | `approval_checklist.content` | Derived from RCARS results — what this design covers that existing catalog items don't |
 | `design_overview` | `approval_checklist.content` | Skill-generated 2-3 sentence summary of design.md |
 | `module_summaries` | `approval_checklist.content` | Skill-generated [{title, overview}] — one per module |
 

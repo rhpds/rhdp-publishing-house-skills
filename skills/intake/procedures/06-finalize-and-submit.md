@@ -6,7 +6,7 @@ files, and submit to Central API.
 ## Step 1: Final Review
 
 Do NOT re-ask questions that were already answered in earlier phases. Prerequisites,
-differentiation, and assessment strategy were all captured during Phases 2-5.
+RCARS vetting, and assessment strategy were all captured during Phases 2-5.
 
 Read `publishing-house/spec.yaml` and `publishing-house/spec/design.md`. Check for any
 fields that are still empty or still have placeholder values. If everything is populated,
@@ -17,7 +17,7 @@ Present the final state to the author:
 > "Here's what we have before submitting for review:
 >
 > **Design:** `publishing-house/spec/design.md` — [title], [module count] modules, [duration]
-> **RCARS:** [differentiation statement, or "not yet vetted" if RCARS was unavailable]
+> **RCARS:** [top match and score, or "not yet vetted" if RCARS was unavailable]
 > **Infrastructure:** [cloud provider, topology, key sizing details]
 >
 > [If any fields are empty or still placeholders, list them here:]
