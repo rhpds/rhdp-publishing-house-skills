@@ -73,10 +73,11 @@ tasks = [
 
 modules = spec_data.get('modules', [])
 for i, m in enumerate(modules, 1):
+    mod_id = m.get('id', f'module-{i:02d}')
     mod_title = m.get('title', f'Module {i}')
     brief = extract_brief_overview(modules_dir, i)
     task = {
-        'key': f'write-module-{i:02d}',
+        'key': mod_id,
         'summary': f'[PH] Write Module {i}: {mod_title}',
         'status': 'open',
     }
