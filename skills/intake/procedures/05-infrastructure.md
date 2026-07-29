@@ -42,6 +42,7 @@ RHEL-based labs. Those fields are irrelevant.
 | Products include AI keywords | `ai_requirement: maas`, `ai_model_tier: open-source` |
 | No AI keywords | `ai_requirement: none` |
 | No specific cloud reason | `cloud_provider: cnv` (platform default) |
+| Bare-metal or nested virt requirements | `cloud_provider: troshka` |
 | No topology discussed | `topology: shared-cluster` |
 
 ## Present as One Profile

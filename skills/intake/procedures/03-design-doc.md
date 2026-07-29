@@ -8,7 +8,7 @@ Read `publishing-house/spec/design.md` from the project repo. This is the templa
 placeholder sections that you will fill in using what you learned in Phase 1 (discovery).
 
 Read `publishing-house/spec.yaml` inline comments to understand valid values for constrained
-fields (e.g., `# cnv | aws | azure` for cloud_provider). Use these as guidance when filling
+fields (e.g., `# cnv | aws | troshka` for cloud_provider). Use these as guidance when filling
 in the corresponding design.md sections.
 
 For each section in design.md:
