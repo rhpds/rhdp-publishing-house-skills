@@ -53,6 +53,14 @@ Do NOT regenerate from scratch.
 
 Write design.md and update corresponding spec.yaml fields.
 
+**Set `prerequisites_verifiable` in spec.yaml** based on the prerequisites section: if verification is automated (solve/validate buttons, scripts), set `true`; if trust-based (no automated check), set `false`. This must be written now — do not leave it null.
+
+```yaml
+approval_checklist:
+  content:
+    prerequisites_verifiable: false   # or true if automated
+```
+
 When writing `spec.modules`, assign each module a stable `id` — `module-01`, `module-02`, etc.
 These IDs are permanent: if modules are later reordered, renamed, or removed, the ID stays
 with the content it was assigned to. Example:
