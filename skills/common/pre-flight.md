@@ -63,31 +63,27 @@ Run silently:
 python -c "
 import json, os, yaml
 f = os.path.expanduser('~/.config/publishing-house/auth.json')
-if os.path.exists(f):
-    d = json.load(open(f))
+central = ''
+try:
+    ci = yaml.safe_load(open('catalog-info.yaml'))
+    for link in ci.get('metadata', {}).get('links', []):
+        if link.get('title') == 'Central':
+            central = link['url']
+            break
+except Exception:
+    pass
+if not central:
+    print('no-central')
+else:
+    os.makedirs(os.path.dirname(f), exist_ok=True)
+    d = json.load(open(f)) if os.path.exists(f) else {}
+    d['central'] = central
+    with open(f, 'w') as fh:
+        json.dump(d, fh, indent=2)
+    os.chmod(f, 0o600)
     cred = d.get('credential', '')
-    central = d.get('central', '')
     print(f'cred:{cred[:8]}' if cred else 'no-cred')
     print(f'central:{central}')
-else:
-    central = ''
-    try:
-        ci = yaml.safe_load(open('catalog-info.yaml'))
-        for link in ci.get('metadata', {}).get('links', []):
-            if link.get('title') == 'Central':
-                central = link['url']
-                break
-    except Exception:
-        pass
-    if central:
-        os.makedirs(os.path.dirname(f), exist_ok=True)
-        with open(f, 'w') as fh:
-            json.dump({'central': central}, fh, indent=2)
-        os.chmod(f, 0o600)
-        print('no-cred')
-        print(f'central:{central}')
-    else:
-        print('no-central')
 "
 ```
 
