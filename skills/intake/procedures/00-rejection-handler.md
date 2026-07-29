@@ -2,27 +2,29 @@
 
 This procedure runs when `ph-sync.py` reports `unresolved_rejections` > 0.
 The project was previously submitted but rejected at Content Review or Infra Review.
-There may be multiple rejection rounds — each is stored separately in spec.yaml.
+Rejection reasons accumulate across rounds — each reason has its own `id` and `resolved` flag.
 
 ## Step 1: Read Rejections
 
 Read `publishing-house/spec.yaml` and look at `approval_checklist.content.rejections`
-and `approval_checklist.infra.rejections`. Each entry has:
+and `approval_checklist.infra.rejections`. Each section is a flat list of reasons:
 
 ```yaml
-- rejection_id: "abc-123"
+- id: "abc-123"
+  text: "Module 3 learning objectives are too vague"
   reviewer: "John Doe"
+  stage: "content_review"
   timestamp: "2026-07-20T14:30:00Z"
-  reasons:
-    - id: "r1"
-      text: "Module 3 learning objectives are too vague"
-      resolved: false
-    - id: "r2"
-      text: "Missing prerequisites section"
-      resolved: true
+  resolved: false
+- id: "def-456"
+  text: "Missing prerequisites section"
+  reviewer: "John Doe"
+  stage: "content_review"
+  timestamp: "2026-07-20T14:30:00Z"
+  resolved: true
 ```
 
-Collect all reasons where `resolved: false` across all rejections in both sections.
+Collect all reasons where `resolved: false` across both sections.
 If none are unresolved, **skip this procedure entirely** — return to the caller.
 
 ## Step 2: Show Rejection Context
@@ -38,7 +40,7 @@ Present each unresolved rejection to the author, grouped by review stage:
 > **Infra Review** (rejected by {reviewer}, {timestamp}):
 > 1. {reason text} — **unresolved**
 
-Only show rejections that have at least one unresolved reason. Skip fully-resolved ones.
+Only show reasons that are unresolved. Skip resolved ones.
 
 ## Step 3: Review Current State
 
