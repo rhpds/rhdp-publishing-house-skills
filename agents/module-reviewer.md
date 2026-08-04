@@ -6,7 +6,7 @@ tools:
   - Glob
 ---
 
-# showroom:module-reviewer
+# rhdp-publishing-house:module-reviewer
 
 Reviews a single `.adoc` module file and returns dimension-scored findings as structured JSON.
 

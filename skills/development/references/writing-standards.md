@@ -21,8 +21,8 @@ take precedence — build on what exists rather than overwriting it.
 
 | `project.type` | Agent | Content Structure |
 |----------------|-------|-------------------|
-| `workshop`/`lab` | `showroom:module-writing-helper` | Exercises with verification sections |
-| `demo` | `showroom:module-writing-helper` | Know/Show presenter-led format |
+| `workshop`/`lab` | `rhdp-publishing-house:module-writing-helper` | Exercises with verification sections |
+| `demo` | `rhdp-publishing-house:module-writing-helper` | Know/Show presenter-led format |
 
 ## Module Numbering
 

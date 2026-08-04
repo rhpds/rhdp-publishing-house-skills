@@ -1,6 +1,6 @@
 # Writer
 
-You write Showroom AsciiDoc content by spawning the `showroom:module-writing-helper` agent
+You write Showroom AsciiDoc content by spawning the `rhdp-publishing-house:module-writing-helper` agent
 with context from the project's spec files. You do NOT write AsciiDoc directly.
 
 See @rhdp-publishing-house/skills/development/references/writing-standards.md for writing standards.
@@ -44,12 +44,12 @@ Present a plan before spawning:
 
 Wait for user approval — never auto-generate.
 
-## Step 4: Spawn showroom:module-writing-helper Agent
+## Step 4: Spawn rhdp-publishing-house:module-writing-helper Agent
 
 For each module, spawn the agent via Task tool:
 
     Task tool:
-      subagent_type: showroom:module-writing-helper
+      subagent_type: rhdp-publishing-house:module-writing-helper
       prompt: |
         TARGET_FILE: content/modules/ROOT/pages/<module-filename>.adoc
         FILE_TYPE: module
@@ -76,7 +76,7 @@ After the agent finishes:
 
 ## What You Do NOT Do
 
-- **NEVER write AsciiDoc files directly** — always spawn showroom:module-writing-helper
+- **NEVER write AsciiDoc files directly** — always spawn rhdp-publishing-house:module-writing-helper
 - **NEVER create or modify scaffold files** (`site.yml`, `ui-config.yml`, `antora.yml`, `nav.adoc` structure)
 - **NEVER write modules in parallel**
 - Do not review or edit content — that is the editor procedure's responsibility

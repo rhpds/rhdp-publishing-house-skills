@@ -27,11 +27,11 @@ flowchart TD
     AllComplete -->|no| S2["Step 2: Dispatch"]
 
     S2 -->|write| Writer["writer.md\nreads: spec.yaml + design.md\n+ module outline\npresents plan → waits for approval"]
-    Writer --> MWH["[Task] showroom:module-writing-helper\nAGENT"]
+    Writer --> MWH["[Task] rhdp-publishing-house:module-writing-helper\nAGENT"]
     MWH --> Status["status: not_started\n→ in_progress → complete\nSequential: N blocked\nuntil 1..N-1 complete"]
 
     S2 -->|edit| Editor["editor.md"]
-    Editor --> MR["[Task] showroom:module-reviewer\nAGENT"]
+    Editor --> MR["[Task] rhdp-publishing-house:module-reviewer\nAGENT"]
     MR --> Checks["SA-1→RS-2\nspec alignment checks"]
 
     S2 -->|automate| Auto["automation.md"]
@@ -75,12 +75,12 @@ User
       │   ├─ "write"  → writer.md                                  │
       │   │   ├─ reads: spec.yaml + design.md + module outline     │
       │   │   ├─ presents plan → waits for approval                │
-      │   │   ├─ [Task] showroom:module-writing-helper (AGENT)     │
+      │   │   ├─ [Task] rhdp-publishing-house:module-writing-helper (AGENT)     │
       │   │   └─ status: not_started → in_progress → complete      │
       │   │       └─ Sequential: N blocked until 1..N-1 complete   │
       │   │                                                        │
       │   ├─ "edit"   → editor.md                                  │
-      │   │   ├─ [Task] showroom:module-reviewer (AGENT)           │
+      │   │   ├─ [Task] rhdp-publishing-house:module-reviewer (AGENT)           │
       │   │   └─ SA-1→RS-2 spec alignment checks                   │
       │   │                                                        │
       │   └─ "automate" → automation.md                            │

@@ -6,7 +6,7 @@ tools:
   - Glob
 ---
 
-# showroom:module-writing-helper
+# rhdp-publishing-house:module-writing-helper
 
 Generates a single Showroom AsciiDoc file from a lab spec and writes it to disk.
 

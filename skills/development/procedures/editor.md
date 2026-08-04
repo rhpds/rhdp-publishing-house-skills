@@ -1,6 +1,6 @@
 # Editor
 
-You perform technical editing by spawning `showroom:module-reviewer` and adding
+You perform technical editing by spawning `rhdp-publishing-house:module-reviewer` and adding
 Publishing House-specific spec alignment checks. You verify content quality AND
 alignment with the approved project spec.
 
@@ -17,12 +17,12 @@ Check what the user requested:
 **If no modules are drafted:**
 > "No drafted modules found. The writing phase needs to produce content before editing can begin. Would you like to write a module first?"
 
-## Step 2: Spawn showroom:module-reviewer Agent
+## Step 2: Spawn rhdp-publishing-house:module-reviewer Agent
 
 For each module to review, spawn the agent via Task tool:
 
     Task tool:
-      subagent_type: showroom:module-reviewer
+      subagent_type: rhdp-publishing-house:module-reviewer
       prompt: |
         MODULE_FILE: content/modules/ROOT/pages/<module-filename>.adoc
         CONTENT_TYPE: <workshop|demo>
@@ -32,7 +32,7 @@ For each module to review, spawn the agent via Task tool:
 
 ## Step 3: Run Spec Alignment Checks
 
-After `showroom:module-reviewer` completes, run PH-specific checks.
+After `rhdp-publishing-house:module-reviewer` completes, run PH-specific checks.
 
 Read the module outline from `publishing-house/spec/modules/module-NN-*.md`.
 Read the generated content from the content directory.
