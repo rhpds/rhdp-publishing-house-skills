@@ -39,7 +39,14 @@ Do NOT call agnosticv skills — catalog automation is handled by PH-native skil
 
 ## Phase 7c: Automation Code
 
-Write automation from the approved manifest. Use approach from manifest (`ansible`, `gitops`, or `both`).
+Dispatch to the appropriate PH skill based on `automation_approach` in the manifest:
+
+- `ansible`  → Skill tool: `rhdp-publishing-house:ansible-helper`  (FUTURE — RHDPCD-110)
+- `gitops`   → Skill tool: `rhdp-publishing-house:gitops-helper`   (FUTURE — RHDPCD-111)
+- `both`     → ansible-helper first, then gitops-helper
+
+**FUTURE:** These skills do not exist yet. Until they are created, refer to the reference guides
+below and write automation collaboratively with the author using the manifest as the spec.
 
 See the detailed guides for code structure and patterns.
 
