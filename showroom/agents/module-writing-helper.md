@@ -1,10 +1,9 @@
 ---
-description: Generates ONE Showroom AsciiDoc file (index, overview, details, or module) from a full lab spec. Writes to disk and returns structured JSON with the file path, nav entry, and any warnings. Called by showroom:create-lab. Self-contained — no ECC, no external tools.
+description: Generates ONE Showroom AsciiDoc file (index, overview, details, or module) from a full lab spec. Writes to disk and returns structured JSON with the file path, nav entry, and any warnings. Called by development:writer. Self-contained — no ECC, no external tools.
 tools:
   - Read
   - Write
   - Glob
-  - WebFetch
 ---
 
 # showroom:module-writing-helper
