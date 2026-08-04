@@ -8,7 +8,7 @@ tools:
   - WebFetch
 ---
 
-# showroom:file-generator
+# showroom:module-writing-helper
 
 Generates a single Showroom AsciiDoc file from a lab spec and writes it to disk.
 
@@ -218,7 +218,7 @@ Write the generated content to `TARGET_FILE`.
 
 ```json
 {
-  "agent": "file-generator",
+  "agent": "module-writing-helper",
   "file_created": "03-module-01-pipeline-setup.adoc",
   "file_path": "<TARGET_FILE>",
   "file_type": "module",
