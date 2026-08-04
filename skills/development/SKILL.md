@@ -61,12 +61,12 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 ### Step 1 — Scaffold check gate (runs BEFORE any dispatch)
 
-Run `rhdp-publishing-house:config-reviewer` automatically against the project's content directory.
+Invoke `rhdp-publishing-house:config-reviewer` via **Skill tool** automatically against the project's content directory.
 
 - **PASS** → proceed to Step 1b
 - **FAIL** → report the specific issues to the author, then ask:
   > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
-  - "help me" → invoke `rhdp-publishing-house:config-helper` to fix the scaffold, then proceed to Step 1b
+  - "help me" → invoke `rhdp-publishing-house:config-helper` via **Skill tool** to fix the scaffold, then proceed to Step 1b
   - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
 
 ### Step 1b — Module status validation gate
