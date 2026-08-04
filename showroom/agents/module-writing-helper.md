@@ -182,7 +182,7 @@ Additional inputs for blog FILE_TYPE (passed via FULL_SPEC):
 - Mandatory: `== What You've Learned` — extract from FULL_SPEC learning_objectives
 - Mandatory: `== References` — consolidate ALL references from source_files + module outlines
 - Optional: `== Next Steps` — related workshops, docs, practice projects
-- See @showroom/skills/create-lab/references/conclusion-template.md for structure
+- See @showroom/templates/workshop/99-conclusion.adoc for structure
 
 **Blog output format:** Markdown (.md) for all platforms.
 
