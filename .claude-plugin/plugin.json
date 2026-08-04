@@ -1,5 +1,5 @@
 {
   "name": "rhdp-publishing-house",
-  "version": "0.2.0",
-  "description": "AI-powered content lifecycle management for RHDP"
+  "version": "0.3.0",
+  "description": "AI-powered content lifecycle management for RHDP — includes showroom and ftl skill plugins"
 }
