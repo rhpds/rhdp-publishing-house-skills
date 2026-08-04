@@ -60,17 +60,22 @@ For each module, spawn the agent via Task tool:
 
 One agent per module, run sequentially.
 
-## Step 5: Post-Generation Verification
+## Step 5: Content Commit and Verification
 
 After the writing agent finishes:
 
-1. Verify the generated file exists in `content/modules/ROOT/pages/`
-2. Check that `content/modules/ROOT/nav.adoc` includes the new module
-3. Scan for placeholders and open items:
+1. Commit the written content immediately:
+   ```bash
+   git add content/
+   git commit -m "feat: write module N — [title]"
+   ```
+2. Verify the generated file exists in `content/modules/ROOT/pages/`
+3. Check that `content/modules/ROOT/nav.adoc` includes the new module
+4. Scan for placeholders and open items:
    - Image references (`image::`) where the image file doesn't exist in `content/modules/ROOT/assets/images/`
    - Placeholder text like `TODO`, `FIXME`, `[placeholder]`, `TBD`
    - Diagram references without corresponding files
-4. Collect all open items into a list
+5. Collect all open items into a list
 
 ## Step 5b: Auto-Run Reviewer
 
@@ -100,6 +105,9 @@ Present a summary to the author:
 > **Findings:** [count] issues found
 > [List HIGH and CRITICAL findings]
 >
+> **These findings are directions, not mandatory fixes.** Review them and fix what you think
+> makes sense for your content. Some may not apply to your specific lab — use your judgment.
+>
 > **Open Items:**
 > - [List any missing images, placeholders, TODOs from Step 5]
 >
@@ -109,32 +117,41 @@ Present a summary to the author:
 > Open it, read through the content, and check that it matches what you expect.
 > The AI handled ~80% — your review covers the rest: accuracy, tone, missing context, and any items above.
 >
-> When you've reviewed and addressed these items, say **"module N is done"** and I'll mark it complete.
+> **What would you like to do?**
+> 1. Edit the file yourself, then say **"review again"** — I'll re-run the reviewer on your changes
+> 2. Say **"module N is done"** — I'll mark it complete and we move to the next module
+> 3. Ask me to fix specific items — tell me what to change and I'll update the file
 
 **HARD STOP HERE.** Do NOT mark the module complete. Do NOT proceed to the next module.
 Wait for the author to explicitly say the module is done.
+
+## Step 5c-retry: Re-Review After Manual Edits
+
+When the author says "review again" / "re-review" / "check it again":
+
+1. Re-run the reviewer agent (same as Step 5b) against the current state of the `.adoc` file
+2. Present updated scores and findings (same format as Step 5c)
+3. HARD STOP again — wait for "module N is done" or another "review again"
+
+This loop can repeat as many times as the author wants.
 
 ## Step 5d: Mark Complete (only after human approval)
 
 When the author says "module N is done" / "it's done" / "mark it complete" / "looks good":
 
-1. Update `publishing-house/spec.yaml`: change `status: in_progress` to `status: complete` for this module
-2. Commit:
+1. Re-check: verify the `.adoc` file exists and `spec.yaml` shows `status: in_progress` for this module
+2. Update `publishing-house/spec.yaml`: change `status: in_progress` to `status: complete` for this module
+3. Commit:
    ```bash
    git add publishing-house/spec.yaml
    git commit -m "feat: mark module N complete — [title]"
    ```
-3. Confirm:
+4. Confirm:
    > "Module N marked complete. [Next module available / All modules complete.]"
 
-## Step 6: Commit the Written Content
-
-Commit the content file and nav update immediately after writing (before review):
-
-    git add content/
-    git commit -m "feat: write module N — [title]"
-
-Note: The completion status commit (Step 5d) is SEPARATE from the content commit.
+**Standalone completion:** If the author returns in a new session and says "module N is done" without
+having run the write flow in this session, Step 5d still works — check `spec.yaml` for `status: in_progress`,
+verify the `.adoc` file exists in `content/modules/ROOT/pages/`, and mark complete.
 
 ## What You Do NOT Do
 
