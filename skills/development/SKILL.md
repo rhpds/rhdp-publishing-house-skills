@@ -59,6 +59,30 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 ## Dispatch
 
+### Step 1 — Scaffold check gate (runs BEFORE any dispatch)
+
+Run `showroom:config-reviewer` automatically against the project's content directory.
+
+- **PASS** → proceed to Step 1b
+- **FAIL** → report the specific issues to the author, then ask:
+  > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
+  - "help me" → invoke `showroom:config-helper` to fix the scaffold, then proceed to Step 1b
+  - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
+
+### Step 1b — Module status validation gate
+
+Read `spec.yaml` and check module statuses.
+
+- **Any module is `in_progress`?** → warn the author:
+  > "Module N is currently marked in_progress. Would you like to continue it, or mark it complete first?"
+  Wait for the author's response before dispatching.
+- **All modules are `complete` AND user request is "write"?** → suggest editing instead:
+  > "All modules are already complete. Did you mean to edit or review the content instead?"
+  Wait for confirmation.
+- **Otherwise** → proceed to Step 2 dispatch.
+
+### Step 2 — Dispatch
+
 Based on what the user asked for:
 
 - **"write module N"** / **"start writing"** / **"write all"** → follow `procedures/writer.md`
