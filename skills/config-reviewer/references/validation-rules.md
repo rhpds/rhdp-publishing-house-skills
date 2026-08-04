@@ -1,0 +1,284 @@
+# Validation Rules Reference
+
+All validation rules enforced by the `showroom:config-reviewer` skill.
+
+## Severity Levels
+
+| Level | Meaning |
+|-------|---------|
+| **CRITICAL** | Deployment will fail or produce a broken UI. Must fix before deploying. |
+| **HIGH** | Likely to cause visible issues at deploy time. Should fix. |
+| **MEDIUM** | Best practice violation. May cause subtle issues or developer confusion. |
+| **LOW** | Style or convention recommendation. Optional to fix. |
+
+---
+
+## site.yml Rules (S-rules)
+
+### S-1 — Bundle URL must be a known valid theme
+
+- **Severity:** CRITICAL
+- **Auto-fix:** No — requires author to confirm intended theme
+
+Valid URLs contain `rhdp_showroom_theme` or `nookbag-bundle` in the GitHub releases path. Unknown bundle URLs may indicate a typo or outdated reference.
+
+### S-2 — start_page must match the antora.yml component name
+
+- **Severity:** HIGH
+- **Auto-fix:** Yes — read antora.yml `name` field and correct `start_page`
+
+Format: `<component-name>::index.adoc`. If antora.yml has `name: modules`, start_page must be `modules::index.adoc`.
+
+### S-3 — Content source start_path must be `content`
+
+- **Severity:** HIGH
+- **Auto-fix:** Yes — set `start_path: content`
+
+The Antora component descriptor (`antora.yml`) lives in the `content/` directory.
+
+### S-4 — Mermaid and tabs Antora extensions should be registered
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — add missing extension blocks
+
+Check for `@sntke/antora-mermaid-extension` and `@andrew-jones/antora-tabs-extension` in `antora.extensions`.
+
+### S-5 — Output directory should be `./www`
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — set `output.dir: ./www`
+
+The `podman-compose.yaml` and Showroom container expect output in `./www`.
+
+### S-6 — Site title should not be a placeholder
+
+- **Severity:** LOW
+- **Auto-fix:** No — requires author input
+
+Check that `site.title` is not `My Project`, `Showroom Template Demo`, or similar default values.
+
+### S-7 — rhdp_showroom_theme: navbar_logo must be a known branding value
+
+- **Severity:** LOW
+- **Auto-fix:** No — informational
+
+If `site.keys.navbar_logo` is set, validate it is a known branding value (e.g. `summit`, `rhdp`). Unknown values will fall back to default branding silently.
+
+### S-8 — nookbag-bundle: dev-mode extension should be registered
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — add dev-mode extension block
+
+The extension must be registered as `- require: /antora/lib/dev-mode.js` with `enabled: true`. This is a zerotouch convention — the dev-mode extension is provided by the Showroom container at build time and is not available during local Antora CLI builds.
+
+---
+
+## ui-config.yml Rules (U-rules)
+
+### U-1 — Format must match the content mode
+
+- **Severity:** CRITICAL
+- **Auto-fix:** No — changing format requires restructuring the entire file
+
+Open/showroom pattern uses `type: showroom` header. Zerotouch/guided pattern uses `antora:` block with module labels. If site.yml uses `rhdp_showroom_theme`, ui-config must have `type: showroom`. If site.yml uses `nookbag-bundle`, ui-config must have `antora:` block.
+
+### U-2 — At least one tab must be defined
+
+- **Severity:** HIGH
+- **Auto-fix:** No — requires author to specify which services to expose
+
+A showroom without tabs renders a blank right pane.
+
+### U-3 — Every tab must have a name property
+
+- **Severity:** HIGH
+- **Auto-fix:** No — requires author to provide meaningful names
+
+Tabs without names appear as blank tab headers.
+
+### U-4 — Each tab must have either url or path (not both, not neither)
+
+- **Severity:** HIGH
+- **Auto-fix:** Partial — can warn about the issue but needs author to decide the correct value
+
+Using both is ambiguous. Using neither produces a broken tab. When using `path`, `port` is also expected (typically `443`).
+
+### U-5 — Placeholder tabs should be replaced before deployment
+
+- **Severity:** LOW
+- **Auto-fix:** No — requires author to provide real URLs
+
+Placeholder tabs (`url: /placeholder`) render a stub panel for local development only.
+
+### U-6 — Variable substitution must use `${VARIABLE}` syntax
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — add `$` prefix to bare `{VARIABLE}` references
+
+The `${}` wrapper is required in ui-config.yml. AsciiDoc attribute substitution uses `{attribute}` without `$`, but ui-config.yml is different. Common mistake: `{DOMAIN}` instead of `${DOMAIN}`.
+
+### U-7 — Zerotouch: antora.modules entries must match page filenames
+
+- **Severity:** HIGH
+- **Auto-fix:** Partial — can add missing entries, but label text needs author input
+
+Each module `name` field must correspond to a file `<name>.adoc` in `content/modules/ROOT/pages/`. Missing entries mean Nookbag won't show that module in the progress bar. Extra entries with no matching file produce broken navigation.
+
+---
+
+## antora.yml Rules (A-rules)
+
+### A-1 — name must be set
+
+- **Severity:** HIGH
+- **Auto-fix:** Yes — set to `modules` if missing
+
+The component name (typically `modules`) is referenced by site.yml `start_page` and ui-config.yml `antora.name`.
+
+### A-2 — title should not be a placeholder
+
+- **Severity:** MEDIUM
+- **Auto-fix:** No — requires author input
+
+Check that it is not `My Lab Title`, `Your Lab Title`, or similar defaults.
+
+### A-3 — nav path must be correct
+
+- **Severity:** HIGH
+- **Auto-fix:** Yes — set correct nav path
+
+Should contain `- modules/ROOT/nav.adoc` pointing to the navigation file.
+
+### A-4 — Common runtime attributes should have sensible defaults
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — add missing attributes with standard defaults
+
+Check that `guid`, `ssh_user`, `ssh_password` (and `openshift_console_url` for OCP labs) are defined with default values. These are overridden by `user_data` at deploy time but are needed for local preview.
+
+### A-5 — experimental: true should be set
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — add `experimental: true` to attributes
+
+Enables the AsciiDoc UI macros: `btn:[]` (buttons), `kbd:[]` (keyboard shortcuts), `menu:[]` (menu paths). Without it, these macros render as literal text.
+
+### A-6 — page-pagination: true should be set
+
+- **Severity:** LOW
+- **Auto-fix:** Yes — add `page-pagination: true` to attributes
+
+Enables next/prev page links at the bottom of each page. For zerotouch this is less critical (Nookbag handles navigation) but still useful.
+
+---
+
+## nav.adoc Rules (N-rules)
+
+### N-1 — All pages should be listed in nav.adoc
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Partial — can suggest xref entries, but position and display name need author input
+
+All pages in `content/modules/ROOT/pages/` should be listed in nav.adoc. Unlisted pages are accessible by direct URL but won't appear in the sidebar (unless dev-mode is enabled). This is a warning — some pages may be intentionally unlisted.
+
+### N-2 — All xref targets in nav.adoc must exist as files
+
+- **Severity:** HIGH
+- **Auto-fix:** No — the file needs to be created or the xref removed; both require author decision
+
+A broken xref produces a build warning and a dead link in the sidebar.
+
+### N-3 — index.adoc should be the first entry
+
+- **Severity:** LOW
+- **Auto-fix:** Yes — reorder nav entries to put index first
+
+Convention — the index page is the landing page and should appear first in navigation.
+
+---
+
+## Cross-file Rules (X-rules)
+
+### X-1 — site.yml start_page component must match antora.yml name
+
+- **Severity:** HIGH
+- **Auto-fix:** Yes — update site.yml `start_page` to match antora.yml `name`
+
+If antora.yml has `name: modules`, site.yml must have `start_page: modules::index.adoc`. A mismatch causes Antora to fail to resolve the start page.
+
+### X-2 — Zerotouch: ui-config module names must match page filenames
+
+- **Severity:** HIGH
+- **Auto-fix:** Partial — can add missing module entries, label text needs author
+
+`antora.modules` names in ui-config.yml must match page filenames in `content/modules/ROOT/pages/`. Each module with `name: foo` must have a corresponding `foo.adoc` file. Pages that exist but aren't listed in modules produce a warning (not error).
+
+### X-3 — Zerotouch: runtime-automation must exist per module
+
+- **Severity:** HIGH
+- **Auto-fix:** Yes — can create stub playbook files
+
+`runtime-automation/` must exist with `solve.yml` and `validate.yml` per module (except index). Each module listed in `antora.modules` (other than the index/intro page) should have a corresponding directory in `runtime-automation/<module-name>/` containing at least `solve.yml` and `validate.yml`. Module-01 may also have `setup.yml`.
+
+### X-4 — Theme and content mode must be consistent
+
+- **Severity:** CRITICAL
+- **Auto-fix:** No — requires author to decide which content mode they want, then both files need updating
+
+`rhdp_showroom_theme` in site.yml requires `type: showroom` in ui-config.yml. `nookbag-bundle` in site.yml requires zerotouch format (`antora:` block) in ui-config.yml. A mismatch produces duplicate navigation (both Antora theme and Nookbag provide nav controls) or missing navigation (neither provides it).
+
+### X-5 — ZT Guided: config and setup-automation directories must exist
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — can create stub config and setup files
+
+`config/` directory must exist with `instances.yaml`, `networks.yaml`, and `firewall.yaml`. `setup-automation/` must exist with `setup.yml`. These are required for Project Zero infrastructure provisioning.
+
+### X-6 — Tab terminal syntax must match infrastructure type
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — can convert between `path`+`port` and `url` syntax
+
+AgD environments (OCP/VM) use `path: /wetty` + `port: 443`. ZT environments use `url: /wetty` (no port). Using the wrong syntax causes the terminal tab to fail to load. Detection: ZT is identified by presence of `config/` directory.
+
+---
+
+## Review Report Format
+
+The config-reviewer produces a report organized by severity:
+
+```
+## Showroom Config Review
+
+**Pattern detected:** Open OCP / Guided VM / ZT Guided / Unknown
+**Theme:** rhdp_showroom_theme / nookbag-bundle
+
+### CRITICAL
+- [X-4] Theme/mode mismatch: site.yml uses nookbag-bundle but ui-config.yml has `type: showroom`
+
+### HIGH
+- [S-2] start_page `foo::index.adoc` does not match antora.yml name `modules`
+- [U-4] Tab "Terminal" has both `url` and `path` — remove one
+
+### MEDIUM
+- [U-6] Tab "OCP Console" uses `{DOMAIN}` — should be `${DOMAIN}`
+- [A-5] `experimental: true` not set — UI macros will not render
+
+### LOW
+- [S-6] Site title is still the default "Showroom Template Demo"
+- [U-5] Placeholder tab "Placeholder" should be replaced before deployment
+
+### PASSED
+- [S-1] Bundle URL is valid (rhdp_showroom_theme v2.0.3)
+- [S-3] Content source path correct
+- [X-1] start_page matches antora.yml name
+...
+```
+
+Each finding includes:
+
+- Rule ID and description
+- Current value (what was found)
+- Expected value (what it should be)
+- Auto-fix available flag
+- Fix suggestion
