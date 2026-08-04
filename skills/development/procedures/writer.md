@@ -60,14 +60,16 @@ For each module, spawn the agent via Task tool:
 
 One agent per module, run sequentially.
 
-## Step 5: Post-Generation Verification
+## Step 5: Post-Generation Verification and Status Update
 
 After the agent finishes:
 
 1. Verify the generated file exists in `content/modules/ROOT/pages/`
 2. Check that `content/modules/ROOT/nav.adoc` includes the new module
 3. Cross-check generated content sections against the module outline
-4. **Update module status in `spec.yaml` to `complete`**
+4. **Update module status:** Read `publishing-house/spec.yaml`, find the module entry matching the module just written, change `status: in_progress` to `status: complete`. Write the updated spec.yaml.
+5. Confirm to the author:
+   > "Module N written and marked complete. [Next module available / All modules complete.]"
 
 ## Step 6: Commit
 
