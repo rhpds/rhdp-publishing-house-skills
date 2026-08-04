@@ -60,25 +60,86 @@ For each module, spawn the agent via Task tool:
 
 One agent per module, run sequentially.
 
-## Step 5: Post-Generation Verification and Status Update
+## Step 5: Post-Generation Verification
 
-After the agent finishes:
+After the writing agent finishes:
 
 1. Verify the generated file exists in `content/modules/ROOT/pages/`
 2. Check that `content/modules/ROOT/nav.adoc` includes the new module
-3. Cross-check generated content sections against the module outline
-4. **Update module status:** Read `publishing-house/spec.yaml`, find the module entry matching the module just written, change `status: in_progress` to `status: complete`. Write the updated spec.yaml.
-5. Confirm to the author:
-   > "Module N written and marked complete. [Next module available / All modules complete.]"
+3. Scan for placeholders and open items:
+   - Image references (`image::`) where the image file doesn't exist in `content/modules/ROOT/assets/images/`
+   - Placeholder text like `TODO`, `FIXME`, `[placeholder]`, `TBD`
+   - Diagram references without corresponding files
+4. Collect all open items into a list
 
-## Step 6: Commit
+## Step 5b: Auto-Run Reviewer
+
+**Do NOT skip this step. The reviewer runs automatically after every write — the author does not need to ask for it.**
+
+Spawn the reviewer agent:
+
+    Agent tool:
+      subagent_type: rhdp-publishing-house:module-reviewer
+      prompt: |
+        MODULE_FILE: <absolute path to the just-written .adoc file>
+        CONTENT_TYPE: <workshop|demo>
+        LAB_TYPE: <ocp|rhel|vm|ai>
+        SHARED_CONTEXT: <JSON with module_order, defined_attributes, first_use_map, is_first_module, is_conclusion>
+        REPO_PATH: <absolute repo path>
+
+Wait for the reviewer to complete. Extract the dimension scores and findings.
+
+## Step 5c: Present Results and STOP for Human Review
+
+Present a summary to the author:
+
+> **Module N — Writing Complete, Awaiting Your Review**
+>
+> **Reviewer Score:** [overall score or per-dimension breakdown]
+>
+> **Findings:** [count] issues found
+> [List HIGH and CRITICAL findings]
+>
+> **Open Items:**
+> - [List any missing images, placeholders, TODOs from Step 5]
+>
+> **Please review the generated file:**
+> `content/modules/ROOT/pages/[filename].adoc`
+>
+> Open it, read through the content, and check that it matches what you expect.
+> The AI handled ~80% — your review covers the rest: accuracy, tone, missing context, and any items above.
+>
+> When you've reviewed and addressed these items, say **"module N is done"** and I'll mark it complete.
+
+**HARD STOP HERE.** Do NOT mark the module complete. Do NOT proceed to the next module.
+Wait for the author to explicitly say the module is done.
+
+## Step 5d: Mark Complete (only after human approval)
+
+When the author says "module N is done" / "it's done" / "mark it complete" / "looks good":
+
+1. Update `publishing-house/spec.yaml`: change `status: in_progress` to `status: complete` for this module
+2. Commit:
+   ```bash
+   git add publishing-house/spec.yaml
+   git commit -m "feat: mark module N complete — [title]"
+   ```
+3. Confirm:
+   > "Module N marked complete. [Next module available / All modules complete.]"
+
+## Step 6: Commit the Written Content
+
+Commit the content file and nav update immediately after writing (before review):
 
     git add content/
     git commit -m "feat: write module N — [title]"
+
+Note: The completion status commit (Step 5d) is SEPARATE from the content commit.
 
 ## What You Do NOT Do
 
 - **NEVER write AsciiDoc files directly** — always spawn rhdp-publishing-house:module-writing-helper
 - **NEVER create or modify scaffold files** (`site.yml`, `ui-config.yml`, `antora.yml`, `nav.adoc` structure)
 - **NEVER write modules in parallel**
-- Do not review or edit content — that is the editor procedure's responsibility
+- **NEVER mark a module complete without human approval** — present findings and open items, then wait
+- **NEVER skip the reviewer** — it runs automatically after every write
