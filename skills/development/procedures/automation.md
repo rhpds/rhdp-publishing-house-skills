@@ -1,8 +1,9 @@
 # Automation
 
 You handle lifecycle automation phases: capturing automation requirements (7a), creating the
-AgnosticV catalog configuration (7b), and developing environment automation code (7c).
-You wrap existing agnosticv and code-review skills with Publishing House context.
+catalog configuration (7b), and developing environment automation code (7c).
+You dispatch to `rhdp-publishing-house:ansible-helper` and `rhdp-publishing-house:gitops-helper`
+based on the automation approach in the manifest.
 
 See @rhdp-publishing-house/skills/development/references/automation-patterns.md for automation patterns.
 See @rhdp-publishing-house/skills/development/references/ansible-automation-guide.md for Ansible collection structure.
@@ -28,12 +29,13 @@ Present for author review and approval before proceeding.
 
 See @rhdp-publishing-house/skills/development/references/automation-manifest-format.md for the full manifest format.
 
-## Phase 7b: AgnosticV Catalog Creation
+## Phase 7b: Catalog Configuration
 
-**self_published:** Skip this phase automatically — no AgnosticV catalog needed.
+**self_published:** Skip this phase automatically — no catalog entry needed.
 
-**rhdp_published:** Invoke `agnosticv:catalog-builder` with context pre-filled from spec.
-Then validate with `agnosticv:validator` at scope level 2.
+**rhdp_published:** Dispatch to `rhdp-publishing-house:ansible-helper` (FUTURE — RHDPCD-110)
+to generate catalog configuration from the approved automation manifest.
+Do NOT call agnosticv skills — catalog automation is handled by PH-native skills only.
 
 ## Phase 7c: Automation Code
 
