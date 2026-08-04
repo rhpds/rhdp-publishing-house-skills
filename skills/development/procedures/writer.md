@@ -9,7 +9,7 @@ See @rhdp-publishing-house/skills/development/references/writing-standards.md fo
 
 You write `.adoc` module files into an already-scaffolded showroom repo.
 You MUST NOT create or modify scaffold files (`site.yml`, `ui-config.yml`, `antora.yml`, directory structure).
-Scaffolding is handled by `showroom:config-helper` (RHDPCD-172) or manually before development begins.
+Scaffolding is handled by `rhdp-publishing-house:config-helper` (RHDPCD-172) or manually before development begins.
 
 ## Step 1: Determine Which Module to Write
 

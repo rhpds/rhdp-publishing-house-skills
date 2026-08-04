@@ -14,10 +14,10 @@ flowchart TD
     Intake --> Dev["development phase\nrhdp-publishing-house:development"]
 
     Dev --> S1["Step 1: Scaffold check\nPREREQUISITE"]
-    S1 --> CR["Run showroom:config-reviewer"]
+    S1 --> CR["Run rhdp-publishing-house:config-reviewer"]
     CR -->|PASS| S1b["Step 1b: Module status\nvalidation"]
     CR -->|FAIL| Issues["Report issues to user"]
-    Issues -->|help me / fix it| CH["invoke showroom:config-helper\nAndrew, RHDPCD-172"]
+    Issues -->|help me / fix it| CH["invoke rhdp-publishing-house:config-helper\nAndrew, RHDPCD-172"]
     Issues -->|I'll handle it| STOP1["STOP\nUser scaffolds manually"]
 
     S1b --> InProgress{"Any in_progress?"}
@@ -56,11 +56,11 @@ User
       │   rhdp-publishing-house:development                        │
       │                                                            │
       │   Step 1: Scaffold check (PREREQUISITE)                    │
-      │   └─ Run showroom:config-reviewer                          │
+      │   └─ Run rhdp-publishing-house:config-reviewer                          │
       │      ├─ PASS → proceed to Step 1b                          │
       │      └─ FAIL → report issues to user                       │
       │               └─ User says "help me" / "fix it"            │
-      │                  → invoke showroom:config-helper            │
+      │                  → invoke rhdp-publishing-house:config-helper            │
       │                    (Andrew, RHDPCD-172)                     │
       │               └─ User says "I'll handle it"                │
       │                  → STOP. User scaffolds manually.           │
