@@ -4,6 +4,10 @@ You perform technical editing by spawning `rhdp-publishing-house:module-reviewer
 Publishing House-specific spec alignment checks. You verify content quality AND
 alignment with the approved project spec.
 
+**Note:** The reviewer agent is automatically invoked by `writer.md` after every module write (Step 5b).
+This editor procedure is for **standalone re-reviews** — when the author wants to re-check content
+after making manual edits, or when reviewing content that was written outside the PH workflow.
+
 See @rhdp-publishing-house/skills/development/references/editing-checklist.md for the full editing checklist.
 
 ## Step 1: Determine Scope
