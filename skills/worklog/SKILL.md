@@ -13,6 +13,15 @@ sessions, people, and decisions. This is NOT a task tracker (the spec tracks
 structured progress). The worklog captures what falls between the cracks: decisions
 pending, things to check with people, handoff notes, session summaries.
 
+## Tool Boundaries
+
+**Do NOT use** MCP tools or Central API tools directly. All external interactions go through `publishing-house/tools/` scripts.
+**Do NOT use** the browser or external network calls — tools scripts handle all API communication.
+
+## Steps 1–3 — Pre-flight
+
+Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
+
 ## Before Starting
 
 1. Read `publishing-house/worklog.yaml` — if it doesn't exist, create it with an empty `entries: []` list

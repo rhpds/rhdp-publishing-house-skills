@@ -14,6 +14,11 @@ See @rhdp-publishing-house/skills/orchestrator/references/gate-language.md for h
 See @rhdp-publishing-house/skills/orchestrator/references/session-protocol.md for session start/end protocol.
 See @rhdp-publishing-house/skills/orchestrator/references/spec-rules.md for spec.yaml rules.
 
+## Tool Boundaries
+
+**Do NOT use** MCP tools or Central API tools directly. All external interactions go through `publishing-house/tools/` scripts.
+**Do NOT use** the browser or external network calls — tools scripts handle all API communication.
+
 ## Steps 1–3 — Pre-flight
 
 Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
