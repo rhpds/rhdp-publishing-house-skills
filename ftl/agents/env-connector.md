@@ -1,6 +1,5 @@
 ---
 description: Pushes solve.yml and validate.yml to a live RHDP showroom, restarts the pod, and runs the full test cycle (fresh validate → solve → validate again → idempotency check). Reports pass/fail per task with full output for debugging.
-model: claude-sonnet-4-6
 tools:
   - Bash
   - Read

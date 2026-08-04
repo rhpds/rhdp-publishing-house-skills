@@ -1,6 +1,5 @@
 ---
 description: Reviews ONE Showroom AsciiDoc module against Red Hat quality standards. Returns structured JSON with dimension scores and findings. Called by showroom:verify-content (parallel, one per module) and by showroom:create-lab (quality check after generation). Self-contained — no ECC, no external tools.
-model: claude-sonnet-4-6
 tools:
   - Read
   - Grep

@@ -1,6 +1,5 @@
 ---
 description: Writes validate.yml playbooks using the validation_check Ansible plugin. Takes the content-reader task report and solve-writer actions as input, producing checks that verify student progress without manual steps or navigation instructions.
-model: claude-sonnet-4-6
 tools:
   - Read
   - Write

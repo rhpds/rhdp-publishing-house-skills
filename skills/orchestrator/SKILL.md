@@ -1,11 +1,7 @@
 ---
 name: rhdp-publishing-house
 description: This skill should be used when the user invokes "/rhdp-publishing-house", asks to "start a publishing house project", "check project status", or "what's next on my lab". Checks workflow state and dispatches to the appropriate stage skill.
----
-
----
 context: main
-model: claude-sonnet-4-6
 ---
 
 # RHDP Publishing House — Orchestrator

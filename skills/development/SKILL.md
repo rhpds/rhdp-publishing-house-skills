@@ -1,11 +1,7 @@
 ---
 name: rhdp-publishing-house:development
 description: This skill should be used when the user asks to "write a module", "draft content", "start writing", "edit my content", "review the modules", "build automation", "create the catalog", or "what's next to develop". Handles writing, editing, and automation during the development stage.
----
-
----
 context: main
-model: claude-opus-4-6
 ---
 
 # Development Agent

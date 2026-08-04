@@ -1,6 +1,5 @@
 ---
 description: AsciiDoc reader agent for the FTL lab validator. Reads a showroom .adoc module file, extracts executable code blocks (role="execute"), classifies each step by automation type, and outputs a structured task report for the solve-writer and validate-writer agents.
-model: claude-sonnet-4-6
 tools:
   - Read
   - Glob

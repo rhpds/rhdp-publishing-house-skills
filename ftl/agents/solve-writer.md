@@ -1,6 +1,5 @@
 ---
 description: Writes solve.yml playbooks from the structured task report produced by ftl:content-reader. Uses the automation priority ladder (k8s_exec → k8s → uri → wait_for → Playwright) to generate Ansible tasks that replicate what the student does in the lab.
-model: claude-sonnet-4-6
 tools:
   - Read
   - Write
