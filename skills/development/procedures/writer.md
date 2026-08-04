@@ -1,15 +1,15 @@
 # Writer
 
-You write Showroom content by wrapping existing showroom skills with Publishing House
-context. You do NOT write AsciiDoc directly — you invoke the appropriate showroom skill
-and provide it with the right inputs from the project's spec.
+You write Showroom AsciiDoc content by spawning the `showroom:module-writing-helper` agent
+with context from the project's spec files. You do NOT write AsciiDoc directly.
 
 See @rhdp-publishing-house/skills/development/references/writing-standards.md for writing standards.
 
-## CRITICAL CONSTRAINT — You Must Use the Showroom Skill
+## CRITICAL CONSTRAINT — Content Only, No Scaffolding
 
-**You MUST invoke `showroom:create-lab` (or `showroom:create-demo`) for every module.**
-You MUST NOT write AsciiDoc files directly using the Write or Edit tools.
+You write `.adoc` module files into an already-scaffolded showroom repo.
+You MUST NOT create or modify scaffold files (`site.yml`, `ui-config.yml`, `antora.yml`, directory structure).
+Scaffolding is handled by `showroom:config-helper` (RHDPCD-172) or manually before development begins.
 
 ## Step 1: Determine Which Module to Write
 
@@ -19,43 +19,64 @@ Check what the user requested:
 - If user said "write all" or "start writing" → write all pending modules sequentially
 - **Never write modules in parallel.** Each module depends on the previous one for story continuity.
 
-## Step 2: Read the Module Outline
+## Step 2: Read Project Context
 
-Read the module's outline file from `publishing-house/spec/modules/`.
+Read three files from the author's project repo:
 
-Also read `publishing-house/spec/design.md` for:
-- Problem statement (business scenario)
-- Target audience
-- Products and technologies
+1. **`publishing-house/spec.yaml`** — machine-readable metadata: environment (ocp_version, topology, cloud_provider), module list, audience, duration
+2. **`publishing-house/spec/design.md`** — human-readable narrative: overview, audience, prerequisites, products, business scenario
+3. **`publishing-house/spec/modules/module-NN-*.md`** — detailed step-by-step outline for the target module
 
-## Step 3: Invoke the Showroom Skill via ph_payload (Headless Mode)
+Build a combined context object from all three sources.
 
-**Use `ph_payload` headless mode.** This skips all interactive questions.
+## Step 3: Check Module Status (Sequential Enforcement)
 
-For labs: invoke `showroom:create-lab`
-For demos: invoke `showroom:create-demo`
+Before spawning any agent, check `spec.yaml` module statuses:
 
-See @rhdp-publishing-house/skills/development/references/writing-standards.md for the full ph_payload format.
+- `not_started` → eligible to write; set to `in_progress` when starting
+- `in_progress` → resume this module (started but not finished)
+- `complete` → skip; move to next module
 
-## Step 4: Post-Generation Verification
+**Sequential rule:** Module N CANNOT start until modules 1 through N-1 are ALL `complete`.
 
-After the showroom skill finishes:
+Present a plan before spawning:
+> "Here's what I'll write for module N: [summary of outline]. Ready to proceed?"
+
+Wait for user approval — never auto-generate.
+
+## Step 4: Spawn showroom:module-writing-helper Agent
+
+For each module, spawn the agent via Task tool:
+
+    Task tool:
+      subagent_type: showroom:module-writing-helper
+      prompt: |
+        TARGET_FILE: content/modules/ROOT/pages/<module-filename>.adoc
+        FILE_TYPE: module
+        FULL_SPEC: <JSON from spec.yaml + design.md + module outline>
+        LAB_TYPE: <ocp|rhel|vm|ai>
+        CONTENT_TYPE: <workshop|demo>
+        REPO_PATH: <absolute repo path>
+
+One agent per module, run sequentially.
+
+## Step 5: Post-Generation Verification
+
+After the agent finishes:
 
 1. Verify the generated file exists in `content/modules/ROOT/pages/`
 2. Check that `content/modules/ROOT/nav.adoc` includes the new module
 3. Cross-check generated content sections against the module outline
+4. **Update module status in `spec.yaml` to `complete`**
 
-## Step 5: Commit and Push
+## Step 6: Commit
 
-```bash
-git add content/
-git commit -m "feat: write module N — [title]"
-git push
-```
+    git add content/
+    git commit -m "feat: write module N — [title]"
 
 ## What You Do NOT Do
 
-- **NEVER write AsciiDoc files directly**
-- **NEVER create or modify scaffold files** (`site.yml`, `ui-config.yml`, `nav.adoc`)
+- **NEVER write AsciiDoc files directly** — always spawn showroom:module-writing-helper
+- **NEVER create or modify scaffold files** (`site.yml`, `ui-config.yml`, `antora.yml`, `nav.adoc` structure)
 - **NEVER write modules in parallel**
 - Do not review or edit content — that is the editor procedure's responsibility
