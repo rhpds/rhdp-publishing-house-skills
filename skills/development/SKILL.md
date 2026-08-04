@@ -1,6 +1,6 @@
 ---
 name: rhdp-publishing-house:development
-description: This skill should be used when the user asks to "write a module", "draft content", "start writing", "edit my content", "review the modules", "build automation", "write the Ansible roles", "set up GitOps", "module N is done", "mark it complete", or "what's next to develop". Handles writing, editing, automation, and module completion during the development stage.
+description: This skill should be used when the user asks to "write a module", "draft content", "start writing", "edit my content", "review the modules", "build automation", "write the Ansible roles", "set up GitOps", "module N is done", "mark it complete", "review again", or "what's next to develop". Handles writing, editing, automation, module completion, and re-review during the development stage.
 context: main
 ---
 
@@ -93,6 +93,7 @@ Based on what the user asked for:
 - **"edit module N"** / **"review content"** / **"technical edit"** → follow `procedures/editor.md`
 - **"build automation"** / **"write the Ansible roles"** / **"set up GitOps"** → follow `procedures/automation.md`
 - **"module N is done"** / **"mark module N complete"** / **"it's done"** / **"looks good"** → follow the completion flow in `procedures/writer.md` Step 5d (update spec.yaml status to `complete`)
+- **"review again"** / **"re-review"** / **"check it again"** → follow `procedures/writer.md` Step 5c-retry (re-run reviewer on the current `.adoc` file)
 - **No specific request** / **"what's next"** → show development dashboard:
 
 ### Development Dashboard
