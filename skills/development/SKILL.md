@@ -61,6 +61,7 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 ### Step 1 — Scaffold check gate (runs BEFORE any dispatch)
 
+<!-- DISABLED: showroom:config-reviewer not yet available (RHDPCD-172)
 Run `showroom:config-reviewer` automatically against the project's content directory.
 
 - **PASS** → proceed to Step 1b
@@ -68,6 +69,9 @@ Run `showroom:config-reviewer` automatically against the project's content direc
   > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
   - "help me" → invoke `showroom:config-helper` to fix the scaffold, then proceed to Step 1b
   - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
+END DISABLED -->
+
+Proceed directly to Step 1b (module status validation).
 
 ### Step 1b — Module status validation gate
 
