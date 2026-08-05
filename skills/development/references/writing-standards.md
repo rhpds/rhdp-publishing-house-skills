@@ -19,47 +19,10 @@ take precedence — build on what exists rather than overwriting it.
 
 ## Content Type Routing
 
-| `project.type` | Showroom Skill | Content Structure |
-|----------------|----------------|-------------------|
-| `workshop`/`lab` | `showroom:create-lab` | Exercises with verification sections |
-| `demo` | `showroom:create-demo` | Know/Show presenter-led format |
-
-## Showroom Skill Invocation (ph_payload format)
-
-### For `showroom:create-lab`
-
-**First module:**
-```
-showroom:create-lab content/
-ph_payload:
-  target_dir: content/modules/ROOT/pages/
-  mode: new
-  spec:
-    lab_name: <from design.md project title>
-    audience: <from design.md target audience>
-    learning_objectives: <from module outline Learning Objectives as list>
-    business_scenario: <from design.md problem statement>
-    duration: <from module outline Audience and Time>
-    module_outline: |
-      <full module outline content>
-    env:
-      ocp_version: <from spec.yaml or design spec>
-      attributes: <from module outline Infrastructure Notes>
-```
-
-**Subsequent modules:**
-```
-showroom:create-lab content/
-ph_payload:
-  target_dir: content/modules/ROOT/pages/
-  mode: continue
-  previous_module: <filename of the previous module>
-  spec:
-    lab_name: <same as first module>
-    learning_objectives: <from THIS module's outline>
-    module_outline: |
-      <THIS module's detailed steps only>
-```
+| `project.type` | Agent | Content Structure |
+|----------------|-------|-------------------|
+| `workshop`/`lab` | `rhdp-publishing-house:module-writing-helper` | Exercises with verification sections |
+| `demo` | `rhdp-publishing-house:module-writing-helper` | Know/Show presenter-led format |
 
 ## Module Numbering
 

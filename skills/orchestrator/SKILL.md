@@ -1,11 +1,7 @@
 ---
 name: rhdp-publishing-house
 description: This skill should be used when the user invokes "/rhdp-publishing-house", asks to "start a publishing house project", "check project status", or "what's next on my lab". Checks workflow state and dispatches to the appropriate stage skill.
----
-
----
 context: main
-model: claude-sonnet-4-6
 ---
 
 # RHDP Publishing House — Orchestrator
@@ -17,6 +13,11 @@ You are a thin dispatcher. You check the workflow state and hand off to the righ
 See @rhdp-publishing-house/skills/orchestrator/references/gate-language.md for how to present stage status.
 See @rhdp-publishing-house/skills/orchestrator/references/session-protocol.md for session start/end protocol.
 See @rhdp-publishing-house/skills/orchestrator/references/spec-rules.md for spec.yaml rules.
+
+## Tool Boundaries
+
+**Do NOT use** MCP tools or Central API tools directly. All external interactions go through `publishing-house/tools/` scripts.
+**Do NOT use** the browser or external network calls — tools scripts handle all API communication.
 
 ## Steps 1–3 — Pre-flight
 

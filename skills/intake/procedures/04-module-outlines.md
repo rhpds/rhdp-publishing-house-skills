@@ -75,6 +75,29 @@ approval_checklist:
         overview: "Generated 1-2 sentence overview..."
 ```
 
+## Initialize Module Statuses
+
+After outlines are generated, update spec.yaml to add `status: not_started` to each module entry:
+
+For each module in `spec.modules`:
+- If no `status` field exists → add `status: not_started`
+- If `status` already exists → leave it unchanged (handles re-intake)
+
+Example spec.yaml module entry after this step:
+```yaml
+modules:
+  - id: module-01
+    title: "Pipeline Setup"
+    duration_min: 30
+    status: not_started
+  - id: module-02
+    title: "Configuring Triggers"
+    duration_min: 25
+    status: not_started
+```
+
+This ensures the development skill's writer can track sequential progress.
+
 ## Write Point
 
 ```bash

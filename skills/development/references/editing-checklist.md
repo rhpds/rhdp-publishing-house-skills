@@ -1,11 +1,11 @@
 # Publishing House Editing Checklist
 
-Additional editorial checks the editor agent performs beyond what `showroom:verify-content`
+Additional editorial checks the editor agent performs beyond what `rhdp-publishing-house:verify-content`
 covers. These are PH-specific quality gates.
 
 ## Spec Alignment Checks
 
-These checks verify the content matches the approved spec. `showroom:verify-content`
+These checks verify the content matches the approved spec. `rhdp-publishing-house:verify-content`
 does not know about the PH spec — only the editor agent does.
 
 ### SA-1: Outline Coverage
@@ -31,7 +31,7 @@ does not know about the PH spec — only the editor agent does.
 
 ## Red Hat Style Additions
 
-Beyond the Red Hat style checks in `showroom:verify-content`:
+Beyond the Red Hat style checks in `rhdp-publishing-house:verify-content`:
 
 ### RS-1: Product Name Accuracy
 - Official Red Hat product names used consistently
@@ -49,7 +49,7 @@ The editor produces a review report at `publishing-house/reviews/editing-review-
 ```markdown
 # Editorial Review — Module N: [Title]
 
-## showroom:verify-content Results
+## rhdp-publishing-house:verify-content Results
 
 [Findings table from verify-content, grouped by severity]
 
