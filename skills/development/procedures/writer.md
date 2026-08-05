@@ -160,3 +160,172 @@ verify the `.adoc` file exists in `content/modules/ROOT/pages/`, and mark comple
 - **NEVER write modules in parallel**
 - **NEVER mark a module complete without human approval** — present findings and open items, then wait
 - **NEVER skip the reviewer** — it runs automatically after every write
+
+## Step 6: Generate Index and Conclusion (After All Modules Complete)
+
+When all modules show `status: complete` in `spec.yaml`, generate the two capstone files:
+**`index.adoc`** — learner-facing introduction
+**`conclusion.adoc`** — recap of learning objectives and next steps
+
+### Step 6a: Check Prerequisites
+
+Before generating index and conclusion:
+
+1. Verify all modules are complete: check `spec.yaml` — every module must show `status: complete`
+2. Identify the target paths in `content/modules/ROOT/pages/`:
+   - `00-index-learner.adoc` (or `00-index.adoc` if demo)
+   - `99-conclusion.adoc`
+3. Confirm `spec.yaml` module list is intact — you'll need the full list for the conclusion's "What You've Learned" recap
+
+Present a plan before proceeding:
+> "All modules are complete. I'll now generate index.adoc and conclusion.adoc to finalize your showroom."
+
+Wait for approval — never auto-generate.
+
+### Step 6b: Generate Index (FILE_TYPE: index)
+
+Spawn the module-writing-helper agent:
+
+    Task tool:
+      subagent_type: rhdp-publishing-house:module-writing-helper
+      prompt: |
+        TARGET_FILE: content/modules/ROOT/pages/00-index-learner.adoc
+        FILE_TYPE: index
+        FULL_SPEC: <JSON from spec.yaml + design.md>
+        LAB_TYPE: <ocp|rhel|vm|ai>
+        CONTENT_TYPE: <workshop|demo>
+        REPO_PATH: <absolute repo path>
+
+Wait for the agent to complete. Verify the file exists.
+
+Commit immediately:
+```bash
+git add content/modules/ROOT/pages/00-index-learner.adoc
+git commit -m "feat: generate index.adoc"
+```
+
+### Step 6b-review: Auto-Run Reviewer on Index
+
+**Do NOT skip this step.** Same pattern as module reviews (Step 5b).
+
+Spawn the reviewer agent:
+
+    Agent tool:
+      subagent_type: rhdp-publishing-house:module-reviewer
+      prompt: |
+        MODULE_FILE: <absolute path to 00-index-learner.adoc>
+        CONTENT_TYPE: <workshop|demo>
+        LAB_TYPE: <ocp|rhel|vm|ai>
+        SHARED_CONTEXT: <JSON with module_order, is_first_module: true>
+        REPO_PATH: <absolute repo path>
+
+Present findings to the author:
+
+> **Index — Writing Complete, Awaiting Your Review**
+>
+> **Reviewer Score:** [score breakdown]
+> **Findings:** [count] issues found
+> [List HIGH and CRITICAL findings]
+>
+> **These findings are directions, not mandatory fixes.** Use your judgment.
+>
+> **Please review:** `content/modules/ROOT/pages/00-index-learner.adoc`
+>
+> **What would you like to do?**
+> 1. Edit the file yourself, then say **"review again"**
+> 2. Say **"index is done"** — I'll move on to conclusion
+> 3. Ask me to fix specific items
+
+**HARD STOP.** Wait for the author to say "index is done" or "review again".
+
+If "review again" — re-run reviewer, present findings, HARD STOP again (same loop as Step 5c-retry).
+
+### Step 6c: Generate Conclusion (FILE_TYPE: conclusion)
+
+Only after the author approves index.
+
+Spawn the module-writing-helper agent:
+
+    Task tool:
+      subagent_type: rhdp-publishing-house:module-writing-helper
+      prompt: |
+        TARGET_FILE: content/modules/ROOT/pages/99-conclusion.adoc
+        FILE_TYPE: conclusion
+        FULL_SPEC: <JSON from spec.yaml + design.md with complete module list>
+        LAB_TYPE: <ocp|rhel|vm|ai>
+        CONTENT_TYPE: <workshop|demo>
+        REPO_PATH: <absolute repo path>
+
+Wait for the agent to complete. Verify the file exists.
+
+Commit immediately:
+```bash
+git add content/modules/ROOT/pages/99-conclusion.adoc
+git commit -m "feat: generate conclusion.adoc"
+```
+
+### Step 6c-review: Auto-Run Reviewer on Conclusion
+
+**Do NOT skip this step.** Same pattern as module reviews (Step 5b).
+
+Spawn the reviewer agent:
+
+    Agent tool:
+      subagent_type: rhdp-publishing-house:module-reviewer
+      prompt: |
+        MODULE_FILE: <absolute path to 99-conclusion.adoc>
+        CONTENT_TYPE: <workshop|demo>
+        LAB_TYPE: <ocp|rhel|vm|ai>
+        SHARED_CONTEXT: <JSON with module_order, is_conclusion: true>
+        REPO_PATH: <absolute repo path>
+
+Present findings to the author:
+
+> **Conclusion — Writing Complete, Awaiting Your Review**
+>
+> **Reviewer Score:** [score breakdown]
+> **Findings:** [count] issues found
+> [List HIGH and CRITICAL findings]
+>
+> **These findings are directions, not mandatory fixes.** Use your judgment.
+>
+> Check that all learning objectives from your modules are captured in "What You've Learned".
+>
+> **Please review:** `content/modules/ROOT/pages/99-conclusion.adoc`
+>
+> **What would you like to do?**
+> 1. Edit the file yourself, then say **"review again"**
+> 2. Say **"conclusion is done"** — I'll finalize the showroom
+> 3. Ask me to fix specific items
+
+**HARD STOP.** Wait for the author to say "conclusion is done" or "review again".
+
+If "review again" — re-run reviewer, present findings, HARD STOP again.
+
+### Step 6d: Verify Navigation and Structure
+
+After both index and conclusion are approved:
+
+1. Check `content/modules/ROOT/nav.adoc` includes both files in correct order:
+   - First entry: `00-index-learner.adoc` (or `00-index.adoc`)
+   - Last entry: `99-conclusion.adoc`
+2. Verify no placeholder text or `TODO` markers in either file
+3. Check that all learning objectives from modules are consolidated in conclusion's "What You've Learned" section
+
+### Step 6e: Mark Showroom Complete (only after human approval of both)
+
+When both index and conclusion are approved:
+
+1. Update `publishing-house/spec.yaml`: add a top-level field:
+   ```yaml
+   showroom_content_status: complete
+   ```
+2. Commit:
+   ```bash
+   git add publishing-house/spec.yaml
+   git commit -m "feat: mark showroom content complete — all modules, index, and conclusion finalized"
+   ```
+3. Confirm:
+   > "Showroom content finalized. All modules, index, and conclusion are written and reviewed."
+
+Do NOT skip Step 6 once all modules are done. Index and conclusion are mandatory for a complete showroom.
