@@ -137,7 +137,7 @@ The response shape:
 
 Parse by `status`:
 
-- **201** — Success. Show: "Intake submitted successfully. Run `/rhdp-publishing-house` to check the current stage."
+- **201** — Success. Show the review status message from the orchestrator (three pending stages: Content Review, Infra Review, Staging). Then: "Run `/rhdp-publishing-house` to check the current stage."
 - **422** — Validation failed. `validation.results` contains the failed checks.
   - Show each failed check to the author: check ID, message, and field path
   - Propose specific fixes for each issue and **ask the author to confirm before making any changes**
@@ -163,7 +163,7 @@ Check `project.showroom_type` in spec.yaml:
 
 ## Step 7: Report result
 
-- If submission succeeded → show: "Intake submitted successfully. Run `/rhdp-publishing-house` to check the current stage."
+- If submission succeeded → show the review status message from the orchestrator (three pending stages: Content Review, Infra Review, Staging) and "Run `/rhdp-publishing-house` to check the current stage."
 - If submission failed → show the error from the response.
 
 **Return to the orchestrator** (if dispatched) or **STOP** (if invoked directly).

@@ -6,7 +6,8 @@ or "granted" — it sounds patronizing. Present what Central did and what the op
 | Gate | What to say |
 |---|---|
 | Vetting | "Vetting complete — RCARS checked for overlapping content." |
-| Reviews | "Three parallel reviews are in progress: Content Review, Infra Review, and Development Review. All three must complete before advancing to Development." |
+| Reviews | "Three pending stages must complete before Development: Content Review — design spec and module outlines; Infra Review — environment and automation requirements; Staging — an RHDP content developer builds the base CI." |
+| Staging | "Staging is now active — an RHDP content developer will build the base CI for this project." |
 | Development | "Development is now active." |
 | Testing | "Development is complete. The project is undergoing testing before release." |
 | Published | "Project is published." |

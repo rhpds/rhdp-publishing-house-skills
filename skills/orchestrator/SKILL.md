@@ -50,19 +50,20 @@ This is a loop. After a skill returns, re-run Step 4 (both scripts), extract the
 Loop:
   intake       → dispatch rhdp-publishing-house:intake
   development  → dispatch rhdp-publishing-house:development
-  content_review / infra_review → show review status, STOP
+  content_review / infra_review / staging → show review status, STOP
   testing      → show testing status, STOP
   published    → show published status, STOP
 ```
 
 ### Stage status messages
 
-**content_review / infra_review:**
-> Spec submitted. Two reviews are in progress:
+**content_review / infra_review / staging:**
+> Spec submitted. Three pending stages must complete before advancing to Development:
 > - **Content Review** — design spec and module outlines
 > - **Infra Review** — environment and automation requirements
+> - **Staging** — an RHDP content developer builds the base CI
 >
-> Both must complete before advancing to Development. Reviewers approve from the RHDH Publishing House portal.
+> Reviewers approve from the RHDH Publishing House portal. Content developers complete staging from the portal.
 
 **development:**
 > Development is now active. What do you need help with?
