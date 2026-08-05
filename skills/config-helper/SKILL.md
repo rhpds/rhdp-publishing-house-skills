@@ -60,9 +60,13 @@ Then run:
 python scaffold.py --pattern <pattern-name> --force
 ```
 
-**A.3 — Verify and adjust:**
+**A.3 — Configure tabs from spec:**
 
-After scaffold.py completes, proceed to Route C (modification flow) to verify and adjust the generated config.
+After scaffolding, the `ui-config.yml` has placeholder tabs. Follow the Tab Advisor procedure (below) to replace them with real tabs based on the spec's infrastructure.
+
+**A.4 — Verify and adjust:**
+
+After tab configuration, proceed to Route C (modification flow) if the user wants further changes.
 
 ### Route B: No config files exist (new repo)
 
@@ -101,10 +105,7 @@ Files to generate:
 2. **`ui-config.yml`** — use the correct format for the content mode:
    - Showroom: `type: showroom` with `view_switcher` and `tabs`
    - Zerotouch: `antora:` block with module labels and `tabs`
-   - Configure tabs based on infrastructure:
-     - OCP: OCP Console tab + terminal tab (`path: /wetty`, `port: 443`)
-     - VM: stacked terminal tab (Bastion + Worker)
-     - ZT: terminal tab (`url: /wetty`)
+   - Configure tabs using the Tab Advisor procedure (below)
 
 3. **`content/antora.yml`** — set title, nav path, default attributes for the infrastructure type
 
@@ -141,6 +142,7 @@ The repo already has `site.yml` and/or `ui-config.yml`.
    - **Add a tab** — add entry to `tabs:` list in ui-config.yml
    - **Remove a tab** — remove entry from `tabs:` list
    - **Change tab order** — reorder entries
+   - **Configure tabs from spec** — read `spec.environment` and run the Tab Advisor procedure
    - **Adjust layout width** — change `default_width` (showroom mode only)
    - **Change title** — update `site.title` in site.yml and/or `title` in antora.yml
    - **Add antora.yml attributes** — add to `asciidoc.attributes`
@@ -151,6 +153,138 @@ The repo already has `site.yml` and/or `ui-config.yml`.
 3. Apply changes while preserving format consistency. When modifying ui-config.yml, maintain the correct format for the detected content mode.
 
 4. After modifications, suggest running `rhdp-publishing-house:config-reviewer` to validate the result.
+
+## Tab Advisor
+
+This procedure is used by Routes A, B, and C to configure tabs based on the lab's infrastructure. For PH projects, read `publishing-house/spec.yaml`. For standalone repos, use the infrastructure type from Step 1 detection or ask the user.
+
+### Read the spec
+
+Extract from `publishing-house/spec.yaml` (if present):
+- `spec.environment.platform` — `ocp` or `rhel-vms`
+- `spec.environment.vms_per_student` — VM roles (for `rhel-vms` platform)
+- `publishing-house/spec/design.md` Products section — hints at deployed applications
+
+### For `platform: ocp`
+
+**OCP Console** — suggest by default:
+```yaml
+- name: OCP Console
+  url: 'https://console-openshift-console.${DOMAIN}'
+```
+
+**Terminal** — ask the user which type they need:
+> Your lab runs on OCP. Which terminal access do learners need?
+>
+> 1. **Bastion terminal** — SSH to a bastion host via wetty (requires a bastion VM in provisioning)
+> 2. **OCP Terminal** — browser-based terminal with `oc` CLI pre-configured (no bastion required)
+> 3. **Both** — stacked vertically in one tab
+> 4. **None** — no terminal tab needed
+
+Bastion terminal:
+```yaml
+- name: ">_ terminal"
+  path: /wetty
+```
+
+OCP Terminal:
+```yaml
+- name: ">_ OCP Terminal"
+  url: 'https://codeserver-codeserver.${DOMAIN}'
+```
+
+Both (stacked):
+```yaml
+- name: ">_ Terminals"
+  path: /wetty
+  secondary_name: OCP Terminal
+  secondary_path: /codeserver
+```
+
+**Application tabs** — ask about deployed services:
+> Will any applications be deployed to OCP that learners need to access in the UI?
+> For example: ArgoCD, RHACS, Grafana, Developer Hub, custom app consoles.
+>
+> If you know the route names now, I can add tabs. Otherwise I can add placeholder tabs we'll fill in during development.
+
+For each app, generate:
+```yaml
+- name: <App Name>
+  url: 'https://<route-name>-<namespace>.${DOMAIN}'
+```
+
+Common OCP app routes:
+- ArgoCD: `openshift-gitops-server-openshift-gitops`
+- RHACS: `central-stackrox`
+- Developer Hub: `backstage-developer-hub-backstage`
+- Grafana: `grafana-grafana`
+
+If the user doesn't know routes yet, add a placeholder:
+```yaml
+- name: <App Name>
+  url: /placeholder
+```
+
+### For `platform: rhel-vms`
+
+Read `spec.environment.vms_per_student` to understand the VM roles.
+
+**Terminal tabs** — for each VM role, suggest a terminal tab. Ask whether to use separate tabs or stacked (vertically split) terminals:
+
+> Your lab provisions these VMs per student:
+> [list roles from vms_per_student]
+>
+> How should terminal access be laid out?
+> 1. **Separate tabs** — one tab per VM
+> 2. **Stacked** — two terminals vertically split in one tab (good for watch + work)
+> 3. **Single** — just the bastion, other VMs accessed via SSH from there
+
+Separate tabs example:
+```yaml
+- name: ">_ Bastion"
+  path: /wetty
+- name: ">_ Worker"
+  path: /terminal2
+```
+
+Stacked example:
+```yaml
+- name: ">_ Terminals"
+  path: /wetty
+  secondary_name: Worker
+  secondary_path: /terminal2
+```
+
+### Vertical split (stacked terminals)
+
+Tabs can be vertically split into top and bottom panels using `secondary_*` properties. This is commonly used to:
+- Run a `watch` command in one terminal while working in the other
+- Monitor logs while executing steps
+- SSH to different hosts simultaneously
+
+Offer split when multiple terminals or VMs are involved. The user can combine any two services in a single split tab.
+
+### Documentation and other links
+
+Always ask:
+> Would you like to add any documentation or reference links as tabs?
+> For example: product docs, API references, architecture diagrams.
+
+External URL tabs:
+```yaml
+- name: Product Docs
+  url: 'https://docs.redhat.com/...'
+```
+
+Sites that set `X-Frame-Options` or `Content-Security-Policy` headers blocking iframes will show a blank pane in the tab.
+
+### Write tabs to ui-config.yml
+
+After the conversation, write the complete `tabs:` list to `ui-config.yml`, replacing any placeholder entries from scaffolding. Preserve the rest of the file (type, view_switcher, antora block).
+
+### Port note
+
+Only specify `port` on a tab if the service runs on a non-standard port (not 80 or 443). For standard HTTP/HTTPS, omit `port` entirely.
 
 ## Rules
 
