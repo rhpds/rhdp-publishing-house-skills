@@ -101,7 +101,7 @@ Tabs without names appear as blank tab headers.
 - **Severity:** HIGH
 - **Auto-fix:** Partial — can warn about the issue but needs author to decide the correct value
 
-Using both is ambiguous. Using neither produces a broken tab. When using `path`, `port` is also expected (typically `443`).
+Using both is ambiguous. Using neither produces a broken tab. `port` is only needed when a service runs on a non-standard port (not 80 or 443) — do not flag missing `port` on standard-port `path` tabs.
 
 ### U-5 — Placeholder tabs should be replaced before deployment
 
@@ -239,7 +239,7 @@ If antora.yml has `name: modules`, site.yml must have `start_page: modules::inde
 - **Severity:** MEDIUM
 - **Auto-fix:** Yes — can convert between `path`+`port` and `url` syntax
 
-AgD environments (OCP/VM) use `path: /wetty` + `port: 443`. ZT environments use `url: /wetty` (no port). Using the wrong syntax causes the terminal tab to fail to load. Detection: ZT is identified by presence of `config/` directory.
+AgD environments (OCP/VM) use `path: /wetty`. ZT environments use `url: /wetty`. Using the wrong syntax causes the terminal tab to fail to load. Detection: ZT is identified by presence of `config/` directory.
 
 ---
 

@@ -23,9 +23,9 @@ Theme MUST match content mode. Mismatch produces duplicate or missing navigation
 
 ### Infrastructure variants
 
-**Open OCP**: tabs include OCP Console (`url: 'https://console-openshift-console.${DOMAIN}'`), terminal (`path: /wetty`, `port: 443`)
+**Open OCP**: tabs include OCP Console (`url: 'https://console-openshift-console.${DOMAIN}'`), terminal (`path: /wetty`)
 
-**Open VM**: tabs include stacked terminals (primary Bastion `path: /wetty` port 443 + secondary Worker `secondary_path: /terminal2` `secondary_port: 443`)
+**Open VM**: tabs include stacked terminals (primary Bastion `path: /wetty` + secondary Worker `secondary_path: /terminal2`)
 
 ### Complete Open OCP ui-config.yml
 
@@ -45,7 +45,6 @@ tabs:
     url: 'https://console-openshift-console.${DOMAIN}'
   - name: Bastion ${USER}
     path: /wetty
-    port: 443
   - name: Placeholder
     url: /placeholder
 ```
@@ -66,10 +65,8 @@ view_switcher:
 tabs:
   - name: Bastion
     path: /wetty
-    port: 443
     secondary_name: Worker
     secondary_path: /terminal2
-    secondary_port: 443
   - name: Placeholder
     url: /placeholder
 ```
@@ -116,7 +113,7 @@ output:
 
 ### Infrastructure variants
 
-**Guided OCP**: tabs include OCP Console + terminal (`path: /wetty`, `port: 443`)
+**Guided OCP**: tabs include OCP Console + terminal (`path: /wetty`)
 
 **Guided VM**: tabs include stacked terminals (Bastion `path: /wetty` + Worker `secondary_path: /terminal2`)
 
@@ -140,7 +137,6 @@ tabs:
     url: 'https://console-openshift-console.${DOMAIN}'
   - name: ">_ terminal"
     path: /wetty
-    port: 443
   - name: Placeholder
     url: /placeholder
 ```
@@ -163,10 +159,8 @@ antora:
 tabs:
   - name: ">_ Bastion"
     path: /wetty
-    port: 443
     secondary_name: Worker
     secondary_path: /terminal2
-    secondary_port: 443
   - name: Placeholder
     url: /placeholder
 ```

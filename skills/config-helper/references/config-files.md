@@ -166,15 +166,15 @@ The `antora.modules` entries drive the Nookbag progress bar and solve/validate b
 | `name` | string | Tab display name (required) |
 | `url` | string | Full URL or relative path for the tab iframe. Supports variable substitution |
 | `path` | string | Path relative to the Showroom instance (e.g. `/wetty`). Use for services in the same pod/host |
-| `port` | integer | Port for constructing tab URL from `path`. Typically `443` |
+| `port` | integer | Port for constructing tab URL from `path`. Only needed for non-standard ports (not 80 or 443) |
 | `secondary_name` | string | Display name for stacked secondary panel within the same tab |
 | `secondary_path` | string | Path for the secondary panel |
-| `secondary_port` | integer | Port for the secondary panel |
+| `secondary_port` | integer | Port for the secondary panel. Only needed for non-standard ports |
 
 Rules:
 
 - Each tab needs either `url` OR `path` (not both, not neither)
-- When using `path`, `port` is typically required (usually `443`)
+- `port` is only needed when the service runs on a non-standard port (not 80 or 443). Omit for standard HTTP/HTTPS
 - `secondary_*` properties create a stacked split within one tab (top/bottom)
 
 ### Variable substitution in tab URLs
@@ -191,12 +191,11 @@ IMPORTANT: Use `${DOMAIN}` not `{DOMAIN}`. The `${}` syntax is required. Antora 
 
 ### Common tab patterns
 
-**Terminal (Wetty):**
+**Terminal (Wetty — SSH to bastion):**
 
 ```yaml
 - name: ">_ terminal"
   path: /wetty
-  port: 443
 ```
 
 **Terminal for ZT environments:**
@@ -206,16 +205,23 @@ IMPORTANT: Use `${DOMAIN}` not `{DOMAIN}`. The `${}` syntax is required. Antora 
   url: /wetty
 ```
 
-**Two terminals (stacked in one tab):**
+**OCP Terminal (ttyd with oc CLI, no bastion required):**
 
 ```yaml
-- name: Terminals
+- name: ">_ OCP Terminal"
+  url: 'https://codeserver-codeserver.${DOMAIN}'
+```
+
+**Two terminals (stacked vertically in one tab):**
+
+```yaml
+- name: ">_ Terminals"
   path: /wetty
-  port: 443
   secondary_name: Worker
   secondary_path: /terminal2
-  secondary_port: 443
 ```
+
+Vertical split is commonly used to run a `watch` command in one terminal while working in the other, or to SSH to different hosts simultaneously.
 
 **OpenShift Console:**
 
@@ -223,6 +229,21 @@ IMPORTANT: Use `${DOMAIN}` not `{DOMAIN}`. The `${}` syntax is required. Antora 
 - name: OCP Console
   url: 'https://console-openshift-console.${DOMAIN}'
 ```
+
+**OCP application services (common routes):**
+
+```yaml
+- name: ArgoCD
+  url: 'https://openshift-gitops-server-openshift-gitops.${DOMAIN}'
+- name: RHACS
+  url: 'https://central-stackrox.${DOMAIN}'
+- name: Developer Hub
+  url: 'https://backstage-developer-hub-backstage.${DOMAIN}'
+- name: Grafana
+  url: 'https://grafana-grafana.${DOMAIN}'
+```
+
+Route URL pattern: `https://<route-name>-<namespace>.${DOMAIN}`. If the author doesn't know the route yet, use a placeholder and fill it in during development.
 
 **External URL:**
 
