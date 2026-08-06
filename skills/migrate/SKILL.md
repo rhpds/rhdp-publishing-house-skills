@@ -234,9 +234,20 @@ For each module in the Module Map table, generate one outline file:
 - Follow the template structure exactly
 - Derive content from the corresponding module in the content analysis report
 
-After writing outlines, generate summaries for spec.yaml:
-- approval_checklist.content.design_overview (2-3 sentences)
-- approval_checklist.content.module_summaries (1-2 sentences per module)
+After writing outlines:
+
+1. Add `status: not_started` to each module in `spec.modules` (if not already present). Example:
+   ```yaml
+   modules:
+     - id: module-01
+       title: "Pipeline Setup"
+       duration_min: 30
+       status: not_started
+   ```
+
+2. Generate summaries for spec.yaml:
+   - approval_checklist.content.design_overview (2-3 sentences)
+   - approval_checklist.content.module_summaries (1-2 sentences per module)
 
 Commit:
 ```bash
