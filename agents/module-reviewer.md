@@ -14,6 +14,7 @@ Reviews a single `.adoc` module file and returns dimension-scored findings as st
 - `MODULE_FILE` — absolute path to the `.adoc` file to review
 - `CONTENT_TYPE` — `workshop` or `demo`
 - `LAB_TYPE` — `rhel` | `ocp` | `ai` | `vm` | `unknown`
+- `SHOWROOM_TYPE` — `classic` | `zero_touch` (from `project.showroom_type` in spec.yaml)
 - `SHARED_CONTEXT` — JSON: `{module_order, defined_attributes, first_use_map, is_first_module, is_conclusion}`
 - `REPO_PATH` — absolute path to repo root (for reading prompt files)
 
@@ -62,7 +63,7 @@ Run ALL checks silently. Collect findings. Do NOT output anything until Step 3.
 | B.9 | Workshop: ≥2 exercises | Fewer than 2 | Warning | Demo or conclusion |
 | B.10 | Exercise steps use numbered lists | Bullets for steps | Medium | Demo |
 | B.11 | Learning objectives use bullets | Numbers for objectives | Medium | — |
-| B.12 | Workshop: every exercise has `=== Verify` section | Missing after exercise | High | Demo or conclusion |
+| B.12 | Workshop: every exercise has `=== Verify` section | Missing after exercise | High | Demo or conclusion or `SHOWROOM_TYPE=zero_touch` (ZT verification is automated via shell scripts, not in-content verify sections) |
 | B.13 | No `== References` in individual modules | Present | Medium | Conclusion (expected) |
 | B.14 | Conclusion: has `== What You've Learned` | Missing | High | Not conclusion module |
 | B.15 | Conclusion: has `== References` | Missing | Medium | Not conclusion module |
@@ -112,7 +113,7 @@ For E.3a: Only flag bash, sh, shell, console, terminal, tty, wetty code blocks m
 | E.3 | Code blocks with `role="execute"` have correct syntax | Invalid role combination | Medium |
 | E.3a | Shell command blocks have `role="execute"` — ONLY flag: bash, sh, shell, console, terminal, tty, wetty. Do NOT flag: yaml, json, python, text, asciidoc | High | High |
 | E.3-img | `image::` macros with `link=self,window=blank` | Any image without it | Warning |
-| E.3b | `role="send-to-wetty"` commands also have `role="execute"` | Missing execute | Warning |
+| E.3b | `role="send-to-wetty"` commands also have `role="execute"` — **classic only** (skip if `SHOWROOM_TYPE=zero_touch` — ZT does not use wetty) | Missing execute | Warning |
 | E.4 | No hardcoded cluster URLs, usernames, passwords — use `{user}`, `{password}`, `{openshift_console_url}` | Literal values | High |
 | E.5 | All `{attribute}` placeholders defined in antora.yml or _attributes.adoc | Undefined attribute — cross-check SHARED_CONTEXT.defined_attributes | High |
 | E.6 | All images have alt text — empty first bracket in `image::` | Missing alt | High |

@@ -56,6 +56,7 @@ For each module, spawn the agent via Task tool:
         FULL_SPEC: <JSON from spec.yaml + design.md + module outline>
         LAB_TYPE: <ocp|rhel|vm|ai>
         CONTENT_TYPE: <workshop|demo>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         REPO_PATH: <absolute repo path>
 
 One agent per module, run sequentially.
@@ -89,6 +90,7 @@ Spawn the reviewer agent:
         MODULE_FILE: <absolute path to the just-written .adoc file>
         CONTENT_TYPE: <workshop|demo>
         LAB_TYPE: <ocp|rhel|vm|ai>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         SHARED_CONTEXT: <JSON with module_order, defined_attributes, first_use_map, is_first_module, is_conclusion>
         REPO_PATH: <absolute repo path>
 
@@ -194,6 +196,7 @@ Spawn the module-writing-helper agent:
         FULL_SPEC: <JSON from spec.yaml + design.md>
         LAB_TYPE: <ocp|rhel|vm|ai>
         CONTENT_TYPE: <workshop|demo>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         REPO_PATH: <absolute repo path>
 
 Wait for the agent to complete. Verify the file exists.
@@ -216,6 +219,7 @@ Spawn the reviewer agent:
         MODULE_FILE: <absolute path to 00-index-learner.adoc>
         CONTENT_TYPE: <workshop|demo>
         LAB_TYPE: <ocp|rhel|vm|ai>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         SHARED_CONTEXT: <JSON with module_order, is_first_module: true>
         REPO_PATH: <absolute repo path>
 
@@ -254,6 +258,7 @@ Spawn the module-writing-helper agent:
         FULL_SPEC: <JSON from spec.yaml + design.md with complete module list>
         LAB_TYPE: <ocp|rhel|vm|ai>
         CONTENT_TYPE: <workshop|demo>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         REPO_PATH: <absolute repo path>
 
 Wait for the agent to complete. Verify the file exists.
@@ -276,6 +281,7 @@ Spawn the reviewer agent:
         MODULE_FILE: <absolute path to 99-conclusion.adoc>
         CONTENT_TYPE: <workshop|demo>
         LAB_TYPE: <ocp|rhel|vm|ai>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         SHARED_CONTEXT: <JSON with module_order, is_conclusion: true>
         REPO_PATH: <absolute repo path>
 
