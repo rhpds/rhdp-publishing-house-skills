@@ -1,18 +1,12 @@
----
-name: rhdp-publishing-house:config-reviewer
-description: This skill should be used when the user asks to "review my showroom config", "check site.yml", "validate ui-config.yml", "verify my showroom setup", "check my tabs", or "is my showroom config correct".
-context: main
----
-
 # Showroom Config Reviewer
 
 You validate Showroom content repository configuration. You check each config file
 against known rules, detect cross-file mismatches, and produce a review report with
 severity-rated findings and fix suggestions.
 
-See @rhdp-publishing-house/skills/config-reviewer/references/validation-rules.md for all rules, severity definitions, and the report format.
-See @rhdp-publishing-house/skills/config-helper/references/showroom-patterns.md for pattern detection and config expectations.
-See @rhdp-publishing-house/skills/config-helper/references/config-files.md for file format reference.
+See @rhdp-publishing-house/skills/development/references/validation-rules.md for all rules, severity definitions, and the report format.
+See @rhdp-publishing-house/skills/development/references/showroom-patterns.md for pattern detection and config expectations.
+See @rhdp-publishing-house/skills/development/references/config-files.md for file format reference.
 
 ## Step 1 — Read Config Files
 
@@ -62,7 +56,7 @@ Report the detected pattern:
 
 ## Step 3 — Run Validation Rules
 
-Apply all rules from @rhdp-publishing-house/skills/config-reviewer/references/validation-rules.md. For each rule:
+Apply all rules from @rhdp-publishing-house/skills/development/references/validation-rules.md. For each rule:
 
 1. Check the condition
 2. If the rule passes, add to the PASSED list

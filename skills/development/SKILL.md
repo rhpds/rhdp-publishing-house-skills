@@ -1,6 +1,6 @@
 ---
 name: rhdp-publishing-house:development
-description: This skill should be used when the user asks to "write a module", "draft content", "start writing", "edit my content", "review the modules", "build automation", "write the Ansible roles", "set up GitOps", "module N is done", "mark it complete", "review again", or "what's next to develop". Handles writing, editing, automation, module completion, and re-review during the development stage.
+description: This skill should be used when the user asks to "write a module", "draft content", "start writing", "edit my content", "review the modules", "build automation", "write the Ansible roles", "set up GitOps", "module N is done", "mark it complete", "review again", "what's next to develop", "set up showroom", "configure showroom tabs", "create site.yml", "scaffold the showroom structure", "add a tab", "review my showroom config", "check site.yml", or "validate ui-config.yml". Handles writing, editing, automation, scaffolding, config review, module completion, and re-review during the development stage.
 context: main
 ---
 
@@ -61,12 +61,12 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 ### Step 1 — Scaffold check gate (runs BEFORE any dispatch)
 
-Invoke `rhdp-publishing-house:config-reviewer` via **Skill tool** automatically against the project's content directory.
+Follow `procedures/config-reviewer.md` automatically against the project's content directory.
 
 - **PASS** → proceed to Step 1b
 - **FAIL** → report the specific issues to the author, then ask:
   > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
-  - "help me" → invoke `rhdp-publishing-house:config-helper` via **Skill tool** to fix the scaffold, then proceed to Step 1b
+  - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 1b
   - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
 
 ### Step 1b — Module status validation gate
@@ -88,6 +88,8 @@ Based on what the user asked for:
 - **"write module N"** / **"start writing"** / **"write all"** → follow `procedures/writer.md`
 - **"edit module N"** / **"review content"** / **"technical edit"** → follow `procedures/editor.md`
 - **"build automation"** / **"write the Ansible roles"** / **"set up GitOps"** → follow `procedures/automation.md`
+- **"set up showroom"** / **"configure tabs"** / **"scaffold"** / **"add a tab"** → follow `procedures/config-helper.md`
+- **"review config"** / **"check site.yml"** / **"validate config"** → follow `procedures/config-reviewer.md`
 - **"module N is done"** / **"mark module N complete"** / **"it's done"** / **"looks good"** → follow the completion flow in `procedures/writer.md` Step 5d (update spec.yaml status to `complete`)
 - **"review again"** / **"re-review"** / **"check it again"** → follow `procedures/writer.md` Step 5c-retry (re-run reviewer on the current `.adoc` file)
 - **No specific request** / **"what's next"** → show development dashboard:
