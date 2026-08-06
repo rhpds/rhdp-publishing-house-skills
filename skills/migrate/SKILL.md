@@ -181,23 +181,41 @@ Project root: <project_root>
 
 ## Instructions
 
+### How to populate spec.yaml
+
+Read <project_root>/publishing-house/spec.yaml carefully. Every field has an inline comment describing its purpose and valid values (e.g. `# ocp | rhel-vms`, `# beginner | intermediate | advanced`, `# sno | multinode`). The comments ARE the schema — they tell you what each field accepts.
+
+Walk through every field in spec.yaml. For each one:
+1. Check if it already has a value (pre-populated by the template) — if so, keep it unless the content analysis clearly contradicts it
+2. Check if the content analysis report provides enough information to populate it — if so, set it
+3. If the content doesn't provide enough signal — leave the field as-is (empty string, null, or empty list)
+
+Do NOT guess or fabricate values. If the content mentions "OpenShift 4.15" in a prerequisites section, set `ocp_version: "4.15"`. If no OCP version is mentioned anywhere, leave it empty. The same principle applies to every field — populate only what the content supports.
+
+Examples of what the content CAN tell you:
+- Operators installed or referenced → products, platform (ocp)
+- `oc` commands, console screenshots → platform: ocp
+- VM provisioning, `ssh` into hosts → platform: rhel-vms
+- Number of workers mentioned in setup → worker_count, cluster_type
+- AI/ML model references → ai_requirement, ai_model_name
+- External URLs called → external_services list
+- AAP playbooks or controller UI → aap_version
+
+Examples of what the content usually CANNOT tell you:
+- Exact CPU/RAM sizing per node (unless explicitly documented)
+- Cost estimates
+- Topology decisions (shared vs per-student)
+- Non-GA access plans
+
 ### Phase 1 — Design Generation
 Follow the procedure in <project_root_skills>/skills/migrate/procedures/01-design-from-content.md
 
-Read the design.md template at <project_root>/publishing-house/spec/design.md and fill in every section using the content analysis report. Do NOT fill Infrastructure Requirements — leave as "TBD — confirmed in infrastructure phase".
+Read the design.md template at <project_root>/publishing-house/spec/design.md and fill in every section using the content analysis report. For the Infrastructure Requirements section, fill in what the content supports and mark unknown fields as "TBD — confirmed in infrastructure phase".
 
-After writing design.md, update spec.yaml with:
-- spec.title
-- spec.audience
-- spec.duration_hours
-- spec.learning_objectives
-- spec.modules (with stable IDs: module-01, module-02, etc.)
-- approval_checklist.content.prerequisites_verifiable
-
-Commit:
+After writing design.md, update spec.yaml — walk through every field and populate what the content analysis supports. Commit:
 ```bash
 git add publishing-house/spec/design.md publishing-house/spec.yaml
-git diff --cached --quiet || git commit -m "feat: design doc generated from imported content" 2>/dev/null || true
+git diff --cached --quiet || git commit -m "feat: design doc and spec populated from imported content" 2>/dev/null || true
 ```
 
 Validate design.md against spec guidelines:
@@ -230,6 +248,7 @@ Do NOT proceed past Phase 2. Return a summary of what was written:
 - List of files created/modified
 - Design doc section count
 - Module outline count
+- spec.yaml fields populated vs left empty
 - Any validation warnings
 ```
 
@@ -256,14 +275,4 @@ After Step 11 completes, **return to the orchestrator** (if dispatched) or **STO
 
 ## Pre-populated Fields
 
-Before generating anything, check spec.yaml for fields already set by the migration template:
-- `project.slug` — project identifier
-- `project.owner_email` — author email
-- `project.content_type` — lab or demo
-- `project.deployment_mode` — rhdp_published or self_published
-- `project.initiative_key` — e.g., rh1_2027
-- `project.showroom_type` — classic or zero_touch
-- `project.intake_type` — will be "migration"
-- `project.description` — project description from import form
-
-**Do not overwrite any field that already has a value unless the content analysis contradicts it and the author confirms the change.**
+The migration template pre-populates some `project.*` fields in spec.yaml (slug, owner_email, content_type, deployment_mode, etc.). The writer agent discovers these by reading spec.yaml — it does not use a hardcoded list. Any field that already has a value is kept unless the content analysis clearly contradicts it and the author confirms the change.
