@@ -30,6 +30,7 @@ Also check for the presence of:
 - `runtime-automation/` directory and its subdirectories
 - `config/` directory (indicates ZT Guided)
 - `setup-automation/` directory (indicates ZT Guided)
+- `lab-metadata.yml` at repo root (indicates ZT Guided — required for ZT catalog integration)
 - `publishing-house/spec.yaml` (indicates PH project)
 
 ## Step 2 — Detect Pattern
