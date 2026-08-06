@@ -8,25 +8,15 @@ context: main
 model: claude-opus-4-6
 ---
 
-# Migrate Agent
+# Migrate Orchestrator
 
 **RULE: If any `publishing-house/tools/` script exits with a non-zero exit code, STOP immediately.** Show the error output to the author and say there was an issue calling the backend. Do not continue the skill.
 
-You handle the migration intake phase. The project repo already contains a `content/` folder, `site.yml`, and possibly `ui-config.yml` from an existing Showroom repo. Your job is to reverse-engineer these into the Publishing House intake format — the same output that a fresh intake produces.
-
-## Core Principles
-
-1. **Template-driven.** You learn what to fill in by reading `publishing-house/spec.yaml` (inline comments with valid values) and `publishing-house/spec/design.md` (placeholder sections). You do NOT have your own templates.
-
-2. **Content is the source of truth.** The existing content/ folder contains the actual lab/demo modules. Read them to understand what the project is, what it teaches, and what infrastructure it needs.
-
-3. **Same output as intake.** When you're done, the repo must have the same files a fresh intake produces: populated spec.yaml, completed design.md, module outlines in `publishing-house/spec/modules/`, and an automation manifest.
-
-4. **Author reviews design.md only.** spec.yaml is written silently. The author reviews and approves the human-readable design doc.
+You handle migration intake by coordinating two agents: a **content reader** that analyzes the imported repo, and a **migration writer** that generates the Publishing House intake artifacts from that analysis.
 
 ## Tool Boundaries
 
-**Do NOT use** Central API tools directly. You work locally: read files, write specs, update spec.yaml.
+**Do NOT use** Central API tools directly. All external interactions go through `publishing-house/tools/` scripts.
 
 **Do NOT use** MCP tools. All external interactions go through `publishing-house/tools/` scripts.
 
@@ -87,69 +77,186 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 6. Read the module outline template from the project repo at `publishing-house/spec/module-outline-template.md`
 
-## Step 6 — Analyze existing content
+## Step 6 — Spawn Content Reader agent
 
-Read the imported content to understand the project:
+Use the Agent tool to spawn a content reader agent. Pass the project root path so the agent knows where to find files.
 
-1. Read `site.yml` — extract the project title, nav structure, and any metadata
-2. Read `ui-config.yml` if it exists — extract UI configuration details
-3. Read all `.adoc` files in `content/modules/ROOT/pages/` — these are the lab modules
-4. Read `content/modules/ROOT/nav.adoc` — this defines the module order and titles
+```
+Agent prompt:
+You are a content reader for a Showroom lab migration. Read all the content files in the project and produce a structured analysis report.
 
-From this analysis, extract:
-- **Title** — from site.yml `title` field
-- **Modules** — from nav.adoc entries, each pointing to a page in pages/
-- **Learning objectives** — derive from what each module teaches (use action verbs from policy)
-- **Products and technologies** — identify from the content (operator names, product references, CLI tools used)
-- **Target audience** — infer from the difficulty and prerequisites described or implied
-- **Duration** — estimate from module count and content depth (10-30 min per module)
-- **Infrastructure requirements** — infer from operators installed, cluster requirements, VM references, external services mentioned
-- **Content type** — read from `project.content_type` in spec.yaml (set by template)
+Project root: <project_root>
 
-Present the analysis to the author:
+Read these files:
+1. <project_root>/site.yml — extract title, nav structure, metadata
+2. <project_root>/ui-config.yml (if it exists) — extract UI config
+3. <project_root>/content/modules/ROOT/nav.adoc — module order and titles
+4. All .adoc files in <project_root>/content/modules/ROOT/pages/ — the actual lab content
+5. <project_root>/publishing-house/spec.yaml — check pre-populated fields
+6. <project_root>/catalog-info.yaml — check ph.rhdp.io/migrated-repo annotation
+
+For each module page, extract:
+- Title (from the page heading or nav.adoc reference)
+- Section headings and structure
+- Code blocks and commands used
+- Products, operators, and tools mentioned
+- Prerequisites assumed
+- Approximate complexity and length
+
+Produce a structured report with these sections:
+
+## Title
+The project title from site.yml
+
+## Migrated Repo
+The ph.rhdp.io/migrated-repo annotation value from catalog-info.yaml (empty if not set)
+
+## Modules
+For each module in nav.adoc order:
+- filename (the .adoc filename)
+- title
+- section_headings (list)
+- products_mentioned (list)
+- commands_used (list of key CLI commands)
+- estimated_duration_min (10-60 based on content length and complexity)
+- summary (2-3 sentence description of what the module covers)
+
+## Products and Technologies
+Consolidated list of all Red Hat products, operators, and tools found across all modules.
+
+## Infrastructure Signals
+What the content implies about infrastructure needs:
+- Cluster type (SNO vs multinode signals)
+- Operators installed
+- VMs referenced
+- External services used
+- GPU or AI model references
+- Storage requirements
+
+## Audience Signals
+Difficulty indicators:
+- Prerequisites mentioned or assumed
+- Complexity of tasks (CLI-heavy, GUI-only, mixed)
+- Prior knowledge assumed
+
+## Pre-populated Fields
+List all non-empty fields from spec.yaml project section.
+
+Do NOT write any files. Return the report as your final output.
+```
+
+## Step 7 — Present analysis to author
+
+Take the content reader's report and present a summary to the author:
 
 > "I've analyzed the imported content. Here's what I found:
 >
-> **Title:** [extracted title]
+> **Title:** [title from report]
 > **Modules:** [count] modules: [list titles]
-> **Products:** [list]
-> **Estimated duration:** [X] hours
+> **Products:** [consolidated list]
+> **Estimated duration:** [sum of module durations] hours
 >
 > Does this look right? Anything I should adjust before I generate the spec?"
 
 **Wait for confirmation before proceeding.**
 
-## Phase Flow
+## Step 8 — Spawn Migration Writer agent
 
-After Step 6 confirmation, follow the same phases as intake but populated from the content analysis instead of conversation:
+Use the Agent tool to spawn a migration writer agent. Pass the content reader's full report and the policy data.
 
-### Phase 2 — Design Generation
-Follow `procedures/01-design-from-content.md`.
-After completion: "Design doc generated from existing content. Next: RCARS vetting. **(3 phases remaining)**"
+```
+Agent prompt:
+You are a migration writer for the Publishing House. You take a content analysis report and generate the intake artifacts: design.md, spec.yaml fields, and module outlines.
 
-### Phase 3 — RCARS Vetting
+Project root: <project_root>
+
+## Content Analysis Report
+<paste the full content reader report here>
+
+## Policy Data
+<paste the policy.json contents — valid products, action verbs, content types, audiences>
+
+## Spec Guidelines
+<paste the spec guidelines content>
+
+## Instructions
+
+### Phase 1 — Design Generation
+Follow the procedure in <project_root_skills>/skills/migrate/procedures/01-design-from-content.md
+
+Read the design.md template at <project_root>/publishing-house/spec/design.md and fill in every section using the content analysis report. Do NOT fill Infrastructure Requirements — leave as "TBD — confirmed in infrastructure phase".
+
+After writing design.md, update spec.yaml with:
+- spec.title
+- spec.audience
+- spec.duration_hours
+- spec.learning_objectives
+- spec.modules (with stable IDs: module-01, module-02, etc.)
+- approval_checklist.content.prerequisites_verifiable
+
+Commit:
+```bash
+git add publishing-house/spec/design.md publishing-house/spec.yaml
+git diff --cached --quiet || git commit -m "feat: design doc generated from imported content" 2>/dev/null || true
+```
+
+Validate design.md against spec guidelines:
+- All 11 required sections present
+- Learning objectives use valid action verbs from policy
+- No unfilled template placeholders
+- Module durations in 10-60 minute range
+- Module Map table has at least one row
+
+### Phase 2 — Module Outlines
+Read the module outline template at <project_root>/publishing-house/spec/module-outline-template.md.
+
+For each module in the Module Map table, generate one outline file:
+- Output directory: <project_root>/publishing-house/spec/modules/
+- Naming: module-01-<short-title>.md, module-02-<short-title>.md
+- Follow the template structure exactly
+- Derive content from the corresponding module in the content analysis report
+
+After writing outlines, generate summaries for spec.yaml:
+- approval_checklist.content.design_overview (2-3 sentences)
+- approval_checklist.content.module_summaries (1-2 sentences per module)
+
+Commit:
+```bash
+git add publishing-house/spec/modules/ publishing-house/spec.yaml
+git diff --cached --quiet || git commit -m "feat: module outlines generated from imported content" 2>/dev/null || true
+```
+
+Do NOT proceed past Phase 2. Return a summary of what was written:
+- List of files created/modified
+- Design doc section count
+- Module outline count
+- Any validation warnings
+```
+
+## Step 9 — RCARS Vetting
+
+After the migration writer completes, run RCARS vetting yourself (not in an agent — this requires API calls via tools scripts).
+
 Follow `@rhdp-publishing-house/skills/intake/procedures/03b-rcars-vetting.md`.
 If offline → skip with warning.
 
 **Migrated repo filtering:** Before presenting RCARS candidates, read `catalog-info.yaml` and extract the `ph.rhdp.io/migrated-repo` annotation. If it has a value, derive the repo name (last path segment of the URL) and filter out any RCARS candidate whose `ci_name` contains that repo name. The migrated lab is the one being imported — flagging it as overlap is meaningless.
 
-After completion: "RCARS vetting complete. Next: module outlines. **(2 phases remaining)**"
+After completion: "RCARS vetting complete. Next: infrastructure confirmation. **(2 phases remaining)**"
 
-### Phase 4 — Module Outlines
-Follow `procedures/02-module-outlines-from-content.md`.
-After completion: "Module outlines generated. Next: infrastructure confirmation. **(1 phase remaining)**"
+## Step 10 — Infrastructure Confirmation
 
-### Phase 5 — Infrastructure Confirmation
 Follow `@rhdp-publishing-house/skills/intake/procedures/05-infrastructure.md`.
 
-### Phase 6 — Finalize + Submit
+## Step 11 — Finalize + Submit
+
 Follow `@rhdp-publishing-house/skills/intake/procedures/06-finalize-and-submit.md`.
 
-After Phase 6 completes, **return to the orchestrator** (if dispatched) or **STOP** (if invoked directly).
+After Step 11 completes, **return to the orchestrator** (if dispatched) or **STOP** (if invoked directly).
 
 ## Pre-populated Fields
 
-Before generating anything, check spec.yaml for fields already set by the import template:
+Before generating anything, check spec.yaml for fields already set by the migration template:
 - `project.slug` — project identifier
 - `project.owner_email` — author email
 - `project.content_type` — lab or demo
