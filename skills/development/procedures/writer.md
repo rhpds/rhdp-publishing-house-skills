@@ -331,7 +331,17 @@ When both index and conclusion are approved:
    git add publishing-house/spec.yaml
    git commit -m "feat: mark showroom content complete — all modules, index, and conclusion finalized"
    ```
-3. Confirm:
-   > "Showroom content finalized. All modules, index, and conclusion are written and reviewed."
+3. Submit development completion to Central API:
+   ```bash
+   python publishing-house/tools/ph-development.py
+   ```
+   This POSTs to `/api/v1/projects/development/{slug}` — Central validates development artifacts
+   server-side and advances the workflow from development → review if validation passes.
+
+   If the script fails (non-zero exit), STOP and show the error to the author. Do not continue.
+
+4. Confirm:
+   > "Showroom content finalized. All modules, index, and conclusion are written and reviewed.
+   > Development submitted to Central — workflow advanced to review stage."
 
 Do NOT skip Step 6 once all modules are done. Index and conclusion are mandatory for a complete showroom.
