@@ -130,6 +130,9 @@ After completion: "Design doc generated from existing content. Next: RCARS vetti
 ### Phase 3 — RCARS Vetting
 Follow `@rhdp-publishing-house/skills/intake/procedures/03b-rcars-vetting.md`.
 If offline → skip with warning.
+
+**Source repo filtering:** Before presenting RCARS candidates, read `catalog-info.yaml` and extract the `ph.rhdp.io/source-repo` annotation. If it has a value, derive the repo name (last path segment of the URL) and filter out any RCARS candidate whose `ci_name` contains that repo name. The source lab is the one being migrated — flagging it as overlap is meaningless.
+
 After completion: "RCARS vetting complete. Next: module outlines. **(2 phases remaining)**"
 
 ### Phase 4 — Module Outlines
