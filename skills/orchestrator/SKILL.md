@@ -48,7 +48,9 @@ This is a loop. After a skill returns, re-run Step 4 (both scripts), extract the
 
 ```
 Loop:
-  intake       → dispatch rhdp-publishing-house:intake
+  intake       → read project.intake_type from publishing-house/spec.yaml
+                  if intake_type == "migration" → dispatch rhdp-publishing-house:migrate
+                  else → dispatch rhdp-publishing-house:intake
   development  → dispatch rhdp-publishing-house:development
   content_review / infra_review / staging → show review status, STOP
   testing      → show testing status, STOP
