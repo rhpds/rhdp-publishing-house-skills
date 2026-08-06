@@ -318,7 +318,7 @@ After both index and conclusion are approved:
 2. Verify no placeholder text or `TODO` markers in either file
 3. Check that all learning objectives from modules are consolidated in conclusion's "What You've Learned" section
 
-### Step 6e: Mark Showroom Complete (only after human approval of both)
+### Step 6e: Mark Showroom Complete and Submit to Central
 
 When both index and conclusion are approved:
 
@@ -335,11 +335,7 @@ When both index and conclusion are approved:
    ```bash
    python publishing-house/tools/ph-development.py
    ```
-   This POSTs to `/api/v1/projects/development/{slug}` — Central validates development artifacts
-   server-side and advances the workflow from development → review if validation passes.
-
    If the script fails (non-zero exit), STOP and show the error to the author. Do not continue.
-
 4. Confirm:
    > "Showroom content finalized. All modules, index, and conclusion are written and reviewed.
    > Development submitted to Central — workflow advanced to review stage."
