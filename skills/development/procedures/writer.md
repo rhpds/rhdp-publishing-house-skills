@@ -65,10 +65,11 @@ One agent per module, run sequentially.
 
 After the writing agent finishes:
 
-1. Commit the written content immediately:
+1. Commit and push the written content immediately:
    ```bash
    git add content/
    git commit -m "feat: write module N — [title]"
+   git push
    ```
 2. Verify the generated file exists in `content/modules/ROOT/pages/`
 3. Check that `content/modules/ROOT/nav.adoc` includes the new module
@@ -143,13 +144,14 @@ When the author says "module N is done" / "it's done" / "mark it complete" / "lo
 
 1. Re-check: verify the `.adoc` file exists and `spec.yaml` shows `status: in_progress` for this module
 2. Update `publishing-house/spec.yaml`: change `status: in_progress` to `status: complete` for this module
-3. Commit:
+3. Commit and push:
    ```bash
    git add publishing-house/spec.yaml
    git commit -m "feat: mark module N complete — [title]"
+   git push
    ```
 4. Confirm:
-   > "Module N marked complete. [Next module available / All modules complete.]"
+   > "Module N marked complete and pushed. [Next module available / All modules complete.]"
 
 **Standalone completion:** If the author returns in a new session and says "module N is done" without
 having run the write flow in this session, Step 5d still works — check `spec.yaml` for `status: in_progress`,
@@ -175,8 +177,8 @@ Before generating index and conclusion:
 
 1. Verify all modules are complete: check `spec.yaml` — every module must show `status: complete`
 2. Identify the target paths in `content/modules/ROOT/pages/`:
-   - `00-index-learner.adoc` (or `00-index.adoc` if demo)
-   - `99-conclusion.adoc`
+   - `index.adoc`
+   - `conclusion.adoc`
 3. Confirm `spec.yaml` module list is intact — you'll need the full list for the conclusion's "What You've Learned" recap
 
 Present a plan before proceeding:
@@ -191,7 +193,7 @@ Spawn the module-writing-helper agent:
     Task tool:
       subagent_type: rhdp-publishing-house:module-writing-helper
       prompt: |
-        TARGET_FILE: content/modules/ROOT/pages/00-index-learner.adoc
+        TARGET_FILE: content/modules/ROOT/pages/index.adoc
         FILE_TYPE: index
         FULL_SPEC: <JSON from spec.yaml + design.md>
         LAB_TYPE: <ocp|rhel|vm|ai>
@@ -203,7 +205,7 @@ Wait for the agent to complete. Verify the file exists.
 
 Commit immediately:
 ```bash
-git add content/modules/ROOT/pages/00-index-learner.adoc
+git add content/modules/ROOT/pages/index.adoc
 git commit -m "feat: generate index.adoc"
 ```
 
@@ -216,7 +218,7 @@ Spawn the reviewer agent:
     Agent tool:
       subagent_type: rhdp-publishing-house:module-reviewer
       prompt: |
-        MODULE_FILE: <absolute path to 00-index-learner.adoc>
+        MODULE_FILE: <absolute path to index.adoc>
         CONTENT_TYPE: <workshop|demo>
         LAB_TYPE: <ocp|rhel|vm|ai>
         SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
@@ -233,7 +235,7 @@ Present findings to the author:
 >
 > **These findings are directions, not mandatory fixes.** Use your judgment.
 >
-> **Please review:** `content/modules/ROOT/pages/00-index-learner.adoc`
+> **Please review:** `content/modules/ROOT/pages/index.adoc`
 >
 > **What would you like to do?**
 > 1. Edit the file yourself, then say **"review again"**
@@ -253,7 +255,7 @@ Spawn the module-writing-helper agent:
     Task tool:
       subagent_type: rhdp-publishing-house:module-writing-helper
       prompt: |
-        TARGET_FILE: content/modules/ROOT/pages/99-conclusion.adoc
+        TARGET_FILE: content/modules/ROOT/pages/conclusion.adoc
         FILE_TYPE: conclusion
         FULL_SPEC: <JSON from spec.yaml + design.md with complete module list>
         LAB_TYPE: <ocp|rhel|vm|ai>
@@ -265,7 +267,7 @@ Wait for the agent to complete. Verify the file exists.
 
 Commit immediately:
 ```bash
-git add content/modules/ROOT/pages/99-conclusion.adoc
+git add content/modules/ROOT/pages/conclusion.adoc
 git commit -m "feat: generate conclusion.adoc"
 ```
 
@@ -278,7 +280,7 @@ Spawn the reviewer agent:
     Agent tool:
       subagent_type: rhdp-publishing-house:module-reviewer
       prompt: |
-        MODULE_FILE: <absolute path to 99-conclusion.adoc>
+        MODULE_FILE: <absolute path to conclusion.adoc>
         CONTENT_TYPE: <workshop|demo>
         LAB_TYPE: <ocp|rhel|vm|ai>
         SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
@@ -297,7 +299,7 @@ Present findings to the author:
 >
 > Check that all learning objectives from your modules are captured in "What You've Learned".
 >
-> **Please review:** `content/modules/ROOT/pages/99-conclusion.adoc`
+> **Please review:** `content/modules/ROOT/pages/conclusion.adoc`
 >
 > **What would you like to do?**
 > 1. Edit the file yourself, then say **"review again"**
@@ -313,8 +315,8 @@ If "review again" — re-run reviewer, present findings, HARD STOP again.
 After both index and conclusion are approved:
 
 1. Check `content/modules/ROOT/nav.adoc` includes both files in correct order:
-   - First entry: `00-index-learner.adoc` (or `00-index.adoc`)
-   - Last entry: `99-conclusion.adoc`
+   - First entry: `index.adoc`
+   - Last entry: `conclusion.adoc`
 2. Verify no placeholder text or `TODO` markers in either file
 3. Check that all learning objectives from modules are consolidated in conclusion's "What You've Learned" section
 
