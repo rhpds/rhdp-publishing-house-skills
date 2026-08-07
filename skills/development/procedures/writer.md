@@ -33,6 +33,7 @@ Build a combined context object from all three sources.
 
 Before spawning any agent, check `spec.yaml` module statuses:
 
+- `not_started` → eligible to write
 - `in_progress` → resume this module (started but not finished)
 - `complete` → skip; move to next module
 
@@ -42,6 +43,18 @@ Present a plan before spawning:
 > "Here's what I'll write for module N: [summary of outline]. Ready to proceed?"
 
 Wait for user approval — never auto-generate.
+
+## Step 3b: Mark Module In Progress
+
+After the author approves, update `spec.yaml` before spawning the writing agent:
+
+1. Change the module's `status: not_started` to `status: in_progress`
+2. Commit and push:
+   ```bash
+   git add publishing-house/spec.yaml
+   git commit -m "feat: start module N — [title]"
+   git push
+   ```
 
 ## Step 4: Spawn rhdp-publishing-house:module-writing-helper Agent
 
