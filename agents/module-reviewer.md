@@ -113,7 +113,7 @@ For E.3a: Only flag bash, sh, shell, console, terminal, tty, wetty code blocks m
 | E.3 | Code blocks with `role="execute"` have correct syntax | Invalid role combination | Medium |
 | E.3a | Shell command blocks have `role="execute"` — ONLY flag: bash, sh, shell, console, terminal, tty, wetty. Do NOT flag: yaml, json, python, text, asciidoc | High | High |
 | E.3-img | `image::` macros with `link=self,window=blank` | Any image without it | Warning |
-| E.3b | `role="send-to-wetty"` commands also have `role="execute"` — **classic only** (skip if `SHOWROOM_TYPE=zero_touch` — ZT does not use wetty) | Missing execute | Warning |
+| E.3b | Terminal-targeted code blocks use correct role syntax: `role="execute"`, `role="execute-top"`, or `role="execute-bottom"` | Invalid role | Warning |
 | E.4 | No hardcoded cluster URLs, usernames, passwords — use `{user}`, `{password}`, `{openshift_console_url}` | Literal values | High |
 | E.5 | All `{attribute}` placeholders defined in antora.yml or _attributes.adoc | Undefined attribute — cross-check SHARED_CONTEXT.defined_attributes | High |
 | E.6 | All images have alt text — empty first bracket in `image::` | Missing alt | High |
