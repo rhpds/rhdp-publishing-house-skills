@@ -33,7 +33,7 @@ Build a combined context object from all three sources.
 
 Before spawning any agent, check `spec.yaml` module statuses:
 
-- `not_started` → eligible to write; set to `in_progress` when starting
+- `not_started` → eligible to write
 - `in_progress` → resume this module (started but not finished)
 - `complete` → skip; move to next module
 
@@ -44,18 +44,34 @@ Present a plan before spawning:
 
 Wait for user approval — never auto-generate.
 
+## Step 3b: Mark Module In Progress
+
+After the author approves, update `spec.yaml` before spawning the writing agent:
+
+1. Change the module's `status: not_started` to `status: in_progress`
+2. Commit and push:
+   ```bash
+   git add publishing-house/spec.yaml
+   git commit -m "feat: start module N — [title]"
+   git push
+   ```
+
 ## Step 4: Spawn rhdp-publishing-house:module-writing-helper Agent
 
 For each module, spawn the agent via Task tool:
 
+Derive the `.adoc` filename from the outline filename in `publishing-house/spec/modules/`:
+replace `.md` with `.adoc`. Example: outline `module-01-pipeline-setup.md` → `content/modules/ROOT/pages/module-01-pipeline-setup.adoc`.
+
     Task tool:
       subagent_type: rhdp-publishing-house:module-writing-helper
       prompt: |
-        TARGET_FILE: content/modules/ROOT/pages/<module-filename>.adoc
+        TARGET_FILE: content/modules/ROOT/pages/<outline-name>.adoc
         FILE_TYPE: module
         FULL_SPEC: <JSON from spec.yaml + design.md + module outline>
         LAB_TYPE: <ocp|rhel|vm|ai>
         CONTENT_TYPE: <workshop|demo>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         REPO_PATH: <absolute repo path>
 
 One agent per module, run sequentially.
@@ -64,10 +80,11 @@ One agent per module, run sequentially.
 
 After the writing agent finishes:
 
-1. Commit the written content immediately:
+1. Commit and push the written content immediately:
    ```bash
    git add content/
    git commit -m "feat: write module N — [title]"
+   git push
    ```
 2. Verify the generated file exists in `content/modules/ROOT/pages/`
 3. Check that `content/modules/ROOT/nav.adoc` includes the new module
@@ -89,6 +106,7 @@ Spawn the reviewer agent:
         MODULE_FILE: <absolute path to the just-written .adoc file>
         CONTENT_TYPE: <workshop|demo>
         LAB_TYPE: <ocp|rhel|vm|ai>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         SHARED_CONTEXT: <JSON with module_order, defined_attributes, first_use_map, is_first_module, is_conclusion>
         REPO_PATH: <absolute repo path>
 
@@ -141,17 +159,23 @@ When the author says "module N is done" / "it's done" / "mark it complete" / "lo
 
 1. Re-check: verify the `.adoc` file exists and `spec.yaml` shows `status: in_progress` for this module
 2. Update `publishing-house/spec.yaml`: change `status: in_progress` to `status: complete` for this module
-3. Commit:
+3. Commit and push:
    ```bash
    git add publishing-house/spec.yaml
    git commit -m "feat: mark module N complete — [title]"
+   git push
    ```
-4. Confirm:
-   > "Module N marked complete. [Next module available / All modules complete.]"
+4. Close the module's Jira ticket (best-effort):
+   ```bash
+   python publishing-house/tools/ph-module-complete.py module-NN
+   ```
+   If there is no epic (self-published mode) or no matching ticket, the script exits cleanly. Do not stop on failure.
+5. Confirm:
+   > "Module N marked complete and pushed. [Next module available / All modules complete.]"
 
 **Standalone completion:** If the author returns in a new session and says "module N is done" without
 having run the write flow in this session, Step 5d still works — check `spec.yaml` for `status: in_progress`,
-verify the `.adoc` file exists in `content/modules/ROOT/pages/`, and mark complete.
+verify the `.adoc` file exists in `content/modules/ROOT/pages/`, and mark complete. Also run `ph-module-complete.py`.
 
 ## What You Do NOT Do
 
@@ -173,8 +197,8 @@ Before generating index and conclusion:
 
 1. Verify all modules are complete: check `spec.yaml` — every module must show `status: complete`
 2. Identify the target paths in `content/modules/ROOT/pages/`:
-   - `00-index-learner.adoc` (or `00-index.adoc` if demo)
-   - `99-conclusion.adoc`
+   - `index.adoc`
+   - `conclusion.adoc`
 3. Confirm `spec.yaml` module list is intact — you'll need the full list for the conclusion's "What You've Learned" recap
 
 Present a plan before proceeding:
@@ -189,18 +213,19 @@ Spawn the module-writing-helper agent:
     Task tool:
       subagent_type: rhdp-publishing-house:module-writing-helper
       prompt: |
-        TARGET_FILE: content/modules/ROOT/pages/00-index-learner.adoc
+        TARGET_FILE: content/modules/ROOT/pages/index.adoc
         FILE_TYPE: index
         FULL_SPEC: <JSON from spec.yaml + design.md>
         LAB_TYPE: <ocp|rhel|vm|ai>
         CONTENT_TYPE: <workshop|demo>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         REPO_PATH: <absolute repo path>
 
 Wait for the agent to complete. Verify the file exists.
 
 Commit immediately:
 ```bash
-git add content/modules/ROOT/pages/00-index-learner.adoc
+git add content/modules/ROOT/pages/index.adoc
 git commit -m "feat: generate index.adoc"
 ```
 
@@ -213,9 +238,10 @@ Spawn the reviewer agent:
     Agent tool:
       subagent_type: rhdp-publishing-house:module-reviewer
       prompt: |
-        MODULE_FILE: <absolute path to 00-index-learner.adoc>
+        MODULE_FILE: <absolute path to index.adoc>
         CONTENT_TYPE: <workshop|demo>
         LAB_TYPE: <ocp|rhel|vm|ai>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         SHARED_CONTEXT: <JSON with module_order, is_first_module: true>
         REPO_PATH: <absolute repo path>
 
@@ -229,7 +255,7 @@ Present findings to the author:
 >
 > **These findings are directions, not mandatory fixes.** Use your judgment.
 >
-> **Please review:** `content/modules/ROOT/pages/00-index-learner.adoc`
+> **Please review:** `content/modules/ROOT/pages/index.adoc`
 >
 > **What would you like to do?**
 > 1. Edit the file yourself, then say **"review again"**
@@ -249,18 +275,19 @@ Spawn the module-writing-helper agent:
     Task tool:
       subagent_type: rhdp-publishing-house:module-writing-helper
       prompt: |
-        TARGET_FILE: content/modules/ROOT/pages/99-conclusion.adoc
+        TARGET_FILE: content/modules/ROOT/pages/conclusion.adoc
         FILE_TYPE: conclusion
         FULL_SPEC: <JSON from spec.yaml + design.md with complete module list>
         LAB_TYPE: <ocp|rhel|vm|ai>
         CONTENT_TYPE: <workshop|demo>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         REPO_PATH: <absolute repo path>
 
 Wait for the agent to complete. Verify the file exists.
 
 Commit immediately:
 ```bash
-git add content/modules/ROOT/pages/99-conclusion.adoc
+git add content/modules/ROOT/pages/conclusion.adoc
 git commit -m "feat: generate conclusion.adoc"
 ```
 
@@ -273,9 +300,10 @@ Spawn the reviewer agent:
     Agent tool:
       subagent_type: rhdp-publishing-house:module-reviewer
       prompt: |
-        MODULE_FILE: <absolute path to 99-conclusion.adoc>
+        MODULE_FILE: <absolute path to conclusion.adoc>
         CONTENT_TYPE: <workshop|demo>
         LAB_TYPE: <ocp|rhel|vm|ai>
+        SHOWROOM_TYPE: <classic|zero_touch from project.showroom_type in spec.yaml>
         SHARED_CONTEXT: <JSON with module_order, is_conclusion: true>
         REPO_PATH: <absolute repo path>
 
@@ -291,7 +319,7 @@ Present findings to the author:
 >
 > Check that all learning objectives from your modules are captured in "What You've Learned".
 >
-> **Please review:** `content/modules/ROOT/pages/99-conclusion.adoc`
+> **Please review:** `content/modules/ROOT/pages/conclusion.adoc`
 >
 > **What would you like to do?**
 > 1. Edit the file yourself, then say **"review again"**
@@ -307,12 +335,53 @@ If "review again" — re-run reviewer, present findings, HARD STOP again.
 After both index and conclusion are approved:
 
 1. Check `content/modules/ROOT/nav.adoc` includes both files in correct order:
-   - First entry: `00-index-learner.adoc` (or `00-index.adoc`)
-   - Last entry: `99-conclusion.adoc`
+   - First entry: `index.adoc`
+   - Last entry: `conclusion.adoc`
 2. Verify no placeholder text or `TODO` markers in either file
 3. Check that all learning objectives from modules are consolidated in conclusion's "What You've Learned" section
 
-### Step 6e: Mark Showroom Complete (only after human approval of both)
+### Step 6d-config: Run Showroom Config Helper (Post-Content Finalization)
+
+**Do NOT skip this step.** After all content (modules, index, conclusion) is finalized, run the
+config helper one final time to ensure the full Showroom deployment configuration is correct.
+
+Follow `procedures/config-helper.md` (Route C — modification flow). Key actions at this stage:
+
+1. Verify `nav.adoc` ordering: index first, modules in sequence, conclusion last
+2. For zerotouch: confirm `antora.modules` includes all pages (index + modules + conclusion)
+3. Cross-check `site.yml` start_page against `content/antora.yml` name
+4. Validate `ui-config.yml` tabs still match the spec's environment
+5. Run `procedures/config-reviewer.md` to produce a final validation report
+
+**Tab review — prompt the author:**
+
+Scan the completed module content for clues about services the learner interacts with
+(e.g. URLs opened in exercises, `oc get route` commands, web console references, application
+UIs mentioned in steps). Then present the current tab list alongside any suggestions:
+
+> **Your current Showroom tabs:**
+> [list current tabs from ui-config.yml]
+>
+> **While writing your modules I noticed references to:**
+> [list any services/URLs/consoles found in the content that aren't already tabs]
+>
+> Now that development is complete, would you like to add or change any tabs?
+> For example: an application console, documentation link, or additional terminal
+> that came up during module development.
+>
+> 1. **Add tabs** — tell me what to add
+> 2. **No changes** — tabs are fine as-is
+
+If the author wants to add tabs, follow the Tab Advisor procedure in `procedures/config-helper.md`.
+
+If any CRITICAL or HIGH findings remain, present them to the author before marking complete.
+Commit any final config fixes:
+```bash
+git add site.yml ui-config.yml content/antora.yml content/modules/ROOT/nav.adoc
+git diff --cached --quiet || git commit -m "chore: finalize showroom config after content complete"
+```
+
+### Step 6e: Mark Showroom Complete and Submit to Central
 
 When both index and conclusion are approved:
 
@@ -325,7 +394,13 @@ When both index and conclusion are approved:
    git add publishing-house/spec.yaml
    git commit -m "feat: mark showroom content complete — all modules, index, and conclusion finalized"
    ```
-3. Confirm:
-   > "Showroom content finalized. All modules, index, and conclusion are written and reviewed."
+3. Submit development completion to Central API:
+   ```bash
+   python publishing-house/tools/ph-development.py
+   ```
+   If the script fails (non-zero exit), STOP and show the error to the author. Do not continue.
+4. Confirm:
+   > "Showroom content finalized. All modules, index, and conclusion are written and reviewed.
+   > Development submitted to Central — workflow advanced to review stage."
 
 Do NOT skip Step 6 once all modules are done. Index and conclusion are mandatory for a complete showroom.

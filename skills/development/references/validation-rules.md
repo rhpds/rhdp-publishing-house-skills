@@ -110,12 +110,23 @@ Using both is ambiguous. Using neither produces a broken tab. `port` is only nee
 
 Placeholder tabs (`url: /placeholder`) render a stub panel for local development only.
 
-### U-6 — Variable substitution must use `${VARIABLE}` syntax
+### U-6 — Variable substitution must use `${VARIABLE}` syntax and reference known variables
 
 - **Severity:** MEDIUM
 - **Auto-fix:** Yes — add `$` prefix to bare `{VARIABLE}` references
 
 The `${}` wrapper is required in ui-config.yml. AsciiDoc attribute substitution uses `{attribute}` without `$`, but ui-config.yml is different. Common mistake: `{DOMAIN}` instead of `${DOMAIN}`.
+
+**Built-in variables** (always valid): `${DOMAIN}`, `${GUID}`, `${USER}`
+
+**Custom variables:** Any key defined in `content/antora.yml` under `asciidoc.attributes.environment_variables` is also valid. Check this map when encountering non-built-in `${VAR}` references — if the variable is listed there, it passes. If not, flag as a warning (the variable may resolve to an unintended container environment variable or be empty at runtime).
+
+### U-6b — Non-built-in variables in tab URLs should be defined in antora.yml environment_variables for local development
+
+- **Severity:** LOW
+- **Auto-fix:** No — requires author to either add the variable to antora.yml or confirm it's injected by the deployment
+
+If a tab URL contains `${VAR}` where VAR is not one of `DOMAIN`, `GUID`, `USER` and is not listed in `content/antora.yml` `asciidoc.attributes.environment_variables`, flag it as a recommendation. In production the variable may be injected by the Helm chart or AgnosticV workload, but defining it in `environment_variables` ensures local preview (`podman-compose up`) works correctly. This is a development convenience, not a deployment requirement.
 
 ### U-7 — Zerotouch: antora.modules entries must match page filenames
 
@@ -218,7 +229,13 @@ If antora.yml has `name: modules`, site.yml must have `start_page: modules::inde
 - **Severity:** HIGH
 - **Auto-fix:** Yes — can create stub playbook files
 
-`runtime-automation/` must exist with `solve.yml` and `validate.yml` per module (except index). Each module listed in `antora.modules` (other than the index/intro page) should have a corresponding directory in `runtime-automation/<module-name>/` containing at least `solve.yml` and `validate.yml`. Module-01 may also have `setup.yml`.
+`runtime-automation/` must exist with solve and validate automation per module (except index). Each module listed in `antora.modules` (other than the index/intro page) should have a corresponding directory in `runtime-automation/<module-name>/` containing solve and validate files.
+
+**Accepted file formats** — check for any of these per module directory:
+- `.yml`/`.yaml` playbooks: `solve.yml`, `validate.yml` (or `validation.yml`), `setup.yml`
+- `.sh` shell scripts: `solve-*.sh`, `validate-*.sh` (or `validation-*.sh`), `setup-*.sh`
+
+A module directory with at least one solve file AND one validate file passes. Module-01 may also have a setup file. Do not flag a module for missing `.yml` if `.sh` files are present (or vice versa).
 
 ### X-4 — Theme and content mode must be consistent
 
@@ -240,6 +257,31 @@ If antora.yml has `name: modules`, site.yml must have `start_page: modules::inde
 - **Auto-fix:** Yes — can convert between `path`+`port` and `url` syntax
 
 AgD environments (OCP/VM) use `path: /wetty`. ZT environments use `url: /wetty`. Using the wrong syntax causes the terminal tab to fail to load. Detection: ZT is identified by presence of `config/` directory.
+
+---
+
+## ZT-Specific Rules (Z-rules) — Skip if pattern is NOT ZT Guided
+
+### Z-1 — lab-metadata.yml must exist at repo root
+
+- **Severity:** HIGH
+- **Auto-fix:** No — requires author to provide lab metadata
+
+ZT repos use `lab-metadata.yml` for lab name, shortname, maintainer, description, and git_ref (production/development branches). This file is required for ZT catalog integration.
+
+### Z-2 — lab-metadata.yml must have lab.name and lab.shortname
+
+- **Severity:** MEDIUM
+- **Auto-fix:** No — requires author input
+
+Both fields must be non-empty and not placeholder values.
+
+### Z-3 — lab-metadata.yml must have lab.git_ref.production
+
+- **Severity:** HIGH
+- **Auto-fix:** No — requires author to specify the production branch/tag
+
+The production git reference is required for catalog deployment. Development ref defaults to `main` if not specified.
 
 ---
 

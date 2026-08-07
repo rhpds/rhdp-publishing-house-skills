@@ -1,17 +1,11 @@
----
-name: rhdp-publishing-house:config-helper
-description: This skill should be used when the user asks to "set up showroom", "configure showroom tabs", "create site.yml", "set up ui-config.yml", "scaffold the showroom structure", "add a tab", "change the theme", or "switch to zerotouch".
-context: main
----
-
 # Showroom Config Helper
 
 You help authors set up and configure Showroom content repositories. You handle the
 first decision (showroom vs zerotouch content mode), generate the correct config files,
 configure tabs, and create automation directory skeletons.
 
-See @rhdp-publishing-house/skills/config-helper/references/showroom-patterns.md for the three lab patterns and their complete config examples.
-See @rhdp-publishing-house/skills/config-helper/references/config-files.md for the full reference on every config file.
+See @rhdp-publishing-house/skills/development/references/showroom-patterns.md for the three lab patterns and their complete config examples.
+See @rhdp-publishing-house/skills/development/references/config-files.md for the full reference on every config file.
 
 ## Step 1 — Detect Repo Context
 
@@ -96,7 +90,7 @@ ZT always uses zerotouch content mode. If the user chose showroom mode and ZT in
 
 **B.4 — Generate config files:**
 
-Based on the content mode and infrastructure type, determine the pattern (Open, Guided, or ZT Guided) and generate all files. Use the exact templates from @rhdp-publishing-house/skills/config-helper/references/showroom-patterns.md — do not improvise config structure.
+Based on the content mode and infrastructure type, determine the pattern (Open, Guided, or ZT Guided) and generate all files. Use the exact templates from @rhdp-publishing-house/skills/development/references/showroom-patterns.md — do not improvise config structure.
 
 Files to generate:
 
@@ -136,7 +130,7 @@ Show a tree of generated files and explain the key next steps:
 
 The repo already has `site.yml` and/or `ui-config.yml`.
 
-1. Read existing config files to detect the current pattern. Use the detection rules from @rhdp-publishing-house/skills/config-helper/references/showroom-patterns.md.
+1. Read existing config files to detect the current pattern. Use the detection rules from @rhdp-publishing-house/skills/development/references/showroom-patterns.md.
 
 2. Understand what the user wants to change. Common requests:
    - **Add a tab** — add entry to `tabs:` list in ui-config.yml
@@ -291,6 +285,9 @@ Only specify `port` on a tab if the service runs on a non-standard port (not 80 
 - Always use the exact config structures from the reference files — do not invent new YAML keys
 - When generating zerotouch ui-config.yml, the `antora.modules` entries must match the page filenames in `content/modules/ROOT/pages/`
 - Tab URLs that reference cluster services should use `${DOMAIN}` variable substitution (not `{DOMAIN}`)
+- Built-in variables available in ui-config.yml: `${DOMAIN}`, `${GUID}`, `${USER}`
+- Custom variables can be defined in `content/antora.yml` under `asciidoc.attributes.environment_variables` — these are exported before `envsubst` runs on ui-config.yml at deploy time
+- When suggesting tab URLs that need custom values, either use a built-in variable or add the variable to `environment_variables` in antora.yml
 - Never modify `site.yml` content source settings — `start_path: content` and `url: .` are fixed
 - For PH projects, do not modify `publishing-house/` directory contents — that is PH skill territory
 - When switching content modes, both `site.yml` (bundle URL) and `ui-config.yml` (format) must change together

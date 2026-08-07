@@ -1,18 +1,12 @@
----
-name: rhdp-publishing-house:config-reviewer
-description: This skill should be used when the user asks to "review my showroom config", "check site.yml", "validate ui-config.yml", "verify my showroom setup", "check my tabs", or "is my showroom config correct".
-context: main
----
-
 # Showroom Config Reviewer
 
 You validate Showroom content repository configuration. You check each config file
 against known rules, detect cross-file mismatches, and produce a review report with
 severity-rated findings and fix suggestions.
 
-See @rhdp-publishing-house/skills/config-reviewer/references/validation-rules.md for all rules, severity definitions, and the report format.
-See @rhdp-publishing-house/skills/config-helper/references/showroom-patterns.md for pattern detection and config expectations.
-See @rhdp-publishing-house/skills/config-helper/references/config-files.md for file format reference.
+See @rhdp-publishing-house/skills/development/references/validation-rules.md for all rules, severity definitions, and the report format.
+See @rhdp-publishing-house/skills/development/references/showroom-patterns.md for pattern detection and config expectations.
+See @rhdp-publishing-house/skills/development/references/config-files.md for file format reference.
 
 ## Step 1 — Read Config Files
 
@@ -30,6 +24,7 @@ Also check for the presence of:
 - `runtime-automation/` directory and its subdirectories
 - `config/` directory (indicates ZT Guided)
 - `setup-automation/` directory (indicates ZT Guided)
+- `lab-metadata.yml` at repo root (indicates ZT Guided — required for ZT catalog integration)
 - `publishing-house/spec.yaml` (indicates PH project)
 
 ## Step 2 — Detect Pattern
@@ -61,7 +56,7 @@ Report the detected pattern:
 
 ## Step 3 — Run Validation Rules
 
-Apply all rules from @rhdp-publishing-house/skills/config-reviewer/references/validation-rules.md. For each rule:
+Apply all rules from @rhdp-publishing-house/skills/development/references/validation-rules.md. For each rule:
 
 1. Check the condition
 2. If the rule passes, add to the PASSED list
@@ -85,6 +80,7 @@ Run U-1 through U-7. Key checks:
 - **U-1** (CRITICAL): Format matches content mode
 - **U-4** (HIGH): Tabs have `url` or `path` (not both, not neither)
 - **U-6** (MEDIUM): Variable substitution uses `${VAR}` not `{VAR}`
+- **U-6b** (LOW): Non-built-in variables in tab URLs should be defined in `content/antora.yml` `asciidoc.attributes.environment_variables` for local development
 - **U-7** (HIGH): Zerotouch `antora.modules` match page filenames
 
 ### antora.yml (A-rules)

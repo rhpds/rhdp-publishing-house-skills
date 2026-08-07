@@ -16,6 +16,7 @@ Generates a single Showroom AsciiDoc file from a lab spec and writes it to disk.
 - `FULL_SPEC` — JSON spec from the planning phase (see schema below)
 - `LAB_TYPE` — `rhel` | `ocp` | `ai` | `vm`
 - `CONTENT_TYPE` — `workshop` | `demo`
+- `SHOWROOM_TYPE` — `classic` | `zero_touch` (from `project.showroom_type` in spec.yaml)
 - `PREVIOUS_MODULE` — (continue mode only) absolute path to the previous .adoc file to read for continuity
 
 ---
@@ -38,7 +39,7 @@ Generates a single Showroom AsciiDoc file from a lab spec and writes it to disk.
   },
   "module_number": 1,
   "module_title": "Pipeline Setup",
-  "module_file": "03-module-01-pipeline-setup.adoc"
+  "module_file": "module-01-pipeline-setup.adoc"
 }
 ```
 
@@ -117,7 +118,7 @@ If `FULL_SPEC.source_files` contains URLs (not local paths):
 If `FULL_SPEC.source_files` contains local file paths:
 - Use Read to read each file
 
-For E2E content (FILE_TYPE=module with solve/validate buttons):
+For E2E content (FILE_TYPE=module with solve/validate buttons — **zerotouch/guided only**, skip if `SHOWROOM_TYPE=classic`):
 - Check if ~/work/code/showroom_template_nookbag exists and switch to e2e-template branch
 - Use examples/e2e-ocp-dedicated/ as canonical reference for button syntax and structure
 
@@ -161,10 +162,10 @@ Follow the template structure exactly. Apply FULL_SPEC values.
 - Cleanup section (OPTIONAL — if module changes shared state):
   oc delete project my-project style commands
 - Conclusion paragraph
-- Solve/validate button placeholders (when E2E automation planned):
+- Solve/validate button placeholders — **zerotouch/guided only** (when E2E automation planned, skip if `SHOWROOM_TYPE=classic`):
   [.solve-button-placeholder]#solve-button-placeholder#
   [.validate-button-placeholder]#validate-button-placeholder#
-- Send-to-terminal combined role: [source,role="execute send-to-wetty"]
+- Split-terminal targeting (when multiple terminals configured): [source,bash,role="execute-top"] or [source,bash,role="execute-bottom"]
 
 **`blog`** — Markdown blog post from source Showroom content
 
@@ -199,10 +200,10 @@ Structure: title, summary excerpt, introduction, body sections matching source m
 - All code blocks that should auto-execute: `[source,bash,role="execute"]`
 - All images: `image::name.png[descriptive alt text, link=self, window=blank]`
 - No heading level skips
-- Solve/validate button placeholders (when E2E automation planned):
+- Solve/validate button placeholders — **zerotouch/guided only** (skip if `SHOWROOM_TYPE=classic`):
   [.solve-button-placeholder]#solve-button-placeholder#
   [.validate-button-placeholder]#validate-button-placeholder#
-- Send-to-terminal combined role: [source,role="execute send-to-wetty"]
+- Split-terminal targeting (when multiple terminals configured): [source,bash,role="execute-top"] or [source,bash,role="execute-bottom"]
 
 ---
 
