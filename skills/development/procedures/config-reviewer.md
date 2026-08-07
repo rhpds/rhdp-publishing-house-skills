@@ -80,7 +80,7 @@ Run U-1 through U-7. Key checks:
 - **U-1** (CRITICAL): Format matches content mode
 - **U-4** (HIGH): Tabs have `url` or `path` (not both, not neither)
 - **U-6** (MEDIUM): Variable substitution uses `${VAR}` not `{VAR}`
-- **U-6b** (LOW): Variables beyond `DOMAIN`, `GUID`, `USER` must be defined in `content/antora.yml` `asciidoc.attributes.environment_variables`
+- **U-6b** (LOW): Non-built-in variables in tab URLs should be defined in `content/antora.yml` `asciidoc.attributes.environment_variables` for local development
 - **U-7** (HIGH): Zerotouch `antora.modules` match page filenames
 
 ### antora.yml (A-rules)
