@@ -63,7 +63,7 @@ approval_checklist:
 
 When writing `spec.modules`, assign each module a stable `id` — `module-01`, `module-02`, etc.
 These IDs are permanent: if modules are later reordered, renamed, or removed, the ID stays
-with the content it was assigned to. Example:
+with the content it was assigned to. Set `status: not_started` on every new module. Example:
 
 ```yaml
 spec:
@@ -71,9 +71,11 @@ spec:
   - id: module-01
     title: "Getting Started with OpenShift"
     duration_min: 30
+    status: not_started
   - id: module-02
     title: "Deploying Applications"
     duration_min: 45
+    status: not_started
 ```
 
 ```bash

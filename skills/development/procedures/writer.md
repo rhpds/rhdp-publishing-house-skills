@@ -33,7 +33,6 @@ Build a combined context object from all three sources.
 
 Before spawning any agent, check `spec.yaml` module statuses:
 
-- `not_started` → eligible to write; set to `in_progress` when starting
 - `in_progress` → resume this module (started but not finished)
 - `complete` → skip; move to next module
 
