@@ -201,6 +201,24 @@ Before generating index and conclusion:
    - `conclusion.adoc`
 3. Confirm `spec.yaml` module list is intact — you'll need the full list for the conclusion's "What You've Learned" recap
 
+### Step 6a-config: Run Showroom Config Helper (Post-Module Development)
+
+**Do NOT skip this step.** After all modules are written, run the config helper to ensure
+Showroom configuration reflects the completed content.
+
+Follow `procedures/config-helper.md` (Route C — modification flow). Key actions at this stage:
+
+1. Verify `content/modules/ROOT/nav.adoc` lists all written module pages in correct order
+2. For zerotouch: verify `antora.modules` in `ui-config.yml` matches the page filenames
+3. Update tabs if the spec's environment or infrastructure changed during development
+4. Commit any config changes:
+   ```bash
+   git add site.yml ui-config.yml content/antora.yml content/modules/ROOT/nav.adoc
+   git diff --cached --quiet || git commit -m "chore: update showroom config after module development"
+   ```
+
+If the config helper detects issues, present them to the author before proceeding to index generation.
+
 Present a plan before proceeding:
 > "All modules are complete. I'll now generate index.adoc and conclusion.adoc to finalize your showroom."
 
@@ -339,6 +357,26 @@ After both index and conclusion are approved:
    - Last entry: `conclusion.adoc`
 2. Verify no placeholder text or `TODO` markers in either file
 3. Check that all learning objectives from modules are consolidated in conclusion's "What You've Learned" section
+
+### Step 6d-config: Run Showroom Config Helper (Post-Content Finalization)
+
+**Do NOT skip this step.** After all content (modules, index, conclusion) is finalized, run the
+config helper one final time to ensure the full Showroom deployment configuration is correct.
+
+Follow `procedures/config-helper.md` (Route C — modification flow). Key actions at this stage:
+
+1. Verify `nav.adoc` ordering: index first, modules in sequence, conclusion last
+2. For zerotouch: confirm `antora.modules` includes all pages (index + modules + conclusion)
+3. Cross-check `site.yml` start_page against `content/antora.yml` name
+4. Validate `ui-config.yml` tabs still match the spec's environment
+5. Run `procedures/config-reviewer.md` to produce a final validation report
+
+If any CRITICAL or HIGH findings remain, present them to the author before marking complete.
+Commit any final config fixes:
+```bash
+git add site.yml ui-config.yml content/antora.yml content/modules/ROOT/nav.adoc
+git diff --cached --quiet || git commit -m "chore: finalize showroom config after content complete"
+```
 
 ### Step 6e: Mark Showroom Complete and Submit to Central
 
