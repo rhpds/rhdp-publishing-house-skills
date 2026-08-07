@@ -83,9 +83,7 @@ Read `spec.yaml` and check module statuses.
 
 ### Step 1c — Development mode selection
 
-Check `spec.yaml` for `development_mode`. If already set (`managed` or `self_service`), skip this step and proceed to Step 2.
-
-If `development_mode` is not set and the author's request involves writing content ("write", "start writing", "write all", "write module N"):
+When the author's request involves writing content ("write", "start writing", "write all", "write module N"), present this choice before proceeding:
 
 > **How would you like to develop your content?**
 >
@@ -99,25 +97,19 @@ If `development_mode` is not set and the author's request involves writing conte
 
 **Wait for the author's response.**
 
-- **Option 1** → set `development_mode: managed` in `spec.yaml`, commit, proceed to Step 2 dispatch
-- **Option 2** → set `development_mode: self_service` in `spec.yaml`, commit, then:
-  > "Understood — you're in charge of writing. Please remember to update module statuses in `publishing-house/spec.yaml` as you go, and run the backend scripts when you're ready to submit. If you'd like to switch to managed mode later, just let me know."
+- **Option 1** → proceed to Step 2 dispatch (follow `procedures/writer.md`)
+- **Option 2** →
+  > "Understood — you're in charge of writing. Please remember to update module statuses in `publishing-house/spec.yaml` as you go, and run the backend scripts when you're ready to submit. If you need help later, just ask."
   >
   > **STOP.**
 
-If the request is NOT about writing (e.g. "edit", "automation", "review config"), skip this step — mode selection only applies to the writing flow.
+If the request is NOT about writing (e.g. "edit", "automation", "review config"), skip this step.
 
 ### Step 2 — Dispatch
 
 Based on what the user asked for:
 
-- **"write module N"** / **"start writing"** / **"write all"** → check `development_mode`:
-  - `managed` → follow `procedures/writer.md`
-  - `self_service` → remind the author:
-    > "You're in self-service mode — please write your `.adoc` files directly and update spec.yaml statuses manually. If you'd like to switch to managed mode, just say 'switch to managed'."
-  - not set → trigger Step 1c first
-- **"switch to managed"** → update `development_mode: managed` in `spec.yaml`, commit, then proceed with the write request
-- **"switch to self service"** → update `development_mode: self_service` in `spec.yaml`, commit, STOP
+- **"write module N"** / **"start writing"** / **"write all"** → follow `procedures/writer.md`
 - **"edit module N"** / **"review content"** / **"technical edit"** → follow `procedures/editor.md`
 - **"build automation"** / **"write the Ansible roles"** / **"set up GitOps"** → follow `procedures/automation.md`
 - **"set up showroom"** / **"configure tabs"** / **"scaffold"** / **"add a tab"** → follow `procedures/config-helper.md`
