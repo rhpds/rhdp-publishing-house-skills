@@ -79,7 +79,31 @@ Read `spec.yaml` and check module statuses.
 - **All modules are `complete` AND user request is "write"?** → suggest editing instead:
   > "All modules are already complete. Did you mean to edit or review the content instead?"
   Wait for confirmation.
-- **Otherwise** → proceed to Step 2 dispatch.
+- **Otherwise** → proceed to Step 1c.
+
+### Step 1c — Development mode selection (first time only)
+
+**Skip this step if** any module has `status: in_progress` or `status: complete` — the author has already started development.
+
+**Trigger:** All modules are `not_started` AND the author's request involves writing content ("write", "start writing", "write all", "write module N").
+
+> **How would you like to develop your content?**
+>
+> 1. **Use PH Writer** — I'll generate modules from your outlines, run the reviewer, track status in spec.yaml, and submit to Central when done. Fully managed.
+>
+> 2. **Write on your own** — Please write your `.adoc` files yourself or use your own tools. A few things to keep in mind:
+>    - Please update each module's `status` in `publishing-house/spec.yaml` manually (`not_started` → `in_progress` → `complete`)
+>    - Please run backend scripts manually to keep Central in sync — PH will not run them for you
+>
+> Which approach would you prefer?
+
+**Wait for the author's response.**
+
+- **Option 1** → proceed to Step 2 dispatch (follow `procedures/writer.md`)
+- **Option 2** →
+  > "Understood — you're in charge of writing. Please remember to update module statuses in `publishing-house/spec.yaml` as you go, and run the backend scripts when you're ready to submit. If you need help later, just ask."
+  >
+  > **STOP.**
 
 ### Step 2 — Dispatch
 
