@@ -60,10 +60,13 @@ After the author approves, update `spec.yaml` before spawning the writing agent:
 
 For each module, spawn the agent via Task tool:
 
+Derive the `.adoc` filename from the outline filename in `publishing-house/spec/modules/`:
+replace `.md` with `.adoc`. Example: outline `module-01-pipeline-setup.md` → `content/modules/ROOT/pages/module-01-pipeline-setup.adoc`.
+
     Task tool:
       subagent_type: rhdp-publishing-house:module-writing-helper
       prompt: |
-        TARGET_FILE: content/modules/ROOT/pages/<module-filename>.adoc
+        TARGET_FILE: content/modules/ROOT/pages/<outline-name>.adoc
         FILE_TYPE: module
         FULL_SPEC: <JSON from spec.yaml + design.md + module outline>
         LAB_TYPE: <ocp|rhel|vm|ai>

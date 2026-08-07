@@ -39,7 +39,7 @@ Generates a single Showroom AsciiDoc file from a lab spec and writes it to disk.
   },
   "module_number": 1,
   "module_title": "Pipeline Setup",
-  "module_file": "03-module-01-pipeline-setup.adoc"
+  "module_file": "module-01-pipeline-setup.adoc"
 }
 ```
 
