@@ -353,6 +353,27 @@ Follow `procedures/config-helper.md` (Route C — modification flow). Key action
 4. Validate `ui-config.yml` tabs still match the spec's environment
 5. Run `procedures/config-reviewer.md` to produce a final validation report
 
+**Tab review — prompt the author:**
+
+Scan the completed module content for clues about services the learner interacts with
+(e.g. URLs opened in exercises, `oc get route` commands, web console references, application
+UIs mentioned in steps). Then present the current tab list alongside any suggestions:
+
+> **Your current Showroom tabs:**
+> [list current tabs from ui-config.yml]
+>
+> **While writing your modules I noticed references to:**
+> [list any services/URLs/consoles found in the content that aren't already tabs]
+>
+> Now that development is complete, would you like to add or change any tabs?
+> For example: an application console, documentation link, or additional terminal
+> that came up during module development.
+>
+> 1. **Add tabs** — tell me what to add
+> 2. **No changes** — tabs are fine as-is
+
+If the author wants to add tabs, follow the Tab Advisor procedure in `procedures/config-helper.md`.
+
 If any CRITICAL or HIGH findings remain, present them to the author before marking complete.
 Commit any final config fixes:
 ```bash
