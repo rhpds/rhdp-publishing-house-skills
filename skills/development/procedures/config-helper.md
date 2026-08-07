@@ -285,6 +285,9 @@ Only specify `port` on a tab if the service runs on a non-standard port (not 80 
 - Always use the exact config structures from the reference files — do not invent new YAML keys
 - When generating zerotouch ui-config.yml, the `antora.modules` entries must match the page filenames in `content/modules/ROOT/pages/`
 - Tab URLs that reference cluster services should use `${DOMAIN}` variable substitution (not `{DOMAIN}`)
+- Built-in variables available in ui-config.yml: `${DOMAIN}`, `${GUID}`, `${USER}`
+- Custom variables can be defined in `content/antora.yml` under `asciidoc.attributes.environment_variables` — these are exported before `envsubst` runs on ui-config.yml at deploy time
+- When suggesting tab URLs that need custom values, either use a built-in variable or add the variable to `environment_variables` in antora.yml
 - Never modify `site.yml` content source settings — `start_path: content` and `url: .` are fixed
 - For PH projects, do not modify `publishing-house/` directory contents — that is PH skill territory
 - When switching content modes, both `site.yml` (bundle URL) and `ui-config.yml` (format) must change together

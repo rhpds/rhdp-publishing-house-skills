@@ -110,12 +110,23 @@ Using both is ambiguous. Using neither produces a broken tab. `port` is only nee
 
 Placeholder tabs (`url: /placeholder`) render a stub panel for local development only.
 
-### U-6 — Variable substitution must use `${VARIABLE}` syntax
+### U-6 — Variable substitution must use `${VARIABLE}` syntax and reference known variables
 
 - **Severity:** MEDIUM
 - **Auto-fix:** Yes — add `$` prefix to bare `{VARIABLE}` references
 
 The `${}` wrapper is required in ui-config.yml. AsciiDoc attribute substitution uses `{attribute}` without `$`, but ui-config.yml is different. Common mistake: `{DOMAIN}` instead of `${DOMAIN}`.
+
+**Built-in variables** (always valid): `${DOMAIN}`, `${GUID}`, `${USER}`
+
+**Custom variables:** Any key defined in `content/antora.yml` under `asciidoc.attributes.environment_variables` is also valid. Check this map when encountering non-built-in `${VAR}` references — if the variable is listed there, it passes. If not, flag as a warning (the variable may resolve to an unintended container environment variable or be empty at runtime).
+
+### U-6b — Non-built-in variables in tab URLs should be defined in antora.yml environment_variables for local development
+
+- **Severity:** LOW
+- **Auto-fix:** No — requires author to either add the variable to antora.yml or confirm it's injected by the deployment
+
+If a tab URL contains `${VAR}` where VAR is not one of `DOMAIN`, `GUID`, `USER` and is not listed in `content/antora.yml` `asciidoc.attributes.environment_variables`, flag it as a recommendation. In production the variable may be injected by the Helm chart or AgnosticV workload, but defining it in `environment_variables` ensures local preview (`podman-compose up`) works correctly. This is a development convenience, not a deployment requirement.
 
 ### U-7 — Zerotouch: antora.modules entries must match page filenames
 

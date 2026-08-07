@@ -17,7 +17,7 @@ Generic recommendations like "Add learning objectives" or "Improve structure" ar
 - **exec_pod.adoc**: Technical utility file - NO title needed  
 - **nav.adoc**: Navigation structure - NO title needed
 - **partials/*.adoc**: Reusable content fragments - NO title needed
-- **antora.yml, workshop.yaml, default-site.yml**: Configuration files - Optional
+- **antora.yml, workshop.yaml, site.yml** (or legacy `default-site.yml`): Configuration files - Optional
 
 ### WORKSHOP CONTENT FILES (TITLE REQUIRED, LEARNING OBJECTIVES REQUIRED):
 - **index.adoc**: Main workshop file - MUST have title

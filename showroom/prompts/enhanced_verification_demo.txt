@@ -68,7 +68,7 @@ Remember that Red Hat demos come in different formats:
 - **exec_pod.adoc**: Technical utility file - NO title needed  
 - **nav.adoc**: Navigation structure - NO title needed
 - **partials/*.adoc**: Reusable content fragments - NO title needed
-- **antora.yml, workshop.yaml, default-site.yml**: Configuration files - Optional
+- **antora.yml, workshop.yaml, site.yml** (or legacy `default-site.yml`): Configuration files - Optional
 
 ### DEMO CONTENT FILES (TITLE REQUIRED, BUSINESS MESSAGING REQUIRED):
 - **index.adoc**: Main demo file - MUST have title

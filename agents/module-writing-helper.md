@@ -118,7 +118,7 @@ If `FULL_SPEC.source_files` contains URLs (not local paths):
 If `FULL_SPEC.source_files` contains local file paths:
 - Use Read to read each file
 
-For E2E content (FILE_TYPE=module with solve/validate buttons, **classic only** — skip if `SHOWROOM_TYPE=zero_touch`):
+For E2E content (FILE_TYPE=module with solve/validate buttons — **zerotouch/guided only**, skip if `SHOWROOM_TYPE=classic`):
 - Check if ~/work/code/showroom_template_nookbag exists and switch to e2e-template branch
 - Use examples/e2e-ocp-dedicated/ as canonical reference for button syntax and structure
 
@@ -162,10 +162,10 @@ Follow the template structure exactly. Apply FULL_SPEC values.
 - Cleanup section (OPTIONAL — if module changes shared state):
   oc delete project my-project style commands
 - Conclusion paragraph
-- Solve/validate button placeholders — **classic only** (when E2E automation planned, skip if `SHOWROOM_TYPE=zero_touch` — ZT runner injects buttons via UI, not in content):
+- Solve/validate button placeholders — **zerotouch/guided only** (when E2E automation planned, skip if `SHOWROOM_TYPE=classic`):
   [.solve-button-placeholder]#solve-button-placeholder#
   [.validate-button-placeholder]#validate-button-placeholder#
-- Send-to-terminal combined role — **classic only** (skip if `SHOWROOM_TYPE=zero_touch` — ZT does not use wetty): [source,role="execute send-to-wetty"]
+- Split-terminal targeting (when multiple terminals configured): [source,bash,role="execute-top"] or [source,bash,role="execute-bottom"]
 
 **`blog`** — Markdown blog post from source Showroom content
 
@@ -200,10 +200,10 @@ Structure: title, summary excerpt, introduction, body sections matching source m
 - All code blocks that should auto-execute: `[source,bash,role="execute"]`
 - All images: `image::name.png[descriptive alt text, link=self, window=blank]`
 - No heading level skips
-- Solve/validate button placeholders — **classic only** (skip if `SHOWROOM_TYPE=zero_touch`):
+- Solve/validate button placeholders — **zerotouch/guided only** (skip if `SHOWROOM_TYPE=classic`):
   [.solve-button-placeholder]#solve-button-placeholder#
   [.validate-button-placeholder]#validate-button-placeholder#
-- Send-to-terminal combined role — **classic only** (skip if `SHOWROOM_TYPE=zero_touch`): [source,role="execute send-to-wetty"]
+- Split-terminal targeting (when multiple terminals configured): [source,bash,role="execute-top"] or [source,bash,role="execute-bottom"]
 
 ---
 
