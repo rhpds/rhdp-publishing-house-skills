@@ -165,12 +165,17 @@ When the author says "module N is done" / "it's done" / "mark it complete" / "lo
    git commit -m "feat: mark module N complete — [title]"
    git push
    ```
-4. Confirm:
+4. Close the module's Jira ticket (best-effort):
+   ```bash
+   python publishing-house/tools/ph-module-complete.py module-NN
+   ```
+   If there is no epic (self-published mode) or no matching ticket, the script exits cleanly. Do not stop on failure.
+5. Confirm:
    > "Module N marked complete and pushed. [Next module available / All modules complete.]"
 
 **Standalone completion:** If the author returns in a new session and says "module N is done" without
 having run the write flow in this session, Step 5d still works — check `spec.yaml` for `status: in_progress`,
-verify the `.adoc` file exists in `content/modules/ROOT/pages/`, and mark complete.
+verify the `.adoc` file exists in `content/modules/ROOT/pages/`, and mark complete. Also run `ph-module-complete.py`.
 
 ## What You Do NOT Do
 
