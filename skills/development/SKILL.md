@@ -81,9 +81,11 @@ Read `spec.yaml` and check module statuses.
   Wait for confirmation.
 - **Otherwise** → proceed to Step 1c.
 
-### Step 1c — Development mode selection
+### Step 1c — Development mode selection (first time only)
 
-When the author's request involves writing content ("write", "start writing", "write all", "write module N"), present this choice before proceeding:
+**Skip this step if** any module has `status: in_progress` or `status: complete` — the author has already started development.
+
+**Trigger:** All modules are `not_started` AND the author's request involves writing content ("write", "start writing", "write all", "write module N").
 
 > **How would you like to develop your content?**
 >
@@ -102,8 +104,6 @@ When the author's request involves writing content ("write", "start writing", "w
   > "Understood — you're in charge of writing. Please remember to update module statuses in `publishing-house/spec.yaml` as you go, and run the backend scripts when you're ready to submit. If you need help later, just ask."
   >
   > **STOP.**
-
-If the request is NOT about writing (e.g. "edit", "automation", "review config"), skip this step.
 
 ### Step 2 — Dispatch
 
