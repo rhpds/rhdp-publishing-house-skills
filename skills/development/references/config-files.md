@@ -179,15 +179,31 @@ Rules:
 
 ### Variable substitution in tab URLs
 
-Tab URLs support `${VARIABLE}` syntax. Variables are replaced at deploy time.
+Tab URLs support `${VARIABLE}` syntax. Variables are substituted at deploy time via `envsubst` in the content container entrypoint.
 
-| Variable | Description |
-|----------|-------------|
-| `${DOMAIN}` | Apps domain of the OpenShift cluster (e.g. `apps.cluster.example.com`) |
-| `${GUID}` | Unique environment identifier |
-| `${USER}` | Current user identifier (multi-user deployments) |
+**Built-in variables** (always available):
+
+| Variable | Source | Description |
+|----------|--------|-------------|
+| `${DOMAIN}` | Helm `deployer.domain` | Apps domain of the OpenShift cluster (e.g. `apps.cluster.example.com`) |
+| `${GUID}` | Helm `guid` | Unique environment identifier |
+| `${USER}` | Helm `user` | Current user identifier (multi-user deployments) |
+
+**Custom variables** — authors can define additional variables in `content/antora.yml` under `asciidoc.attributes.environment_variables`. These are exported as environment variables before `envsubst` runs:
+
+```yaml
+asciidoc:
+  attributes:
+    environment_variables:
+      CLUSTER_NAME: "my-cluster"
+      APP_NAMESPACE: "my-app"
+```
+
+These become available as `${CLUSTER_NAME}` and `${APP_NAMESPACE}` in `ui-config.yml`.
 
 IMPORTANT: Use `${DOMAIN}` not `{DOMAIN}`. The `${}` syntax is required. Antora attribute substitution in AsciiDoc uses `{attribute}` without `$`, but ui-config.yml uses `${VARIABLE}`.
+
+IMPORTANT: Avoid using common shell variables (e.g. `${HOME}`, `${PATH}`, `${GIT_REPO_URL}`) in tab URLs — `envsubst` replaces ALL environment variables in the container, not just the intended ones. Stick to `DOMAIN`, `GUID`, `USER`, and explicitly defined custom variables.
 
 ### Common tab patterns
 
