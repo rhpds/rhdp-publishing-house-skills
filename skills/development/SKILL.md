@@ -114,3 +114,10 @@ Present the current state:
 - Never tell the author to run any script
 - The development skill dispatches to procedures but does not own workflow advancement
 - Each procedure handles its own commit and push
+- When adding a new module to `spec.modules`, always set `status: not_started`:
+  ```yaml
+  - id: module-NN
+    title: "Module Title"
+    duration_min: 30
+    status: not_started
+  ```
