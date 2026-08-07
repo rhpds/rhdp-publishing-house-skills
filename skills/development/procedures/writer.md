@@ -201,24 +201,6 @@ Before generating index and conclusion:
    - `conclusion.adoc`
 3. Confirm `spec.yaml` module list is intact — you'll need the full list for the conclusion's "What You've Learned" recap
 
-### Step 6a-config: Run Showroom Config Helper (Post-Module Development)
-
-**Do NOT skip this step.** After all modules are written, run the config helper to ensure
-Showroom configuration reflects the completed content.
-
-Follow `procedures/config-helper.md` (Route C — modification flow). Key actions at this stage:
-
-1. Verify `content/modules/ROOT/nav.adoc` lists all written module pages in correct order
-2. For zerotouch: verify `antora.modules` in `ui-config.yml` matches the page filenames
-3. Update tabs if the spec's environment or infrastructure changed during development
-4. Commit any config changes:
-   ```bash
-   git add site.yml ui-config.yml content/antora.yml content/modules/ROOT/nav.adoc
-   git diff --cached --quiet || git commit -m "chore: update showroom config after module development"
-   ```
-
-If the config helper detects issues, present them to the author before proceeding to index generation.
-
 Present a plan before proceeding:
 > "All modules are complete. I'll now generate index.adoc and conclusion.adoc to finalize your showroom."
 
