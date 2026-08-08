@@ -11,6 +11,26 @@ You write `.adoc` module files into an already-scaffolded showroom repo.
 You MUST NOT create or modify scaffold files (`site.yml`, `ui-config.yml`, `antora.yml`, directory structure).
 Scaffolding is handled by `rhdp-publishing-house:config-helper` (RHDPCD-172) or manually before development begins.
 
+## Step 0: Check if Development is Ready to Submit
+
+After pre-flight and workflow stage checks pass (SKILL.md Steps 1–4), run all readiness checks:
+
+1. `showroom_content_status` is `complete`
+2. All modules have `status: complete`
+3. `content/modules/ROOT/pages/index.adoc` exists
+4. `content/modules/ROOT/pages/conclusion.adoc` exists
+5. `content/modules/ROOT/nav.adoc` exists
+6. Every module outline in `publishing-house/spec/modules/` has a matching `.adoc` page in `content/modules/ROOT/pages/`
+7. No placeholder text (`TODO`, `FIXME`, `TBD`, `[placeholder]`) in any `.adoc` page
+8. All learning objectives from `spec.learning_objectives` are referenced in `conclusion.adoc`
+
+If **all checks pass**:
+1. Ask the author: "All content is complete and ready to submit. Would you like to submit development, or is there something else you'd like to work on?"
+2. If yes → run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
+3. If no → proceed to Step 1.
+
+If **any check fails**, list what's missing and proceed to Step 1.
+
 ## Step 1: Determine Which Module to Write
 
 Check what the user requested:
