@@ -59,31 +59,10 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 ## Dispatch
 
-### Step 1 — Scaffold check gate (runs BEFORE any dispatch)
-
-Follow `procedures/config-reviewer.md` automatically against the project's content directory.
-
-- **PASS** → proceed to Step 1b
-- **FAIL** → report the specific issues to the author, then ask:
-  > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
-  - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 1b
-  - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
-
-### Step 1b — Module status validation gate
-
-Read `spec.yaml` and check module statuses.
-
-- **Any module is `in_progress`?** → warn the author:
-  > "Module N is currently marked in_progress. Would you like to continue it, or mark it complete first?"
-  Wait for the author's response before dispatching.
-- **All modules are `complete` AND user request is "write"?** → suggest editing instead:
-  > "All modules are already complete. Did you mean to edit or review the content instead?"
-  Wait for confirmation.
-- **Otherwise** → proceed to Step 1c.
-
-### Step 1b-submit — Readiness check (all modules complete)
+### Step 1 — Readiness check (runs FIRST, before anything else)
 
 **Trigger:** All modules have `status: complete` in spec.yaml.
+**Skip if** any module is `not_started` or `in_progress` — proceed directly to Step 2.
 
 Run these checks:
 
@@ -99,11 +78,33 @@ Run these checks:
 > "All content is complete and ready to submit. Would you like to submit development, or is there something else you'd like to work on?"
 
 - **Yes** → run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
-- **No** → proceed to Step 2 dispatch.
+- **No** → proceed to Step 3 dispatch.
 
-**Any check fails →** list what's missing and proceed to Step 2 dispatch.
+**Any check fails →** list what's missing and proceed to Step 2.
 
-### Step 1c — Development mode selection (first time only)
+### Step 2 — Scaffold check gate
+
+Follow `procedures/config-reviewer.md` automatically against the project's content directory.
+
+- **PASS** → proceed to Step 2b
+- **FAIL** → report the specific issues to the author, then ask:
+  > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
+  - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2b
+  - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
+
+### Step 2b — Module status validation gate
+
+Read `spec.yaml` and check module statuses.
+
+- **Any module is `in_progress`?** → warn the author:
+  > "Module N is currently marked in_progress. Would you like to continue it, or mark it complete first?"
+  Wait for the author's response before dispatching.
+- **All modules are `complete` AND user request is "write"?** → suggest editing instead:
+  > "All modules are already complete. Did you mean to edit or review the content instead?"
+  Wait for confirmation.
+- **Otherwise** → proceed to Step 2c.
+
+### Step 2c — Development mode selection (first time only)
 
 **Skip this step if** any module has `status: in_progress` or `status: complete` — the author has already started development.
 
@@ -121,13 +122,13 @@ Run these checks:
 
 **Wait for the author's response.**
 
-- **Option 1** → proceed to Step 2 dispatch (follow `procedures/writer.md`)
+- **Option 1** → proceed to Step 3 dispatch (follow `procedures/writer.md`)
 - **Option 2** →
   > "Understood — you're in charge of writing. Please remember to update module statuses in `publishing-house/spec.yaml` as you go, and run the backend scripts when you're ready to submit. If you need help later, just ask."
   >
   > **STOP.**
 
-### Step 2 — Dispatch
+### Step 3 — Dispatch
 
 Based on what the user asked for:
 
