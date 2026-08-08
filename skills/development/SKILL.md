@@ -81,6 +81,28 @@ Read `spec.yaml` and check module statuses.
   Wait for confirmation.
 - **Otherwise** → proceed to Step 1c.
 
+### Step 1b-submit — Readiness check (all modules complete)
+
+**Trigger:** All modules have `status: complete` in spec.yaml.
+
+Run these checks:
+
+1. `showroom_content_status` is `complete`
+2. `content/modules/ROOT/pages/index.adoc` exists
+3. `content/modules/ROOT/pages/conclusion.adoc` exists
+4. `content/modules/ROOT/nav.adoc` exists
+5. Every module outline in `publishing-house/spec/modules/` has a matching `.adoc` page in `content/modules/ROOT/pages/`
+6. No placeholder text (`TODO`, `FIXME`, `TBD`, `[placeholder]`) in any `.adoc` page
+7. All learning objectives from `spec.learning_objectives` are referenced in `conclusion.adoc`
+
+**All checks pass →**
+> "All content is complete and ready to submit. Would you like to submit development, or is there something else you'd like to work on?"
+
+- **Yes** → run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
+- **No** → proceed to Step 2 dispatch.
+
+**Any check fails →** list what's missing and proceed to Step 2 dispatch.
+
 ### Step 1c — Development mode selection (first time only)
 
 **Skip this step if** any module has `status: in_progress` or `status: complete` — the author has already started development.
