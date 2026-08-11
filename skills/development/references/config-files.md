@@ -431,7 +431,7 @@ volumes:
 - The `httpd` service serves the built site on port 8080
 - Preview at `http://localhost:8080`
 - The `WAIT_FOR_GIT_CLONER=false` flag disables the git-cloner sidecar wait (not used locally)
-- `ANTORA_ENABLE_DEV_MODE` is commented out by default so the stack works without extra host permissions. Enabling it makes the container rewrite `site.yml` at startup to inject the dev-mode extension (lists sidebar pages before they're added to `nav.adoc`), which requires `podman unshare chown -R 1001:0 site.yml` first on rootless Podman — see "Enabling Dev Mode" in the template repo's README.md / index.adoc
+- `ANTORA_ENABLE_DEV_MODE` is commented out by default so the stack works without extra host permissions. Enabling it makes the container rewrite `site.yml` at startup to inject the dev-mode extension (lists sidebar pages before they're added to `nav.adoc`, and adds an Attributes Page), which requires `podman unshare chown -R 1001:0 site.yml` first on rootless Podman — see "Enabling Dev Mode" in the template repo's README.md / index.adoc
 - This file should not require modification for typical content development
 
 ---
