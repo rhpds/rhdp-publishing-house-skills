@@ -403,7 +403,7 @@ services:
     image: quay.io/rhpds/antora:v1.3.0
     environment:
       - WAIT_FOR_GIT_CLONER=false
-      - ANTORA_ENABLE_DEV_MODE=true
+      # - ANTORA_ENABLE_DEV_MODE=true
       - ANTORA_WATCH=true
     volumes:
       - ./:/files:z
@@ -431,6 +431,7 @@ volumes:
 - The `httpd` service serves the built site on port 8080
 - Preview at `http://localhost:8080`
 - The `WAIT_FOR_GIT_CLONER=false` flag disables the git-cloner sidecar wait (not used locally)
+- `ANTORA_ENABLE_DEV_MODE` is commented out by default so the stack works without extra host permissions. Enabling it makes the container rewrite `site.yml` at startup to inject the dev-mode extension (lists sidebar pages before they're added to `nav.adoc`), which requires `podman unshare chown -R 1001:0 site.yml` first on rootless Podman — see "Enabling Dev Mode" in the template repo's README.md / index.adoc
 - This file should not require modification for typical content development
 
 ---
