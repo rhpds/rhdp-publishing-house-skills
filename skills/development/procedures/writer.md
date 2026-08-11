@@ -385,16 +385,7 @@ git diff --cached --quiet || git commit -m "chore: finalize showroom config afte
 
 When both index and conclusion are approved:
 
-1. Update `publishing-house/spec.yaml`: add a top-level field:
-   ```yaml
-   showroom_content_status: complete
-   ```
-2. Commit:
-   ```bash
-   git add publishing-house/spec.yaml
-   git commit -m "feat: mark showroom content complete — all modules, index, and conclusion finalized"
-   ```
-3. Submit development completion to Central API:
+1. Submit development completion to Central API:
    ```bash
    python publishing-house/tools/ph-development.py
    ```

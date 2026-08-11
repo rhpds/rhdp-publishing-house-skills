@@ -66,13 +66,12 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 Run these checks:
 
-1. `showroom_content_status` is `complete`
-2. `content/modules/ROOT/pages/index.adoc` exists
-3. `content/modules/ROOT/pages/conclusion.adoc` exists
-4. `content/modules/ROOT/nav.adoc` exists
-5. Every module outline in `publishing-house/spec/modules/` has a matching `.adoc` page in `content/modules/ROOT/pages/`
-6. No placeholder text (`TODO`, `FIXME`, `TBD`, `[placeholder]`) in any `.adoc` page
-7. All learning objectives from `spec.learning_objectives` are referenced in `conclusion.adoc`
+1. `content/modules/ROOT/pages/index.adoc` exists
+2. `content/modules/ROOT/pages/conclusion.adoc` exists
+3. `content/modules/ROOT/nav.adoc` exists
+4. Every module outline in `publishing-house/spec/modules/` has a matching `.adoc` page in `content/modules/ROOT/pages/`
+5. No placeholder text (`TODO`, `FIXME`, `TBD`, `[placeholder]`) in any `.adoc` page
+6. All learning objectives from `spec.learning_objectives` are referenced in `conclusion.adoc`
 
 **All checks pass →**
 > "All content is complete and ready to submit. Would you like to submit development, or is there something else you'd like to work on?"
