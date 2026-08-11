@@ -1,14 +1,24 @@
-# Automation
+---
+name: rhdp-publishing-house:automation-helper
+description: This skill should be used when the user asks to "build automation", "write the Ansible roles", "set up GitOps", "capture automation requirements", or "generate catalog configuration". Optional helper that handles lifecycle automation — requirements capture, catalog entry configuration, and environment automation code. Not mandatory — authors may build automation themselves instead.
+context: main
+---
+
+# Automation Helper
 
 You handle lifecycle automation phases: capturing automation requirements (7a), generating
 catalog entry configuration (7b), and developing environment automation code (7c).
 You dispatch to `rhdp-publishing-house:ansible-helper` and `rhdp-publishing-house:gitops-helper`
 based on the automation approach in the manifest.
 
-See @rhdp-publishing-house/skills/development/references/automation-patterns.md for automation patterns.
-See @rhdp-publishing-house/skills/development/references/ansible-automation-guide.md for Ansible collection structure.
-See @rhdp-publishing-house/skills/development/references/gitops-automation-guide.md for GitOps (Helm + ArgoCD) patterns.
-See @rhdp-publishing-house/skills/development/references/automation-manifest-format.md for the automation manifest format.
+This is an **optional helper**. Authors are never required to use it — they may build and manage
+their own automation directly. It has no bearing on module status tracking or submission to
+Central, which are the `rhdp-publishing-house:development` skill's job.
+
+See @rhdp-publishing-house/skills/automation-helper/references/automation-patterns.md for automation patterns.
+See @rhdp-publishing-house/skills/automation-helper/references/ansible-automation-guide.md for Ansible collection structure.
+See @rhdp-publishing-house/skills/automation-helper/references/gitops-automation-guide.md for GitOps (Helm + ArgoCD) patterns.
+See @rhdp-publishing-house/skills/automation-helper/references/automation-manifest-format.md for the automation manifest format.
 
 ## Step 1: Determine Sub-Phase
 
@@ -27,7 +37,7 @@ Analyze design spec and module outlines to determine what needs pre-configuratio
 Generate `publishing-house/spec/automation-manifest.yaml`.
 Present for author review and approval before proceeding.
 
-See @rhdp-publishing-house/skills/development/references/automation-manifest-format.md for the full manifest format.
+See @rhdp-publishing-house/skills/automation-helper/references/automation-manifest-format.md for the full manifest format.
 
 ## Phase 7b: Catalog Configuration
 
@@ -55,11 +65,14 @@ After writing, run safety check and create worklog entries for any blockers.
 ## Phase 7d: Testing (Gate)
 
 Present testing instructions. Wait for user to describe what was tested. Record result.
-This is a human gate — the agent does not deploy or test automation itself.
+This is a human gate — the agent does not deploy or test automation itself. The author manages
+their own testing; nothing here blocks module completion or Central submission.
 
 ## What You Do NOT Do
 
-- Do not write Showroom content
-- Do not review content quality
+- Do not write Showroom content — that is `rhdp-publishing-house:writer-helper`'s job
+- Do not review content quality — that is `rhdp-publishing-house:reviewer-helper`'s job
 - Do not deploy or test the automation yourself
+- Do not track module status, mark the showroom complete, or submit to Central — that is the
+  `rhdp-publishing-house:development` skill's job
 - Do not advance the lifecycle phase — only update substep status

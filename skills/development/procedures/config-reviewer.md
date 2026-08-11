@@ -20,12 +20,17 @@ Read the following files silently. If a file does not exist, note its absence as
 | `content/modules/ROOT/nav.adoc` | Yes — sidebar navigation |
 
 Also check for the presence of:
-- `content/modules/ROOT/pages/` directory and list all `.adoc` files in it
+- `content/modules/ROOT/pages/` directory and list all `.adoc` files in it — note specifically whether
+  `index.adoc` and `conclusion.adoc` are present
 - `runtime-automation/` directory and its subdirectories
 - `config/` directory (indicates ZT Guided)
 - `setup-automation/` directory (indicates ZT Guided)
 - `lab-metadata.yml` at repo root (indicates ZT Guided — required for ZT catalog integration)
 - `publishing-house/spec.yaml` (indicates PH project)
+
+**For PH projects only** (`publishing-house/spec.yaml` present), also read:
+- `spec.modules` from `spec.yaml` — the `id`/`title`/`status` of each module, needed to gate J-02 and J-04
+- `publishing-house/spec/modules/*.md` — list all module outline filenames, needed for J-02
 
 ## Step 2 — Detect Pattern
 
@@ -104,6 +109,18 @@ Run X-1 through X-6. Key checks:
 - **X-3** (HIGH): Zerotouch has runtime-automation per module
 - **X-6** (MEDIUM): Tab terminal syntax matches infra type
 
+### Module & page coverage (J-rules) — PH projects only
+
+Skip this section entirely if `publishing-house/spec.yaml` is not present. Run J-02 through J-05. Key checks:
+- **J-02** (HIGH): Every module outline in `publishing-house/spec/modules/*.md` has a matching page in
+  `content/modules/ROOT/pages/` with the same filename stem. Only flag outlines whose module `status` in
+  `spec.yaml` is `in_progress` or `complete` — a `not_started` module with no page yet is expected.
+- **J-03** (HIGH): `index.adoc` exists. Check unconditionally.
+- **J-04** (HIGH, gated): `conclusion.adoc` exists. Only evaluate this rule if **all** modules in
+  `spec.yaml` are `status: complete` — otherwise skip it silently (no PASS, no FAIL, no mention in the
+  report). This mirrors when `writer-helper` actually generates the file.
+- **J-05** (HIGH): `content/modules/ROOT/nav.adoc` exists. Check unconditionally.
+
 ## Step 4 — Produce Report
 
 Present findings organized by severity, following the report format in the validation rules reference.
@@ -155,4 +172,4 @@ For findings without auto-fix, provide a specific suggestion for what the user s
 - Report ALL findings, not just the first one found — the user needs the complete picture
 - When a CRITICAL finding is present, highlight it prominently — it means deployment will fail
 - Pattern detection (Step 2) must complete before running U-1 and X-4 — those rules need the detected pattern as context
-- For PH projects, do not flag `publishing-house/` directory issues — that is outside showroom config scope
+- For PH projects, do not flag `publishing-house/` directory issues — that is outside showroom config scope. Reading `spec.yaml` and `spec/modules/*.md` to cross-reference against `content/` for J-02 and J-04 is in scope; flagging problems *within* `publishing-house/` itself (bad outline formatting, spec.yaml schema issues, etc.) is not — that belongs to the `development`/`intake` skills
