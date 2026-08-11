@@ -97,13 +97,15 @@ and `spec.modules` are populated.
 
 **If design.md is mostly placeholders AND spec fields are empty → ask:**
 
+> Here's the description you provided: *'{project.description}'*
+>
 > How would you like to start?
 >
-> 1. **I have an idea** — let's talk about it and I'll build the spec
+> 1. **Build on this description** — we'll use it as a starting point and flesh out the details
 > 2. **I have a doc or outline** — share it and I'll convert it to our format
 > 3. **I already filled this out** — the design doc and spec are in the repo
 
-- Option 1 → Full intake: Phase 1 through Phase 6
+- Option 1 → Full intake: Phase 1 (Path A — build on description) through Phase 6
 - Option 2 → Phase 1 variant: extract from provided doc, fill gaps, then Phase 2 onward
 - Option 3 → Gap-fill: validate what exists, fill missing fields, skip to Phase 5/6
 

@@ -4,21 +4,18 @@ Phase 1 of the intake flow. Capture the author's idea through conversation.
 
 ## Entry Paths
 
-### Path A — "I have an idea"
+### Path A — "Build on the description"
 
-Start conversational. Ask one open-ended question:
+Read `project.description` from spec.yaml. Present it and ask whether to build on it:
 
-> "Tell me about your idea."
+> "Here's the description you provided: *'{description}'* — would you like to build on this, or would you like to take it in a different direction?"
 
-Accept whatever the author provides. Extract what you can from the freeform response — goal,
+Accept whatever the author provides. Extract what you can from their response — goal,
 audience, products, content type, duration. Then ask targeted follow-ups for what's missing,
 one at a time.
 
 **Discover, don't interrogate.** The author's words are the spec. You are the scribe, not
 the author. If something is unclear, ask — don't fill it in.
-
-If `project.description` exists in spec.yaml and is non-empty, use it as the starting
-context: "I see this description: *'{description}'* — let's build on this."
 
 ### Path B — "I have something written up elsewhere"
 
