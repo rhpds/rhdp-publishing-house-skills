@@ -148,6 +148,36 @@ The repo already has `site.yml` and/or `ui-config.yml`.
 
 4. After modifications, suggest running `rhdp-publishing-house:config-reviewer` to validate the result.
 
+### Fixing J-rule findings from config-reviewer
+
+When the author asks for help resolving J-02 through J-05 findings from `config-reviewer` (PH projects only):
+
+**J-02 — outline/page filename mismatch:**
+1. Present the mismatched pair: the outline filename (`publishing-house/spec/modules/<stem>.md`) and
+   whatever `.adoc` file(s) exist in `content/modules/ROOT/pages/` that don't match its stem.
+2. Ask the author how to resolve it — never rename files without confirmation:
+   > I found `<outline-stem>.md` with no matching page. Did you mean `<closest-existing-page>.adoc`?
+   > I can rename it to `<outline-stem>.adoc` and update its `nav.adoc` xref to match. Proceed?
+3. If confirmed: rename the page file, then update its `xref:` entry in `content/modules/ROOT/nav.adoc`
+   in the same step so the two never drift apart again.
+
+**J-03 — index.adoc missing:**
+Create the minimal stub (same template as Route B.5), then tell the author to fill in the real content
+themselves or ask `writer-helper` to generate it.
+
+**J-04 — conclusion.adoc missing:**
+Do NOT create a stub — a placeholder conclusion isn't useful, since it needs the full list of completed
+modules and learning objectives to be meaningful. Instead:
+> `conclusion.adoc` isn't written yet. Once all your modules are marked complete, ask **writer-helper**
+> to "generate the conclusion" — it needs the full module list to build the "What You've Learned" recap.
+
+**J-05 — nav.adoc missing:**
+Create `nav.adoc` with an index entry (same template as Route B.4), then scan
+`content/modules/ROOT/pages/` for any existing `.adoc` files and offer to append `xref:` entries for
+them too:
+> I created `nav.adoc` with an index entry. I also found `<N>` existing page(s) not yet listed —
+> want me to add them?
+
 ## Tab Advisor
 
 This procedure is used by Routes A, B, and C to configure tabs based on the lab's infrastructure. For PH projects, read `publishing-house/spec.yaml`. For standalone repos, use the infrastructure type from Step 1 detection or ask the user.
@@ -291,3 +321,5 @@ Only specify `port` on a tab if the service runs on a non-standard port (not 80 
 - Never modify `site.yml` content source settings — `start_path: content` and `url: .` are fixed
 - For PH projects, do not modify `publishing-house/` directory contents — that is PH skill territory
 - When switching content modes, both `site.yml` (bundle URL) and `ui-config.yml` (format) must change together
+- When fixing J-02 findings, never rename a page file or edit its `nav.adoc` xref without author confirmation
+- Never stub `conclusion.adoc` — redirect to `writer-helper` instead, since it needs full module context

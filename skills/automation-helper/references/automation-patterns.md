@@ -30,8 +30,8 @@ Sub-phases run in order.
 
 Two automation approaches are supported:
 
-- **Ansible collections:** See `@rhdp-publishing-house/skills/automation/references/ansible-automation-guide.md`
-- **GitOps (Helm + ArgoCD):** See `@rhdp-publishing-house/skills/automation/references/gitops-automation-guide.md`
+- **Ansible collections:** See `@rhdp-publishing-house/skills/automation-helper/references/ansible-automation-guide.md`
+- **GitOps (Helm + ArgoCD):** See `@rhdp-publishing-house/skills/automation-helper/references/gitops-automation-guide.md`
 
 ## What the Automation Agent Does NOT Do
 
