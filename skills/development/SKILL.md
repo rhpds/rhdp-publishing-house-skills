@@ -1,6 +1,6 @@
 ---
 name: rhdp-publishing-house:development
-description: This skill should be used when the user asks to "write a module", "draft content", "start writing", "edit my content", "review the modules", "build automation", "write the Ansible roles", "set up GitOps", "module N is done", "mark it complete", "review again", "what's next to develop", "set up showroom", "configure showroom tabs", "create site.yml", "scaffold the showroom structure", "add a tab", "review my showroom config", "check site.yml", or "validate ui-config.yml". Handles writing, editing, automation, scaffolding, config review, module completion, and re-review during the development stage.
+description: This skill should be used when the user asks to "set up showroom", "configure showroom tabs", "create site.yml", "scaffold the showroom structure", "add a tab", "review my showroom config", "check site.yml", "validate ui-config.yml", "module N is done", "mark it complete", "what's next to develop", or "submit to central". Handles showroom scaffolding, config review, module status tracking, and submission to Central during the development stage.
 context: main
 ---
 
@@ -8,8 +8,10 @@ context: main
 
 **RULE: If any `publishing-house/tools/` script exits with a non-zero exit code, STOP immediately.** Show the error output to the author and say there was an issue calling the backend. Do not continue the skill.
 
-You handle the development phase of the Publishing House lifecycle. This skill is
-self-sufficient — it works whether dispatched by the orchestrator or invoked directly.
+You handle the development phase of the Publishing House lifecycle. After scaffolding, this skill
+does exactly three things: scaffold the showroom structure, track module status in `spec.yaml`, and
+submit to Central when the author says all content is complete. Writing, reviewing, and automation
+are optional helper skills the author may use — or not — entirely at their own discretion.
 
 ## Tool Boundaries
 
@@ -64,7 +66,8 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 **Trigger:** All modules have `status: complete` in spec.yaml.
 **Skip if** any module is `not_started` or `in_progress` — proceed directly to Step 2.
 
-Run these checks:
+Run these checks against the current state of the repo (do not rely on any previously-saved
+"complete" flag — recompute this every time):
 
 1. `content/modules/ROOT/pages/index.adoc` exists
 2. `content/modules/ROOT/pages/conclusion.adoc` exists
@@ -76,8 +79,10 @@ Run these checks:
 **All checks pass →**
 > "All content is complete and ready to submit. Would you like to submit development, or is there something else you'd like to work on?"
 
-- **Yes** → run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
-- **No** → proceed to Step 3 dispatch.
+- **Yes** →
+  1. Run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
+  2. Confirm: "Showroom content finalized and submitted to Central — workflow advanced to review stage."
+- **No** → proceed to Step 2 dispatch.
 
 **Any check fails →** list what's missing and proceed to Step 2.
 
@@ -101,65 +106,87 @@ Read `spec.yaml` and check module statuses.
 - **All modules are `complete` AND user request is "write"?** → suggest editing instead:
   > "All modules are already complete. Did you mean to edit or review the content instead?"
   Wait for confirmation.
-- **Otherwise** → proceed to Step 2c.
+- **Otherwise** → proceed to Step 3.
 
-### Step 2c — Development mode selection (first time only)
+### Step 3 — Module status management
 
-**Skip this step if** any module has `status: in_progress` or `status: complete` — the author has already started development.
+Handle status transitions in `publishing-house/spec.yaml` directly. This is the only place module
+status is authoritatively tracked — it works the same whether the author wrote content by hand,
+used `rhdp-publishing-house:writer-helper`, or something else entirely.
 
-**Trigger:** All modules are `not_started` AND the author's request involves writing content ("write", "start writing", "write all", "write module N").
+- **"start module N"** / **"module N in progress"** →
+  1. Set the module's `status: not_started` to `status: in_progress` in `spec.yaml`
+  2. Commit: `git add publishing-house/spec.yaml && git commit -m "feat: start module N — [title]"`
 
-> **How would you like to develop your content?**
->
-> 1. **Use PH Writer** — I'll generate modules from your outlines, run the reviewer, track status in spec.yaml, and submit to Central when done. Fully managed.
->
-> 2. **Write on your own** — Please write your `.adoc` files yourself or use your own tools. A few things to keep in mind:
->    - Please update each module's `status` in `publishing-house/spec.yaml` manually (`not_started` → `in_progress` → `complete`)
->    - Please run backend scripts manually to keep Central in sync — PH will not run them for you
->
-> Which approach would you prefer?
+- **"module N is done"** / **"mark module N complete"** / **"it's done"** / **"looks good"** →
+  1. Verify the module's `.adoc` file exists in `content/modules/ROOT/pages/`. If it doesn't, tell the
+     author and do not mark complete.
+  2. Update `publishing-house/spec.yaml`: set `status: complete` for that module (from whatever its
+     current status was).
+  3. Commit and push:
+     ```bash
+     git add publishing-house/spec.yaml
+     git commit -m "feat: mark module N complete — [title]"
+     git push
+     ```
+  4. Close the module's Jira ticket (best-effort):
+     ```bash
+     python publishing-house/tools/ph-module-complete.py module-NN
+     ```
+     If there is no epic (self-published mode) or no matching ticket, the script exits cleanly. Do not stop on failure.
+  5. Confirm:
+     > "Module N marked complete and pushed. [Next module available / All modules complete.]"
 
-**Wait for the author's response.**
+  This works standalone too — if the author returns in a new session and says "module N is done"
+  without any prior write activity this session, still verify the `.adoc` file exists and mark complete.
 
-- **Option 1** → proceed to Step 3 dispatch (follow `procedures/writer.md`)
-- **Option 2** →
-  > "Understood — you're in charge of writing. Please remember to update module statuses in `publishing-house/spec.yaml` as you go, and run the backend scripts when you're ready to submit. If you need help later, just ask."
-  >
-  > **STOP.**
-
-### Step 3 — Dispatch
+### Step 4 — Dispatch
 
 Based on what the user asked for:
 
-- **"write module N"** / **"start writing"** / **"write all"** → follow `procedures/writer.md`
-- **"edit module N"** / **"review content"** / **"technical edit"** → follow `procedures/editor.md`
-- **"build automation"** / **"write the Ansible roles"** / **"set up GitOps"** → follow `procedures/automation.md`
 - **"set up showroom"** / **"configure tabs"** / **"scaffold"** / **"add a tab"** → follow `procedures/config-helper.md`
 - **"review config"** / **"check site.yml"** / **"validate config"** → follow `procedures/config-reviewer.md`
-- **"module N is done"** / **"mark module N complete"** / **"it's done"** / **"looks good"** → follow the completion flow in `procedures/writer.md` Step 5d (update spec.yaml status to `complete`)
-- **"review again"** / **"re-review"** / **"check it again"** → follow `procedures/writer.md` Step 5c-retry (re-run reviewer on the current `.adoc` file)
+- **"module N is done"** / **"start module N"** / other status phrases → handled by Step 3 above
+- **"write a module"** / **"draft content"** / **"start writing"** / **"edit module N"** / **"review content"** / **"technical edit"** / **"build automation"** / **"write the Ansible roles"** / **"set up GitOps"** → redirect:
+  > "That's handled by an optional helper skill now, not by me directly. Ask me to run `rhdp-publishing-house:writer-helper`, `rhdp-publishing-house:reviewer-helper`, or `rhdp-publishing-house:automation-helper` — or invoke it yourself. I'll keep tracking module status and handling submission to Central whenever you're ready."
 - **No specific request** / **"what's next"** → show development dashboard:
 
 ### Development Dashboard
 
-Present the current state:
+Present the current state, reading module status directly from `spec.yaml` (not file presence):
 
 > **Development Status**
 >
 > **Modules:**
-> [For each module outline, check if a corresponding .adoc exists in content/modules/ROOT/pages/]
-> - Module 1: [title] — [written / not started]
-> - Module 2: [title] — [written / not started]
->
-> **Automation:** [done / not started]
+> [For each module in spec.yaml, show its title and status]
+> - Module 1: [title] — [not_started / in_progress / complete]
+> - Module 2: [title] — [not_started / in_progress / complete]
 >
 > What would you like to work on?
+
+**If the scaffold gate (Step 2) just passed and every module is still `not_started`** (i.e. this is
+the first time the repo is ready for content), append the optional-helpers blurb before the "what
+would you like to work on" line:
+
+> Your showroom is scaffolded and ready for content. Here are some optional helper tools you can
+> use — they are not mandatory:
+>
+> - **Writer helper** — generates module content from your outlines using AI
+> - **Reviewer helper** — reviews your `.adoc` files against Red Hat quality standards
+> - **Automation helper** — helps build Ansible roles or GitOps configs
+>
+> Write your content however you prefer. When all modules are done, update each module's status to
+> `complete` and say "submit to central" — I'll handle the rest.
 
 ## Rules
 
 - Never tell the author to run any script
-- The development skill dispatches to procedures but does not own workflow advancement
-- Each procedure handles its own commit and push
+- The development skill owns scaffolding, module status tracking, and Central submission. It does
+  not write, review, or build automation itself — those are optional helper skills
+  (`rhdp-publishing-house:writer-helper`, `rhdp-publishing-house:reviewer-helper`,
+  `rhdp-publishing-house:automation-helper`) that the author invokes independently
+- `config-helper.md` and `config-reviewer.md` are the only procedures this skill dispatches to —
+  each handles its own commit and push
 - When adding a new module to `spec.modules`, always set `status: not_started`:
   ```yaml
   - id: module-NN

@@ -1,5 +1,5 @@
 ---
-description: Reviews ONE Showroom AsciiDoc module against Red Hat quality standards. Returns structured JSON with dimension scores and findings. Called by development:editor. Self-contained — no ECC, no external tools.
+description: Reviews ONE Showroom AsciiDoc module against Red Hat quality standards. Returns structured JSON with dimension scores and findings. Called by reviewer-helper. Self-contained — no ECC, no external tools.
 tools:
   - Read
   - Grep
