@@ -82,53 +82,68 @@ Read from `spec.yaml`:
 - `development.e2e.status`
 - `development.healthCheck.status`
 
-Present:
+Present the dashboard. The rows shown depend on whether automation is complete.
+
+**If `development.automation.status` is NOT `complete`:**
 
 > **Development Dashboard**
 >
 > | # | Workstream | Status |
 > |---|------------|--------|
 > | 1 | Modules | N of M complete |
-> | 2 | Automation | not_started / in_progress / complete |
-> | 3 | E2E Tests | not_started / in_progress / complete |
-> | 4 | Health Check | not_started / in_progress / complete |
+> | 2 | Automation | not_started / in_progress |
+> | 3 | Showroom Config | set up / review |
+>
+> Type a number to work on that item.
+
+**If `development.automation.status` IS `complete`:**
+
+> **Development Dashboard**
+>
+> | # | Workstream | Status |
+> |---|------------|--------|
+> | 1 | Modules | N of M complete |
+> | 2 | Automation | complete |
+> | 3 | E2E Tests *(optional)* | not_started / in_progress / complete |
+> | 4 | Health Check *(optional)* | not_started / in_progress / complete |
 > | 5 | Showroom Config | set up / review |
 >
 > Type a number to work on that item.
+>
+> E2E Tests and Health Check are optional — you can submit without completing them.
 
 **If this is the first visit** (all modules `not_started` and all development fields `not_started`),
 append:
 
-> Your showroom is scaffolded and ready for content. Here are some optional helper tools you can
-> use — they are not mandatory:
->
-> - **Writer helper** — generates module content from your outlines using AI
-> - **Reviewer helper** — reviews your `.adoc` files against Red Hat quality standards
-> - **Automation helper** — helps build Ansible roles or GitOps configs
->
-> Write your content however you prefer. When all workstreams are done, I'll submit to Central.
+> Your showroom is scaffolded and ready for content. Each workstream has optional AI helpers
+> available when you select it. Write your content however you prefer — when required workstreams
+> are done, I'll submit to Central.
 
 ### Step 3 — Submission gate
 
-**Trigger:** ALL four workstreams are complete:
+**Trigger:** Required workstreams are complete:
 - All modules have `status: complete`
 - `development.automation.status` is `complete`
-- `development.e2e.status` is `complete`
-- `development.healthCheck.status` is `complete`
 
-**All complete →**
-> "All workstreams are complete and ready to submit. Would you like to submit development?"
+E2E Tests and Health Check are **not required** for submission.
+
+**Required complete →**
+> "Modules and automation are complete. Would you like to submit development?"
+> *(If E2E or Health Check are incomplete, add: "E2E Tests and Health Check are still incomplete but are optional.")*
 
 - **Yes** →
   1. Run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
   2. Confirm: "Development submitted to Central — workflow advanced to review stage."
 - **No** → return to dashboard.
 
-**Not all complete →** do not offer submission. Show the dashboard with outstanding items.
+**Required not complete →** do not offer submission. Show the dashboard with outstanding items.
 
 ### Step 4 — Workstream selection and dispatch
 
-Based on the user's number selection from the dashboard:
+Based on the user's number selection from the dashboard.
+**Note:** Options 3–5 depend on whether automation is complete (see dashboard above).
+When automation is NOT complete, option 3 = Showroom Config.
+When automation IS complete, options 3/4 = E2E/Health Check, option 5 = Showroom Config.
 
 #### Option 1 — Modules
 
@@ -169,8 +184,11 @@ Show the module list with sub-options:
      ```
   5. Return to dashboard.
 
-Module writing and reviewing are handled by optional helper skills (`rhdp-publishing-house:writer-helper`,
-`rhdp-publishing-house:reviewer-helper`) — redirect if the author asks to write or review content.
+**Optional helpers** — mention these when the author selects a module:
+- **Writer helper** (`rhdp-publishing-house:writer-helper`) — generates module content from outlines using AI
+- **Reviewer helper** (`rhdp-publishing-house:reviewer-helper`) — reviews `.adoc` files against Red Hat quality standards
+
+Redirect if the author asks to write or review content.
 
 #### Option 2 — Automation
 
@@ -179,29 +197,60 @@ If `development.automation.status` is already `complete`:
 > 1. Reopen (set back to `in_progress`)
 > 2. Back to dashboard
 
-Otherwise, set `development.automation.status: in_progress` if currently `not_started`, commit, then show:
+Otherwise, set `development.automation.status: in_progress` if currently `not_started`, commit, then
+read `project.automation_type` from `spec.yaml` and show the appropriate menu:
 
-> **Automation**
+**If `automation_type` is `gitops`:**
+
+> **Automation (GitOps)**
 >
-> | # | Option | Status |
-> |---|--------|--------|
-> | 1 | GitOps helper | dispatches to gitops-helper skill |
-> | 2 | Ansible helper | not yet implemented — build manually |
-> | 3 | Mark automation complete | |
-> | 4 | Back to dashboard | |
+> | # | Option |
+> |---|--------|
+> | 1 | GitOps helper (generates Helm + ArgoCD) |
+> | 2 | Mark automation complete |
+> | 3 | Back to dashboard |
 
 - **1** → dispatch to `rhdp-publishing-house:gitops-helper` skill. When it returns, return to dashboard.
-- **2** → inform:
-  > "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible
-  > automation manually. Select option 3 when done."
-- **3** →
+- **2** → set complete, commit, push, close Jira (see below).
+- **3** → return to dashboard.
+
+**If `automation_type` is `ansible`:**
+
+> **Automation (Ansible)**
+>
+> | # | Option |
+> |---|--------|
+> | 1 | Ansible helper *(not yet implemented — RHDPCD-110)* |
+> | 2 | Mark automation complete |
+> | 3 | Back to dashboard |
+
+- **1** → inform: "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible automation manually. Select option 2 when done."
+- **2** → set complete, commit, push, close Jira (see below).
+- **3** → return to dashboard.
+
+**If `automation_type` is `both`:**
+
+> **Automation (GitOps + Ansible)**
+>
+> | # | Option |
+> |---|--------|
+> | 1 | GitOps helper (generates Helm + ArgoCD) |
+> | 2 | Ansible helper *(not yet implemented — RHDPCD-110)* |
+> | 3 | Mark automation complete |
+> | 4 | Back to dashboard |
+
+- **1** → dispatch to `rhdp-publishing-house:gitops-helper` skill. When it returns, return to dashboard.
+- **2** → inform: "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible automation manually."
+- **3** → set complete, commit, push, close Jira (see below).
+- **4** → return to dashboard.
+
+**Marking automation complete (all types):**
   1. Set `development.automation.status: complete` in spec.yaml
   2. Commit and push
   3. Close the Jira ticket: `python publishing-house/tools/ph-task-complete.py write-automation`
   4. Return to dashboard.
-- **4** → return to dashboard.
 
-#### Option 3 — E2E Tests
+#### Option 3 — E2E Tests (only shown when automation is complete)
 
 If `development.e2e.status` is already `complete`:
 > "E2E tests are already complete. Would you like to reopen?"
@@ -227,7 +276,7 @@ Otherwise, set `development.e2e.status: in_progress` if currently `not_started`,
   4. Return to dashboard.
 - **2** → return to dashboard.
 
-#### Option 4 — Health Check
+#### Option 4 — Health Check (only shown when automation is complete)
 
 If `development.healthCheck.status` is already `complete`:
 > "Health check is already complete. Would you like to reopen?"
@@ -253,7 +302,9 @@ Otherwise, set `development.healthCheck.status: in_progress` if currently `not_s
   4. Return to dashboard.
 - **2** → return to dashboard.
 
-#### Option 5 — Showroom Config
+#### Option 3 or 5 — Showroom Config
+
+This is option **3** when automation is not complete, or option **5** when it is.
 
 > | # | Option |
 > |---|--------|
