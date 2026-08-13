@@ -208,31 +208,50 @@ The dashboard rows are dynamic — match the user's selection to the workstream 
 
 #### Option 1 — Modules
 
-Show the module list with sub-options:
+Show only incomplete modules (not_started or in_progress) with numbered options:
 
 > **Modules**
 >
 > | # | Module | Status |
 > |---|--------|--------|
-> | 1 | [title] | not_started / in_progress / complete |
-> | 2 | [title] | not_started / in_progress / complete |
+> | 1 | [title] | not_started / in_progress |
+> | 2 | [title] | not_started / in_progress |
 > | ... | ... | ... |
+> | N+1 | Back to dashboard | |
 >
-> **Actions:**
-> - Type a module number to **start** it (sets status to `in_progress`)
-> - Type `done N` to **mark module N complete**
-> - Type `back` to return to the dashboard
+> Type a number to select a module.
 
-**Starting a module (only if `not_started`):**
-  1. If the module is already `in_progress` → tell the author it's already in progress, no change needed.
-  2. If the module is already `complete` → tell the author it's already complete. Ask if they want to reopen it (set back to `in_progress`).
-  3. Otherwise set `status: in_progress` in `spec.yaml`
-  4. Commit: `git add publishing-house/spec.yaml && git commit -m "feat: start module N — [title]"`
+When the author selects a module, show its action menu:
 
-**Marking a module complete (only if not already `complete`):**
-  If already `complete` → tell the author it's already done, return to dashboard.
-  1. Verify the module's `.adoc` file exists in `content/modules/ROOT/pages/`. If not, tell the author.
-  2. Update `publishing-house/spec.yaml`: set `status: complete`
+> **Module N — [title]** (status: not_started / in_progress)
+>
+> | # | Option |
+> |---|--------|
+> | 1 | Start writing (sets to in_progress) |
+> | 2 | Use writer helper (AI-assisted) |
+> | 3 | Use reviewer helper (quality check) |
+> | 4 | Mark complete |
+> | 5 | Back to module list |
+
+Adjust options based on current status:
+- If already `in_progress` → hide option 1 (already started)
+- If `not_started` → hide options 3 and 4 (nothing to review or complete yet)
+
+**Option 1 — Start writing:**
+  1. Set `status: in_progress` in `spec.yaml`
+  2. Commit: `git add publishing-house/spec.yaml && git commit -m "feat: start module N — [title]"`
+  3. Return to module action menu (now with updated status).
+
+**Option 2 — Writer helper:**
+  Dispatch to `rhdp-publishing-house:writer-helper` skill. When it returns, return to module list.
+
+**Option 3 — Reviewer helper:**
+  Dispatch to `rhdp-publishing-house:reviewer-helper` skill. When it returns, return to module list.
+
+**Option 4 — Mark complete:**
+  1. Verify the module's `.adoc` file exists in `content/modules/ROOT/pages/`. If not, warn the author
+     but still allow marking complete if they confirm.
+  2. Set `status: complete` in spec.yaml
   3. Commit and push:
      ```bash
      git add publishing-house/spec.yaml
@@ -243,13 +262,9 @@ Show the module list with sub-options:
      ```bash
      python publishing-house/tools/ph-task-complete.py module-NN
      ```
-  5. Return to dashboard.
+  5. Return to module list (module no longer shown since it's complete).
 
-**Optional helpers** — mention these when the author selects a module:
-- **Writer helper** (`rhdp-publishing-house:writer-helper`) — generates module content from outlines using AI
-- **Reviewer helper** (`rhdp-publishing-house:reviewer-helper`) — reviews `.adoc` files against Red Hat quality standards
-
-Redirect if the author asks to write or review content.
+**Option 5 — Back:** Return to module list.
 
 #### Option 2 — Automation
 
