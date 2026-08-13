@@ -147,11 +147,14 @@ Show the module list with sub-options:
 > - Type `done N` to **mark module N complete**
 > - Type `back` to return to the dashboard
 
-**Starting a module:**
-  1. Set the module's `status` to `in_progress` in `spec.yaml`
-  2. Commit: `git add publishing-house/spec.yaml && git commit -m "feat: start module N — [title]"`
+**Starting a module (only if `not_started`):**
+  1. If the module is already `in_progress` → tell the author it's already in progress, no change needed.
+  2. If the module is already `complete` → tell the author it's already complete. Ask if they want to reopen it (set back to `in_progress`).
+  3. Otherwise set `status: in_progress` in `spec.yaml`
+  4. Commit: `git add publishing-house/spec.yaml && git commit -m "feat: start module N — [title]"`
 
-**Marking a module complete:**
+**Marking a module complete (only if not already `complete`):**
+  If already `complete` → tell the author it's already done, return to dashboard.
   1. Verify the module's `.adoc` file exists in `content/modules/ROOT/pages/`. If not, tell the author.
   2. Update `publishing-house/spec.yaml`: set `status: complete`
   3. Commit and push:
@@ -171,7 +174,12 @@ Module writing and reviewing are handled by optional helper skills (`rhdp-publis
 
 #### Option 2 — Automation
 
-Set `development.automation.status: in_progress` if currently `not_started`, commit, then show:
+If `development.automation.status` is already `complete`:
+> "Automation is already complete. Would you like to reopen it?"
+> 1. Reopen (set back to `in_progress`)
+> 2. Back to dashboard
+
+Otherwise, set `development.automation.status: in_progress` if currently `not_started`, commit, then show:
 
 > **Automation**
 >
@@ -195,7 +203,12 @@ Set `development.automation.status: in_progress` if currently `not_started`, com
 
 #### Option 3 — E2E Tests
 
-Set `development.e2e.status: in_progress` if currently `not_started`, commit, then show:
+If `development.e2e.status` is already `complete`:
+> "E2E tests are already complete. Would you like to reopen?"
+> 1. Reopen (set back to `in_progress`)
+> 2. Back to dashboard
+
+Otherwise, set `development.e2e.status: in_progress` if currently `not_started`, commit, then show:
 
 > **E2E Tests**
 >
@@ -216,7 +229,12 @@ Set `development.e2e.status: in_progress` if currently `not_started`, commit, th
 
 #### Option 4 — Health Check
 
-Set `development.healthCheck.status: in_progress` if currently `not_started`, commit, then show:
+If `development.healthCheck.status` is already `complete`:
+> "Health check is already complete. Would you like to reopen?"
+> 1. Reopen (set back to `in_progress`)
+> 2. Back to dashboard
+
+Otherwise, set `development.healthCheck.status: in_progress` if currently `not_started`, commit, then show:
 
 > **Health Check**
 >
