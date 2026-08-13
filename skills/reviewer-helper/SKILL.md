@@ -74,10 +74,9 @@ Present a summary to the author:
 > for your content — some may not apply to your specific lab.
 >
 > **What would you like to do?**
-> 1. Edit the file yourself, then say **"review again"** — I'll re-check your changes
+> 1. Edit the file yourself, then type **1** again — I'll re-check your changes
 > 2. Ask me to fix specific items — tell me what to change and I'll update the file
-> 3. When you're happy with it, tell the **development** skill it's done — it tracks status and
->    handles submission
+> 3. Done — go back to the **development** skill dashboard to mark the module complete
 
 Write the full review report to `publishing-house/reviews/editing-review-module-NN.md`.
 

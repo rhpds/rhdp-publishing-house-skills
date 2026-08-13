@@ -127,7 +127,7 @@ Present a summary to the author:
 > 1. Edit the file yourself
 > 2. Ask me to fix specific items — tell me what to change and I'll update the file
 > 3. Want an AI quality pass first? Ask me to run `rhdp-publishing-house:reviewer-helper` on this file
-> 4. When you're happy with it, tell the **development** skill **"module N is done"** — it tracks status and handles submission
+> 4. When you're happy with it, go back to the **development** skill and select the module from the dashboard to mark it complete
 
 **STOP HERE.** Do NOT mark the module complete yourself. Do NOT proceed to the next module without
 being asked. Marking complete and submitting to Central are the `rhdp-publishing-house:development`
@@ -191,10 +191,12 @@ Present to the author:
 >
 > Please review: `content/modules/ROOT/pages/index.adoc`
 >
-> Say **"index is done"** when you're happy, or ask me to fix specific items. Want an AI review first?
-> Ask me to run `rhdp-publishing-house:reviewer-helper` on it.
+> **Options:**
+> 1. Accept — move on to conclusion
+> 2. Fix specific items — tell me what to change
+> 3. AI review — I'll run `rhdp-publishing-house:reviewer-helper` on it
 
-**STOP.** Wait for the author to say "index is done" before moving to conclusion.
+**STOP.** Wait for the author to select an option before moving to conclusion.
 
 ### Step 6c: Generate Conclusion (FILE_TYPE: conclusion)
 
@@ -228,10 +230,12 @@ Present to the author:
 >
 > Please review: `content/modules/ROOT/pages/conclusion.adoc`
 >
-> Say **"conclusion is done"** when you're happy, or ask me to fix specific items. Want an AI review
-> first? Ask me to run `rhdp-publishing-house:reviewer-helper` on it.
+> **Options:**
+> 1. Accept — finalize conclusion
+> 2. Fix specific items — tell me what to change
+> 3. AI review — I'll run `rhdp-publishing-house:reviewer-helper` on it
 
-**STOP.** Wait for the author to say "conclusion is done".
+**STOP.** Wait for the author to select an option.
 
 ### Step 6d: Verify Navigation and Structure
 
