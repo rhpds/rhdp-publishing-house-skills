@@ -190,7 +190,7 @@ Otherwise, set `development.automation.status: in_progress` if currently `not_st
 > | 3 | Mark automation complete | |
 > | 4 | Back to dashboard | |
 
-- **1** → dispatch to `rhdp-publishing-house:gitops-helper` skill
+- **1** → dispatch to `rhdp-publishing-house:gitops-helper` skill. When it returns, return to dashboard.
 - **2** → inform:
   > "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible
   > automation manually. Select option 3 when done."

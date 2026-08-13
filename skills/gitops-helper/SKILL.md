@@ -281,6 +281,31 @@ Populate the `helm_values` block with only the values that should be deployer-ma
 operator channels/CSVs, git revisions, image tags, secrets, user count/prefix.
 Leave everything else to the chart's `values.yaml` defaults.
 
+## Step 9 — Completion confirmation (Publishing House mode only)
+
+Skip this step in standalone mode.
+
+After the user has reviewed the generated files (Step 8), ask:
+
+> "GitOps automation is generated. Is automation complete, or do you need to do more work?"
+> 1. Mark automation complete
+> 2. Back to dashboard (I'll finish later)
+
+- **1** →
+  1. Set `development.automation.status: complete` in `publishing-house/spec.yaml`
+  2. Commit and push:
+     ```bash
+     git add publishing-house/spec.yaml
+     git commit -m "feat: mark automation complete"
+     git push
+     ```
+  3. Close the Jira ticket:
+     ```bash
+     python publishing-house/tools/ph-task-complete.py write-automation
+     ```
+  4. Confirm: "Automation marked complete. Returning to development dashboard."
+- **2** → Confirm: "Returning to development dashboard. You can come back to automation anytime."
+
 ## Rules
 
 - The rhdp-gitops-patterns repo is required. If it cannot be cloned, STOP.
@@ -291,4 +316,4 @@ Leave everything else to the chart's `values.yaml` defaults.
 - Ask the user when you don't have a reference for a component.
 - Do not hardcode cluster domains — construct URLs from `deployer.domain`.
 - Never enable the ApplicationSet in `bootstrap-infra`. Do not add a `tenant:` key to its `values.yaml`. The ApplicationSet is for manual use only.
-- Do not advance the lifecycle phase — that is the development skill's job.
+- Do not advance the lifecycle phase — that is the development skill's job. This skill only marks the automation workstream complete (Step 9).
