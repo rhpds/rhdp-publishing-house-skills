@@ -131,7 +131,7 @@ used `rhdp-publishing-house:writer-helper`, or something else entirely.
      ```
   4. Close the module's Jira ticket (best-effort):
      ```bash
-     python publishing-house/tools/ph-module-complete.py module-NN
+     python publishing-house/tools/ph-task-complete.py module-NN
      ```
      If there is no epic (self-published mode) or no matching ticket, the script exits cleanly. Do not stop on failure.
   5. Confirm:

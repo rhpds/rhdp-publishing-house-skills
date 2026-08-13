@@ -32,7 +32,7 @@ flowchart TD
     AllComplete -->|no| S3["Step 3: Module status\nmanagement"]
 
     S3 -->|"start module N"| InProg["status: not_started -> in_progress"]
-    S3 -->|"module N is done"| Complete["verify .adoc exists\nstatus -> complete\nph-module-complete.py"]
+    S3 -->|"module N is done"| Complete["verify .adoc exists\nstatus -> complete\nph-task-complete.py"]
 
     S3 --> S4["Step 4: Dispatch"]
     S4 -->|scaffold/config| CH2["procedures/config-helper.md\nprocedures/config-reviewer.md"]
@@ -81,7 +81,7 @@ User
       |   Step 3: Module status management (AUTHORITATIVE, in SKILL.md) |
       |   +- "start module N" -> status: in_progress                    |
       |   +- "module N is done" -> verify .adoc exists, status: complete|
-      |      -> ph-module-complete.py                                   |
+      |      -> ph-task-complete.py                                   |
       |                                                                  |
       |   Step 4: Dispatch                                              |
       |   +- scaffold/config -> config-helper.md / config-reviewer.md   |
