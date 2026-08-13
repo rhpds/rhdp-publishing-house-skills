@@ -71,10 +71,78 @@ Follow `procedures/config-reviewer.md` automatically against the project's conte
   - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2
   - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
 
-### Step 2 — Development Dashboard
+### Step 2 — In-progress check
 
-Read all workstream statuses from `spec.yaml` and present the dashboard. This runs every time —
-it is the central hub of the development phase.
+Before showing the dashboard, check for any `in_progress` work and ask the author about each one.
+
+**2a. Modules** — For each module with `status: in_progress`, ask:
+
+> "Module N — *[title]* is in progress. Are you done with it?"
+> 1. Yes, mark it complete
+> 2. No, still working on it
+
+- **1** →
+  1. Verify the module's `.adoc` file exists in `content/modules/ROOT/pages/`. If not, warn the author
+     but still allow marking complete if they confirm.
+  2. Set `status: complete` in spec.yaml
+  3. Commit and push:
+     ```bash
+     git add publishing-house/spec.yaml
+     git commit -m "feat: mark module N complete — [title]"
+     git push
+     ```
+  4. Close the Jira ticket (best-effort):
+     ```bash
+     python publishing-house/tools/ph-task-complete.py module-NN
+     ```
+- **2** → leave as `in_progress`, move to next.
+
+Ask about all `in_progress` modules sequentially before proceeding.
+
+**2b. Automation** — If `development.automation.status` is `in_progress`, ask:
+
+> "Automation is in progress. Are you done with it?"
+> 1. Yes, mark it complete
+> 2. No, still working on it
+
+- **1** →
+  1. Set `development.automation.status: complete` in spec.yaml
+  2. Commit and push
+  3. Close the Jira ticket: `python publishing-house/tools/ph-task-complete.py write-automation`
+- **2** → leave as `in_progress`, move on.
+
+**2c. E2E Tests** — If `development.e2e.status` is `in_progress`, ask:
+
+> "E2E Tests are in progress. Are you done with them?"
+> 1. Yes, mark complete
+> 2. No, still working on it
+
+- **1** →
+  1. Set `development.e2e.status: complete` in spec.yaml
+  2. Commit and push
+  3. Close the Jira ticket: `python publishing-house/tools/ph-task-complete.py write-e2e-tests`
+- **2** → leave as `in_progress`, move on.
+
+**2d. Health Check** — If `development.healthCheck.status` is `in_progress`, ask:
+
+> "Health Check is in progress. Are you done with it?"
+> 1. Yes, mark complete
+> 2. No, still working on it
+
+- **1** →
+  1. Set `development.healthCheck.status: complete` in spec.yaml
+  2. Commit and push
+  3. Close the Jira ticket: `python publishing-house/tools/ph-task-complete.py write-health-check`
+- **2** → leave as `in_progress`, move on.
+
+After all checks, proceed to Step 3.
+
+### Step 3 — Development Dashboard
+
+Read all workstream statuses from `spec.yaml` (updated after Step 2) and present the dashboard.
+This runs every time — it is the central hub of the development phase.
+
+Only show **incomplete** workstreams (not_started or in_progress). Completed workstreams are hidden.
 
 Read from `spec.yaml`:
 - Module statuses from `spec.modules[*].status`
@@ -82,34 +150,29 @@ Read from `spec.yaml`:
 - `development.e2e.status`
 - `development.healthCheck.status`
 
-Present the dashboard. The rows shown depend on whether automation is complete.
-
-**If `development.automation.status` is NOT `complete`:**
+Build the dashboard dynamically based on what is still incomplete:
 
 > **Development Dashboard**
 >
 > | # | Workstream | Status |
 > |---|------------|--------|
-> | 1 | Modules | N of M complete |
-> | 2 | Automation | not_started / in_progress |
-> | 3 | Showroom Config | set up / review |
->
+
+Include these rows **only if incomplete**:
+- **Modules** — show if any module is not `complete` (display "N of M complete")
+- **Automation** — show if `development.automation.status` is not `complete`
+
+Include these rows **only if automation is complete AND the workstream is incomplete**:
+- **E2E Tests *(optional)*** — show if `development.e2e.status` is not `complete`
+- **Health Check *(optional)*** — show if `development.healthCheck.status` is not `complete`
+
+Always include:
+- **Showroom Config** — always shown (set up / review)
+
+Number rows sequentially starting at 1 based on what is shown.
+
 > Type a number to work on that item.
 
-**If `development.automation.status` IS `complete`:**
-
-> **Development Dashboard**
->
-> | # | Workstream | Status |
-> |---|------------|--------|
-> | 1 | Modules | N of M complete |
-> | 2 | Automation | complete |
-> | 3 | E2E Tests *(optional)* | not_started / in_progress / complete |
-> | 4 | Health Check *(optional)* | not_started / in_progress / complete |
-> | 5 | Showroom Config | set up / review |
->
-> Type a number to work on that item.
->
+If E2E or Health Check rows are shown, append:
 > E2E Tests and Health Check are optional — you can submit without completing them.
 
 **If this is the first visit** (all modules `not_started` and all development fields `not_started`),
@@ -119,7 +182,7 @@ append:
 > available when you select it. Write your content however you prefer — when required workstreams
 > are done, I'll submit to Central.
 
-### Step 3 — Submission gate
+### Step 4 — Submission gate
 
 **Trigger:** Required workstreams are complete:
 - All modules have `status: complete`
@@ -138,12 +201,10 @@ E2E Tests and Health Check are **not required** for submission.
 
 **Required not complete →** do not offer submission. Show the dashboard with outstanding items.
 
-### Step 4 — Workstream selection and dispatch
+### Step 5 — Workstream selection and dispatch
 
 Based on the user's number selection from the dashboard.
-**Note:** Options 3–5 depend on whether automation is complete (see dashboard above).
-When automation is NOT complete, option 3 = Showroom Config.
-When automation IS complete, options 3/4 = E2E/Health Check, option 5 = Showroom Config.
+The dashboard rows are dynamic — match the user's selection to the workstream shown at that number.
 
 #### Option 1 — Modules
 
