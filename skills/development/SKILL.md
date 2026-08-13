@@ -61,112 +61,43 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 ## Dispatch
 
-### Step 1 — Readiness check (runs FIRST, before anything else)
-
-**Trigger:** All modules have `status: complete` in spec.yaml.
-**Skip if** any module is `not_started` or `in_progress` — proceed directly to Step 2.
-
-Run these checks against the current state of the repo (do not rely on any previously-saved
-"complete" flag — recompute this every time):
-
-1. `content/modules/ROOT/pages/index.adoc` exists
-2. `content/modules/ROOT/pages/conclusion.adoc` exists
-3. `content/modules/ROOT/nav.adoc` exists
-4. Every module outline in `publishing-house/spec/modules/` has a matching `.adoc` page in `content/modules/ROOT/pages/`
-5. No placeholder text (`TODO`, `FIXME`, `TBD`, `[placeholder]`) in any `.adoc` page
-6. All learning objectives from `spec.learning_objectives` are referenced in `conclusion.adoc`
-
-**All checks pass →**
-> "All content is complete and ready to submit. Would you like to submit development, or is there something else you'd like to work on?"
-
-- **Yes** →
-  1. Run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
-  2. Confirm: "Showroom content finalized and submitted to Central — workflow advanced to review stage."
-- **No** → proceed to Step 2 dispatch.
-
-**Any check fails →** list what's missing and proceed to Step 2.
-
-### Step 2 — Scaffold check gate
+### Step 1 — Scaffold check gate
 
 Follow `procedures/config-reviewer.md` automatically against the project's content directory.
 
-- **PASS** → proceed to Step 2b
+- **PASS** → proceed to Step 2
 - **FAIL** → report the specific issues to the author, then ask:
   > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
-  - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2b
+  - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2
   - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
 
-### Step 2b — Module status validation gate
+### Step 2 — Development Dashboard
 
-Read `spec.yaml` and check module statuses.
+Read all workstream statuses from `spec.yaml` and present the dashboard. This runs every time —
+it is the central hub of the development phase.
 
-- **Any module is `in_progress`?** → warn the author:
-  > "Module N is currently marked in_progress. Would you like to continue it, or mark it complete first?"
-  Wait for the author's response before dispatching.
-- **All modules are `complete` AND user request is "write"?** → suggest editing instead:
-  > "All modules are already complete. Did you mean to edit or review the content instead?"
-  Wait for confirmation.
-- **Otherwise** → proceed to Step 3.
+Read from `spec.yaml`:
+- Module statuses from `spec.modules[*].status`
+- `development.automation.status`
+- `development.e2e.status`
+- `development.healthCheck.status`
 
-### Step 3 — Module status management
+Present:
 
-Handle status transitions in `publishing-house/spec.yaml` directly. This is the only place module
-status is authoritatively tracked — it works the same whether the author wrote content by hand,
-used `rhdp-publishing-house:writer-helper`, or something else entirely.
-
-- **"start module N"** / **"module N in progress"** →
-  1. Set the module's `status: not_started` to `status: in_progress` in `spec.yaml`
-  2. Commit: `git add publishing-house/spec.yaml && git commit -m "feat: start module N — [title]"`
-
-- **"module N is done"** / **"mark module N complete"** / **"it's done"** / **"looks good"** →
-  1. Verify the module's `.adoc` file exists in `content/modules/ROOT/pages/`. If it doesn't, tell the
-     author and do not mark complete.
-  2. Update `publishing-house/spec.yaml`: set `status: complete` for that module (from whatever its
-     current status was).
-  3. Commit and push:
-     ```bash
-     git add publishing-house/spec.yaml
-     git commit -m "feat: mark module N complete — [title]"
-     git push
-     ```
-  4. Close the module's Jira ticket (best-effort):
-     ```bash
-     python publishing-house/tools/ph-task-complete.py module-NN
-     ```
-     If there is no epic (self-published mode) or no matching ticket, the script exits cleanly. Do not stop on failure.
-  5. Confirm:
-     > "Module N marked complete and pushed. [Next module available / All modules complete.]"
-
-  This works standalone too — if the author returns in a new session and says "module N is done"
-  without any prior write activity this session, still verify the `.adoc` file exists and mark complete.
-
-### Step 4 — Dispatch
-
-Based on what the user asked for:
-
-- **"set up showroom"** / **"configure tabs"** / **"scaffold"** / **"add a tab"** → follow `procedures/config-helper.md`
-- **"review config"** / **"check site.yml"** / **"validate config"** → follow `procedures/config-reviewer.md`
-- **"module N is done"** / **"start module N"** / other status phrases → handled by Step 3 above
-- **"write a module"** / **"draft content"** / **"start writing"** / **"edit module N"** / **"review content"** / **"technical edit"** / **"build automation"** / **"write the Ansible roles"** / **"set up GitOps"** → redirect:
-  > "That's handled by an optional helper skill now, not by me directly. Ask me to run `rhdp-publishing-house:writer-helper`, `rhdp-publishing-house:reviewer-helper`, or `rhdp-publishing-house:automation-helper` — or invoke it yourself. I'll keep tracking module status and handling submission to Central whenever you're ready."
-- **No specific request** / **"what's next"** → show development dashboard:
-
-### Development Dashboard
-
-Present the current state, reading module status directly from `spec.yaml` (not file presence):
-
-> **Development Status**
+> **Development Dashboard**
 >
-> **Modules:**
-> [For each module in spec.yaml, show its title and status]
-> - Module 1: [title] — [not_started / in_progress / complete]
-> - Module 2: [title] — [not_started / in_progress / complete]
+> | # | Workstream | Status |
+> |---|------------|--------|
+> | 1 | Modules | N of M complete |
+> | 2 | Automation | not_started / in_progress / complete |
+> | 3 | E2E Tests | not_started / in_progress / complete |
+> | 4 | Health Check | not_started / in_progress / complete |
+> | 5 | Showroom Config | set up / review |
 >
-> What would you like to work on?
+> Type a number to work on that item.
 
-**If the scaffold gate (Step 2) just passed and every module is still `not_started`** (i.e. this is
-the first time the repo is ready for content), append the optional-helpers blurb before the "what
-would you like to work on" line:
+**If this is the first visit** (all modules `not_started` and all development fields `not_started`),
+append:
 
 > Your showroom is scaffolded and ready for content. Here are some optional helper tools you can
 > use — they are not mandatory:
@@ -175,18 +106,157 @@ would you like to work on" line:
 > - **Reviewer helper** — reviews your `.adoc` files against Red Hat quality standards
 > - **Automation helper** — helps build Ansible roles or GitOps configs
 >
-> Write your content however you prefer. When all modules are done, update each module's status to
-> `complete` and say "submit to central" — I'll handle the rest.
+> Write your content however you prefer. When all workstreams are done, I'll submit to Central.
+
+### Step 3 — Submission gate
+
+**Trigger:** ALL four workstreams are complete:
+- All modules have `status: complete`
+- `development.automation.status` is `complete`
+- `development.e2e.status` is `complete`
+- `development.healthCheck.status` is `complete`
+
+**All complete →**
+> "All workstreams are complete and ready to submit. Would you like to submit development?"
+
+- **Yes** →
+  1. Run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
+  2. Confirm: "Development submitted to Central — workflow advanced to review stage."
+- **No** → return to dashboard.
+
+**Not all complete →** do not offer submission. Show the dashboard with outstanding items.
+
+### Step 4 — Workstream selection and dispatch
+
+Based on the user's number selection from the dashboard:
+
+#### Option 1 — Modules
+
+Show the module list with sub-options:
+
+> **Modules**
+>
+> | # | Module | Status |
+> |---|--------|--------|
+> | 1 | [title] | not_started / in_progress / complete |
+> | 2 | [title] | not_started / in_progress / complete |
+> | ... | ... | ... |
+>
+> **Actions:**
+> - Type a module number to **start** it (sets status to `in_progress`)
+> - Type `done N` to **mark module N complete**
+> - Type `back` to return to the dashboard
+
+**Starting a module:**
+  1. Set the module's `status` to `in_progress` in `spec.yaml`
+  2. Commit: `git add publishing-house/spec.yaml && git commit -m "feat: start module N — [title]"`
+
+**Marking a module complete:**
+  1. Verify the module's `.adoc` file exists in `content/modules/ROOT/pages/`. If not, tell the author.
+  2. Update `publishing-house/spec.yaml`: set `status: complete`
+  3. Commit and push:
+     ```bash
+     git add publishing-house/spec.yaml
+     git commit -m "feat: mark module N complete — [title]"
+     git push
+     ```
+  4. Close the Jira ticket (best-effort):
+     ```bash
+     python publishing-house/tools/ph-task-complete.py module-NN
+     ```
+  5. Return to dashboard.
+
+Module writing and reviewing are handled by optional helper skills (`rhdp-publishing-house:writer-helper`,
+`rhdp-publishing-house:reviewer-helper`) — redirect if the author asks to write or review content.
+
+#### Option 2 — Automation
+
+Set `development.automation.status: in_progress` if currently `not_started`, commit, then show:
+
+> **Automation**
+>
+> | # | Option | Status |
+> |---|--------|--------|
+> | 1 | GitOps helper | dispatches to gitops-helper skill |
+> | 2 | Ansible helper | not yet implemented — build manually |
+> | 3 | Mark automation complete | |
+> | 4 | Back to dashboard | |
+
+- **1** → dispatch to `rhdp-publishing-house:gitops-helper` skill
+- **2** → inform:
+  > "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible
+  > automation manually. Select option 3 when done."
+- **3** →
+  1. Set `development.automation.status: complete` in spec.yaml
+  2. Commit and push
+  3. Close the Jira ticket: `python publishing-house/tools/ph-task-complete.py write-automation`
+  4. Return to dashboard.
+- **4** → return to dashboard.
+
+#### Option 3 — E2E Tests
+
+Set `development.e2e.status: in_progress` if currently `not_started`, commit, then show:
+
+> **E2E Tests**
+>
+> The E2E test helper skill is not yet implemented. Please write your E2E tests manually in
+> `qa-automation/`.
+>
+> | # | Option |
+> |---|--------|
+> | 1 | Mark E2E tests complete |
+> | 2 | Back to dashboard |
+
+- **1** →
+  1. Set `development.e2e.status: complete` in spec.yaml
+  2. Commit and push
+  3. Close the Jira ticket: `python publishing-house/tools/ph-task-complete.py write-e2e-tests`
+  4. Return to dashboard.
+- **2** → return to dashboard.
+
+#### Option 4 — Health Check
+
+Set `development.healthCheck.status: in_progress` if currently `not_started`, commit, then show:
+
+> **Health Check**
+>
+> The health check helper skill is not yet implemented. Please write your health check playbook
+> in `qa-automation/`.
+>
+> | # | Option |
+> |---|--------|
+> | 1 | Mark health check complete |
+> | 2 | Back to dashboard |
+
+- **1** →
+  1. Set `development.healthCheck.status: complete` in spec.yaml
+  2. Commit and push
+  3. Close the Jira ticket: `python publishing-house/tools/ph-task-complete.py write-health-check`
+  4. Return to dashboard.
+- **2** → return to dashboard.
+
+#### Option 5 — Showroom Config
+
+> | # | Option |
+> |---|--------|
+> | 1 | Set up showroom (config-helper) |
+> | 2 | Review showroom config (config-reviewer) |
+> | 3 | Back to dashboard |
+
+- **1** → follow `procedures/config-helper.md`
+- **2** → follow `procedures/config-reviewer.md`
+- **3** → return to dashboard.
 
 ## Rules
 
 - Never tell the author to run any script
-- The development skill owns scaffolding, module status tracking, and Central submission. It does
-  not write, review, or build automation itself — those are optional helper skills
+- The development skill owns scaffolding, workstream status tracking, and Central submission
+- Writing, reviewing, and building automation are optional helper skills
   (`rhdp-publishing-house:writer-helper`, `rhdp-publishing-house:reviewer-helper`,
   `rhdp-publishing-house:automation-helper`) that the author invokes independently
-- `config-helper.md` and `config-reviewer.md` are the only procedures this skill dispatches to —
-  each handles its own commit and push
+- `config-helper.md` and `config-reviewer.md` are the only procedures this skill dispatches to
+- Status transitions: `not_started` → `in_progress` (on selection) → `complete` (on explicit human confirmation only)
+- **NEVER mark a workstream complete without the author explicitly saying it is done**
 - When adding a new module to `spec.modules`, always set `status: not_started`:
   ```yaml
   - id: module-NN
