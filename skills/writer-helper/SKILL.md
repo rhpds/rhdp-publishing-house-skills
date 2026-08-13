@@ -124,10 +124,15 @@ Present a summary to the author:
 > The AI handled ~80% — your review covers the rest: accuracy, tone, missing context, and any items above.
 >
 > **What would you like to do?**
-> 1. Edit the file yourself
-> 2. Ask me to fix specific items — tell me what to change and I'll update the file
-> 3. Want an AI quality pass first? Ask me to run `rhdp-publishing-house:reviewer-helper` on this file
-> 4. When you're happy with it, go back to the **development** skill and select the module from the dashboard to mark it complete
+> 1. Looks good — done with this module
+> 2. Edit the file yourself, then type 1 when ready
+> 3. Fix specific items — tell me what to change and I'll update the file
+> 4. Run AI quality pass (`rhdp-publishing-house:reviewer-helper`)
+
+- **1** → return to the calling skill (development will mark the module complete).
+- **2** → wait for the author to finish editing and type 1.
+- **3** → apply fixes, then re-present this menu.
+- **4** → dispatch to `rhdp-publishing-house:reviewer-helper`, then re-present this menu.
 
 **STOP HERE.** Do NOT mark the module complete yourself. Do NOT proceed to the next module without
 being asked. Marking complete and submitting to Central are the `rhdp-publishing-house:development`

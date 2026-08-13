@@ -247,9 +247,24 @@ When the author selects a module:
 
 **Option 1 — Write it myself:**
   Tell the author:
-  > "Write your content in `content/modules/ROOT/pages/[filename].adoc`. When you're done,
-  > come back to the development dashboard — I'll ask if it's complete."
-  Return to dashboard.
+  > "Write your content in `content/modules/ROOT/pages/[filename].adoc`."
+  > 1. Done — mark module complete
+  > 2. Back to dashboard (I'll finish later)
+
+  - **1** → mark module complete:
+    1. Set `status: complete` in spec.yaml
+    2. Commit and push:
+       ```bash
+       git add publishing-house/spec.yaml
+       git commit -m "feat: mark module N complete — [title]"
+       git push
+       ```
+    3. Close the Jira ticket (best-effort):
+       ```bash
+       python publishing-house/tools/ph-task-complete.py module-NN
+       ```
+    4. Return to dashboard.
+  - **2** → return to dashboard (module stays `in_progress`, will be caught by Step 2 next time).
 
 **Option 2 — AI writer helper:**
   Dispatch to `rhdp-publishing-house:writer-helper` skill. When it returns, mark module complete:
