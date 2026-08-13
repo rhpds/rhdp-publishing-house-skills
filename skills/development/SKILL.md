@@ -221,34 +221,38 @@ Show only incomplete modules (not_started or in_progress) with numbered options:
 >
 > Type a number to select a module.
 
-When the author selects a module, show its action menu:
+When the author selects a module:
 
-> **Module N — [title]** (status: not_started / in_progress)
+1. If `not_started`:
+   - Set `status: in_progress` in spec.yaml
+   - Create an empty `.adoc` stub at `content/modules/ROOT/pages/[filename].adoc` if it doesn't exist:
+     ```adoc
+     = [Module Title]
+     ```
+   - Commit:
+     ```bash
+     git add publishing-house/spec.yaml content/modules/ROOT/pages/[filename].adoc
+     git commit -m "feat: start module N — [title]"
+     ```
+
+2. Show the action menu:
+
+> **Module N — [title]**
 >
 > | # | Option |
 > |---|--------|
-> | 1 | Start writing (sets to in_progress) |
-> | 2 | Use writer helper (AI-assisted) |
-> | 3 | Use reviewer helper (quality check) |
-> | 4 | Mark complete |
-> | 5 | Back to module list |
+> | 1 | Write it myself |
+> | 2 | Use AI writer helper |
+> | 3 | Back to dashboard |
 
-Adjust options based on current status:
-- If already `in_progress` → hide option 1 (already started)
-- If `not_started` → hide options 3 and 4 (nothing to review or complete yet)
+**Option 1 — Write it myself:**
+  Tell the author:
+  > "Write your content in `content/modules/ROOT/pages/[filename].adoc`. When you're done,
+  > come back to the development dashboard — I'll ask if it's complete."
+  Return to dashboard.
 
-**Option 1 — Start writing:**
-  1. Set `status: in_progress` in `spec.yaml`
-  2. Commit: `git add publishing-house/spec.yaml && git commit -m "feat: start module N — [title]"`
-  3. Return to module action menu (now with updated status).
-
-**Option 2 — Writer helper:**
-  Dispatch to `rhdp-publishing-house:writer-helper` skill. When it returns, return to module list.
-
-**Option 3 — Reviewer helper:**
-  Dispatch to `rhdp-publishing-house:reviewer-helper` skill. When it returns, return to module list.
-
-**Option 4 — Mark complete:**
+**Option 2 — AI writer helper:**
+  Dispatch to `rhdp-publishing-house:writer-helper` skill. When it returns, mark module complete:
   1. Verify the module's `.adoc` file exists in `content/modules/ROOT/pages/`. If not, warn the author
      but still allow marking complete if they confirm.
   2. Set `status: complete` in spec.yaml
@@ -262,9 +266,9 @@ Adjust options based on current status:
      ```bash
      python publishing-house/tools/ph-task-complete.py module-NN
      ```
-  5. Return to module list (module no longer shown since it's complete).
+  5. Return to dashboard.
 
-**Option 5 — Back:** Return to module list.
+**Option 3 — Back:** Return to dashboard.
 
 #### Option 2 — Automation
 
