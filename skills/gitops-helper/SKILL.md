@@ -205,7 +205,8 @@ For each component:
    and any additional user-provided repos. If a matching pattern exists (e.g., GitLab, DevHub,
    Istio Gateway, per-user ArgoCD, KubeVirt VMs), use it as the basis for generation.
    Adapt values and namespaces to the current project. Add a provenance comment to each
-   generated file: `# Generated from rhdp-gitops-patterns/examples/<name> (<version>)`.
+   generated file with the full git repo URL of the source, e.g.
+   `# Generated from https://github.com/redhat-gpte/rhdp-gitops-patterns/examples/modernize-ocp-virt`.
 
    **Never generate ArgoCD Application CRs that point back to subdirectories of the same repo.**
    Expand all manifests directly into the chart templates.
@@ -217,6 +218,19 @@ For each component:
    information available. Tell the user what you assumed and ask for review.
 
 Apply sync-wave annotations per the ordering conventions in `gitops-patterns.md`.
+
+**Before generating any operator Subscription**, check the "Known Operator Quirks"
+section in `gitops-patterns.md`. Some operators (e.g., Gitea) are not in standard
+OLM catalogs and require a custom CatalogSource or specific install modes. Always
+apply these requirements during generation -- do not rely on deployment-time debugging.
+
+**Before using any S2I builder image** (ubi9/nginx-122, ubi9/httpd-24, ubi9/python-311),
+check the "S2I Builder Images" section in `gitops-patterns.md`. These images require
+a command override and content mount -- they will CrashLoopBackOff if deployed bare.
+
+**For PVCs**, place them at the same sync-wave as the workload that uses them
+(not with namespaces at wave -2). See "PVC with WaitForFirstConsumer StorageClass"
+in `gitops-patterns.md`.
 
 Ensure all tenant resources target one of the tenant's namespaces (never a shared namespace).
 
@@ -267,6 +281,31 @@ Populate the `helm_values` block with only the values that should be deployer-ma
 operator channels/CSVs, git revisions, image tags, secrets, user count/prefix.
 Leave everything else to the chart's `values.yaml` defaults.
 
+## Step 9 — Completion confirmation (Publishing House mode only)
+
+Skip this step in standalone mode.
+
+After the user has reviewed the generated files (Step 8), ask:
+
+> "GitOps automation is generated. Is automation complete, or do you need to do more work?"
+> 1. Mark automation complete
+> 2. Back to dashboard (I'll finish later)
+
+- **1** →
+  1. Set `development.automation.status: complete` in `publishing-house/spec.yaml`
+  2. Commit and push:
+     ```bash
+     git add publishing-house/spec.yaml
+     git commit -m "feat: mark automation complete"
+     git push
+     ```
+  3. Close the Jira ticket:
+     ```bash
+     python publishing-house/tools/ph-task-complete.py write-automation
+     ```
+  4. Confirm: "Automation marked complete. Returning to development dashboard."
+- **2** → Confirm: "Returning to development dashboard. You can come back to automation anytime."
+
 ## Rules
 
 - The rhdp-gitops-patterns repo is required. If it cannot be cloned, STOP.
@@ -277,4 +316,4 @@ Leave everything else to the chart's `values.yaml` defaults.
 - Ask the user when you don't have a reference for a component.
 - Do not hardcode cluster domains — construct URLs from `deployer.domain`.
 - Never enable the ApplicationSet in `bootstrap-infra`. Do not add a `tenant:` key to its `values.yaml`. The ApplicationSet is for manual use only.
-- Do not advance the lifecycle phase — that is the development skill's job.
+- Do not advance the lifecycle phase — that is the development skill's job. This skill only marks the automation workstream complete (Step 9).

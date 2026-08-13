@@ -299,7 +299,7 @@ How to detect which pattern is in use from existing config:
 
 ## Publishing House integration
 
-When a PH project has `_scaffolds/` directory and `scaffold.py`:
+When a PH project has `.scaffolds/` directory and `scaffold.py`:
 
 - The intake writes `project.showroom_type` to `publishing-house/spec.yaml` during Phase 1 (discovery)
 - config-helper reads this field and maps it to the scaffold pattern:
@@ -313,7 +313,7 @@ When a PH project has `_scaffolds/` directory and `scaffold.py`:
 Note: `agd-guided` is not currently offered during intake. Only `classic` and `zero_touch` are selectable.
 
 - config-helper confirms the detected pattern with the user, then runs `scaffold.py --pattern <name> --force`
-- scaffold.py copies pattern-specific stubs, sets `showroom_type` and `infrastructure` in spec.yaml, deletes `_scaffolds/`
+- scaffold.py copies pattern-specific stubs, sets `showroom_type` and `infrastructure` in spec.yaml, deletes `.scaffolds/`
 - After scaffold.py runs, config-helper operates in modification mode on the generated files
 
 ---

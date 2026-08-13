@@ -14,7 +14,7 @@ Check these files and directories silently to understand the current state:
 | Check | Meaning |
 |-------|---------|
 | `publishing-house/spec.yaml` exists | This is a Publishing House project |
-| `_scaffolds/` directory exists | PH project that has NOT been scaffolded yet |
+| `.scaffolds/` directory exists | PH project that has NOT been scaffolded yet |
 | `site.yml` exists | Antora playbook already configured |
 | `ui-config.yml` exists | Showroom UI already configured |
 | `content/antora.yml` exists | Antora component present |
@@ -23,7 +23,7 @@ Check these files and directories silently to understand the current state:
 
 ## Step 2 — Route Based on State
 
-### Route A: PH project with `_scaffolds/` still present
+### Route A: PH project with `.scaffolds/` still present
 
 The project has not been scaffolded. Read the intake spec to determine the pattern, then delegate to `scaffold.py`.
 
