@@ -260,6 +260,51 @@ AgD environments (OCP/VM) use `path: /wetty`. ZT environments use `url: /wetty`.
 
 ---
 
+## Ansible Collection Rules (G-rules) — Skip if `automation/ansible/galaxy.yml` does not exist
+
+These rules validate the starter Ansible collection created by `scaffold.py --automation ansible`
+(or `both`) and filled in by `config-helper`'s Filling in the Ansible Collection procedure. See
+@rhdp-publishing-house/skills/development/references/ansible-conventions.md for the full naming
+rules and derivation algorithm — these checks just verify the result matches it.
+
+### G-1 — galaxy.yml namespace/authors must not be placeholders
+
+- **Severity:** HIGH
+- **Auto-fix:** Yes — re-run the config-helper fill-in procedure
+
+Check `namespace` and `authors` in `automation/ansible/galaxy.yml` are not still
+`<your_namespace>` or `<Your Name> <you@example.com>`. Placeholder values mean the collection was
+scaffolded but never filled in. (`name` is not checked here — it ships as `"automation"` from the
+template and is never a placeholder; see G-2 if it's been changed to something invalid.)
+
+### G-2 — namespace and name must satisfy Ansible's collection naming rules
+
+- **Severity:** CRITICAL
+- **Auto-fix:** No — requires the author to choose a valid namespace
+
+Both `namespace` and `name` must contain only lowercase alphanumeric characters and underscores, be
+at least 3 characters long, not start with an underscore or a digit, and not contain consecutive
+underscores. A violation means `ansible-galaxy collection install` will fail for anyone who tries
+to consume the collection — this is not a style nit.
+
+### G-3 — repository should point to the real repo, not a placeholder
+
+- **Severity:** LOW
+- **Auto-fix:** Yes — set to `https://github.com/rhpds/<repo-name>`
+
+Check `repository` in `galaxy.yml` is not still `https://github.com/rhpds/your-project-repo` (the
+shipped placeholder) and does resolve to this project's actual repo.
+
+### G-4 — role meta author should not be a placeholder
+
+- **Severity:** LOW
+- **Auto-fix:** Yes — set to the GitHub username from `catalog-info.yaml`/`spec.yaml`
+
+Check `galaxy_info.author` in each `automation/ansible/roles/*/meta/main.yml` is not still
+`<Your Name>`.
+
+---
+
 ## ZT-Specific Rules (Z-rules) — Skip if pattern is NOT ZT Guided
 
 ### Z-1 — lab-metadata.yml must exist at repo root
@@ -350,6 +395,7 @@ The config-reviewer produces a report organized by severity:
 
 ### CRITICAL
 - [X-4] Theme/mode mismatch: site.yml uses nookbag-bundle but ui-config.yml has `type: showroom`
+- [G-2] galaxy.yml namespace `3tier_lab` starts with a digit — invalid Ansible namespace
 
 ### HIGH
 - [S-2] start_page `foo::index.adoc` does not match antora.yml name `modules`

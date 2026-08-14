@@ -7,6 +7,7 @@ configure tabs, and create automation directory skeletons.
 See @rhdp-publishing-house/skills/development/references/showroom-patterns.md for the three lab patterns and their complete config examples.
 See @rhdp-publishing-house/skills/development/references/config-files.md for the full reference on every config file.
 See @rhdp-publishing-house/skills/development/references/gitops-patterns.md for GitOps (Helm + ArgoCD) conventions and patterns.
+See @rhdp-publishing-house/skills/development/references/ansible-conventions.md for Ansible collection naming rules and how to fill in the starter collection.
 
 ## Step 1 — Detect Repo Context
 
@@ -50,18 +51,33 @@ If `project.showroom_type` is empty, unset, or unrecognised, fall back to asking
 Confirm the detected pattern with the user before running:
 > Your spec has `showroom_type: <value>` — I'll scaffold as **<pattern description>**. Proceed?
 
+Also read `project.automation_type` from `publishing-house/spec.yaml`. This is the only chance to
+scaffold automation directories automatically — `scaffold.py` deletes `.scaffolds/` (including
+`.scaffolds/automation/`) once it completes, so automation scaffolding must happen in this same
+invocation, not as a later separate step. See the Automation Scaffolding reference (below) for
+what each value creates.
+
+If `automation_type` is empty, unset, or unrecognised, omit `--automation` entirely. If
+`spec.environment.topology` already happens to be `shared-cluster` at this point, also pass
+`--topology shared-cluster` (usually it won't be known yet — topology is normally decided later
+during intake).
+
 Then run:
 ```bash
-python scaffold.py --pattern <pattern-name> --force
+python scaffold.py --pattern <pattern-name> --automation <automation_type> --force
 ```
+(Omit `--automation` if `automation_type` was empty/unset. Add `--topology shared-cluster` if applicable.)
 
 **A.3 — Configure tabs from spec:**
 
 After scaffolding, the `ui-config.yml` has placeholder tabs. Follow the Tab Advisor procedure (below) to replace them with real tabs based on the spec's infrastructure.
 
-**A.4 — Scaffold automation directories:**
+**A.4 — Automation directories already scaffolded:**
 
-Follow the Automation Scaffolding procedure (below) to create automation directory skeletons based on the project's `automation_type` and topology. If `automation_type` is empty or unset, skip this step silently.
+`scaffold.py` (step A.2) already created `automation/` if `--automation` was passed. See the
+Automation Scaffolding reference (below) for a summary of what was created, and for how to add
+`automation/gitops/bootstrap-tenant/` manually later if topology turns out to be `shared-cluster`
+after `.scaffolds/` is already gone.
 
 **A.5 — Verify and adjust:**
 
@@ -148,7 +164,11 @@ The repo already has `site.yml` and/or `ui-config.yml`.
    - **Switch content mode** — change theme in site.yml AND format of ui-config.yml (significant change — confirm with user)
    - **Add a module** — create page file, update nav.adoc, and if zerotouch update `antora.modules` in ui-config.yml and create runtime-automation stubs
    - **Replace placeholders** — swap `/placeholder` tabs with real URLs
-   - **Set up automation** — scaffold automation directories if `automation/` doesn't exist yet (follow Automation Scaffolding below)
+   - **Set up automation** — see the Automation Scaffolding reference (below). If `.scaffolds/`
+     still exists, delegate to Route A instead so `scaffold.py --automation` can run before it's
+     removed. If `.scaffolds/` is already gone, automation directories must be created manually
+     (pull them from the `rhdp-publishing-house-template` repo directly) — `scaffold.py --automation`
+     only works on a project's first scaffolding run
 
 3. Apply changes while preserving format consistency. When modifying ui-config.yml, maintain the correct format for the detected content mode.
 
@@ -318,47 +338,83 @@ Only specify `port` on a tab if the service runs on a non-standard port (not 80 
 
 ## Automation Scaffolding
 
-This procedure creates the automation directory skeleton based on the project's automation type
-and cluster topology. It runs automatically during initial scaffolding (Route A, step A.4) and
-can be triggered from Route C when the user asks to set up automation.
+`scaffold.py --automation {ansible,gitops,both}` creates the automation directory skeleton —
+this is handled by the script itself (Route A, step A.2), not by manually copying files. Its
+source templates live in `.scaffolds/automation/`, which only exists before the project's first
+scaffolding run.
 
-Template files live in the project's `.scaffolds/automation/` directory and are copied into
-`automation/` during scaffolding.
+### What each automation_type creates
 
-### Read spec.yaml
+Reading `project.automation_type` from `publishing-house/spec.yaml`:
 
-Extract from `publishing-house/spec.yaml`:
-- `project.automation_type` — `ansible`, `gitops`, or `both`
-- `spec.environment.topology` — `shared-cluster`, `per-student`, or `cnv-pool`
+| `automation_type` | Flag | Creates |
+|---|---|---|
+| `ansible` | `--automation ansible` | `automation/ansible/` |
+| `gitops` | `--automation gitops` | `automation/gitops/bootstrap-infra/` (+ `automation/gitops/bootstrap-tenant/` if `--topology shared-cluster` was also passed) |
+| `both` | `--automation both` | all of the above |
 
-If `project.automation_type` is empty, unset, or unrecognised → skip automation scaffolding silently.
+If `automation_type` is empty, unset, or unrecognised → omit `--automation` and skip silently.
 
 If the target directory already exists for a given type (`automation/gitops/` or `automation/ansible/`),
-skip that type silently (already scaffolded). To re-scaffold, the user must delete the directory first.
+`scaffold.py` clears and recreates it (with `--force`) or prompts before overwriting — see its
+`--help` for the exact behavior.
 
-### GitOps scaffolding (automation_type: gitops or both)
+- **`automation/gitops/bootstrap-infra/`** — minimal Helm chart with a single test namespace that
+  proves the ArgoCD Application deploys correctly. The author replaces this with real workloads
+  during development.
+- **`automation/gitops/bootstrap-tenant/`** — per-user tenant chart with a single namespace and
+  edit RoleBinding. The deployer creates one ArgoCD Application per user, injecting `username` and
+  `deployer.domain`. Only created when `spec.environment.topology` is `shared-cluster` — for
+  `per-student` or `cnv-pool` topologies, each student gets their own cluster, so there is no
+  multi-tenant deployment and this should NOT be created.
+- **`automation/ansible/`** — starter Ansible collection. Its `galaxy.yml`, example role, and
+  READMEs still have `<placeholder>` tokens after scaffolding — fill them in immediately after
+  (see below) rather than leaving them for the author to find.
 
-Copy `.scaffolds/automation/gitops/bootstrap-infra/` to `automation/gitops/bootstrap-infra/`.
+### Filling in the Ansible collection
 
-This creates a minimal Helm chart with a single test namespace that proves the ArgoCD
-Application deploys correctly. The author replaces this with real workloads during development.
+Immediately after `scaffold.py` creates `automation/ansible/` (whether from `--automation ansible`
+or `--automation both`), fill in its placeholders using real project values. Full rules and
+rationale are in @rhdp-publishing-house/skills/development/references/ansible-conventions.md —
+follow it exactly rather than improvising the derivation or the naming validation.
 
-**If `spec.environment.topology` is `shared-cluster`**, also copy
-`.scaffolds/automation/gitops/bootstrap-tenant/` to `automation/gitops/bootstrap-tenant/`.
+1. **Read project identity.** From `catalog-info.yaml`: `metadata.name` (repo name), annotation
+   `ph.rhdp.io/github-user`, annotation `ph.rhdp.io/owner` (email). Fall back to
+   `publishing-house/spec.yaml` (`project.slug`, `project.owner_email`) for whichever fields
+   `catalog-info.yaml` doesn't have. If neither source has a value, ask the author directly —
+   never write a placeholder into a real file.
 
-This creates a per-user tenant chart with a single namespace and edit RoleBinding.
-The deployer creates one ArgoCD Application per user, injecting `username` and `deployer.domain`.
+2. **Derive and validate the namespace.** Replace `-` with `_` in the repo name. If the result
+   starts with a digit, is under 3 characters, or has consecutive underscores, it fails Ansible's
+   naming rules — stop and ask the author for a valid namespace instead of writing a broken one:
+   > The repo name `<repo-name>` doesn't map to a valid Ansible namespace (`<reason>`). What
+   > namespace would you like to use? Lowercase letters/digits/underscores only, 3+ characters,
+   > can't start with a digit or underscore, no double underscores.
 
-If topology is `per-student` or `cnv-pool` → do NOT copy `bootstrap-tenant/`. Each student
-gets their own cluster, so there is no multi-tenant deployment.
+3. **Fill `automation/ansible/galaxy.yml`:**
+   - `namespace: "<derived-or-provided>"`
+   - `authors: ["<github-user> <owner-email>"]`
+   - `repository: "https://github.com/rhpds/<repo-name>"`
+   - Leave `name` alone — it already ships as `"automation"`, not a placeholder. Leave `license`
+     untouched too — there's no signal for which license the org wants.
 
-### Ansible scaffolding (automation_type: ansible or both)
+4. **Fill `automation/ansible/roles/example/meta/main.yml`** — set `galaxy_info.author` to the
+   GitHub username. Leave `license` untouched, same reasoning.
 
-Copy `.scaffolds/automation/ansible/` to `automation/ansible/`.
+5. **Update the FQCN examples** in `automation/ansible/README.md` and
+   `automation/ansible/roles/example/README.md` — both ship with `<your_namespace>.automation.*`
+   placeholders; replace `<your_namespace>` with the derived namespace in each.
 
-This creates a placeholder directory with `.gitkeep`. Tell the author:
-> Ansible automation is not yet implemented (RHDPCD-110). The `automation/ansible/` directory
-> is a placeholder — build your Ansible automation there when ready.
+Include the resulting namespace in the overall scaffolding summary (below), not as a separate message.
+
+### Adding bootstrap-tenant/ after the fact
+
+Topology is normally decided during intake, *after* the first `scaffold.py` run — by which point
+`.scaffolds/automation/` is already gone. If topology later turns out to be `shared-cluster` and
+`bootstrap-tenant/` wasn't created on that first run, it must be added manually: pull
+`.scaffolds/automation/gitops/bootstrap-tenant/` from the `rhdp-publishing-house-template` repository
+directly and copy it into this project's `automation/gitops/bootstrap-tenant/`. There is no
+automated re-scaffold path once `.scaffolds/` has been removed.
 
 ### After scaffolding
 
@@ -372,7 +428,9 @@ Summarise what was created:
 > **Automation skeleton created:**
 > - `automation/gitops/bootstrap-infra/` — Helm chart with a test namespace (replace with real workloads)
 > [If tenant:] - `automation/gitops/bootstrap-tenant/` — per-user namespace and RBAC
-> [If ansible:] - `automation/ansible/` — placeholder for Ansible automation (RHDPCD-110)
+> [If ansible:] - `automation/ansible/` — namespace `<namespace>`, collection `automation`,
+>   author `<github-user> <owner-email>`. Still needs: pick a `license`, then rename or replace
+>   `roles/example/` with real automation.
 >
 > See the [GitOps patterns reference](references/gitops-patterns.md) for sync-wave ordering,
 > operator quirks, and deployment conventions.
