@@ -166,7 +166,7 @@ If a resource looks tenant-scoped but `automation/bootstrap-tenant/` does not ex
 > "This resource looks per-user but there's no tenant chart. Should I create
 > `automation/bootstrap-tenant/`, or place this in infra?"
 
-If the user wants tenant, copy the tenant scaffold from `@showroom/templates/automation/bootstrap-tenant/`
+If the user wants tenant, copy the tenant scaffold from `.scaffolds/automation/bootstrap-tenant/`
 into `automation/bootstrap-tenant/`.
 
 ### 7b. Generate templates

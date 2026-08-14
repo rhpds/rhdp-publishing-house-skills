@@ -322,9 +322,8 @@ This procedure creates the automation directory skeleton based on the project's 
 and cluster topology. It runs automatically during initial scaffolding (Route A, step A.4) and
 can be triggered from Route C when the user asks to set up automation.
 
-Template files live in `@showroom/templates/automation/` and are copied into the project's
-`automation/` directory. The same templates are included in `.scaffolds/` for new projects
-created through the RHDH software template.
+Template files live in the project's `.scaffolds/automation/` directory and are copied into
+`automation/` during scaffolding.
 
 ### Read spec.yaml
 
@@ -339,13 +338,13 @@ the user must delete the directory first.
 
 ### GitOps scaffolding (automation_type: gitops or both)
 
-Copy `@showroom/templates/automation/bootstrap-infra/` to `automation/bootstrap-infra/`.
+Copy `.scaffolds/automation/bootstrap-infra/` to `automation/bootstrap-infra/`.
 
 This creates a minimal Helm chart with a single test namespace that proves the ArgoCD
 Application deploys correctly. The author replaces this with real workloads during development.
 
 **If `spec.environment.topology` is `shared-cluster`**, also copy
-`@showroom/templates/automation/bootstrap-tenant/` to `automation/bootstrap-tenant/`.
+`.scaffolds/automation/bootstrap-tenant/` to `automation/bootstrap-tenant/`.
 
 This creates a per-user tenant chart with a single namespace and edit RoleBinding.
 The deployer creates one ArgoCD Application per user, injecting `username` and `deployer.domain`.
@@ -355,7 +354,7 @@ gets their own cluster, so there is no multi-tenant deployment.
 
 ### Ansible scaffolding (automation_type: ansible or both)
 
-Copy `@showroom/templates/automation/ansible/` to `automation/ansible/`.
+Copy `.scaffolds/automation/ansible/` to `automation/ansible/`.
 
 This creates a placeholder directory with `.gitkeep`. Tell the author:
 > Ansible automation is not yet implemented (RHDPCD-110). The `automation/ansible/` directory
