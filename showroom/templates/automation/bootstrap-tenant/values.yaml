@@ -1,0 +1,7 @@
+deployer:
+  domain: apps.example.com
+
+username: user1
+
+namespaces:
+  - app

@@ -293,7 +293,18 @@ If `development.automation.status` is already `complete`:
 > 2. Back to dashboard
 
 Otherwise, set `development.automation.status: in_progress` if currently `not_started`, commit, then
-read `project.automation_type` from `spec.yaml` and show the appropriate menu:
+read `project.automation_type` from `spec.yaml` and check if `automation/` directory exists.
+
+**If `automation/` directory does not exist:**
+> "The automation skeleton hasn't been created yet. Would you like me to scaffold it?"
+> 1. Yes, scaffold automation directories
+> 2. Back to dashboard
+
+- **1** → follow `procedures/config-helper.md` (Automation Scaffolding section). When it completes, return to dashboard.
+- **2** → return to dashboard.
+
+**If `automation/` directory exists**, read `project.automation_type` from `spec.yaml` and show the
+appropriate menu:
 
 **If `automation_type` is `gitops`:**
 
@@ -301,7 +312,7 @@ read `project.automation_type` from `spec.yaml` and show the appropriate menu:
 >
 > | # | Option |
 > |---|--------|
-> | 1 | GitOps helper (generates Helm + ArgoCD) |
+> | 1 | GitOps helper (populates Helm charts with workloads) |
 > | 2 | Mark automation complete |
 > | 3 | Back to dashboard |
 
@@ -319,7 +330,7 @@ read `project.automation_type` from `spec.yaml` and show the appropriate menu:
 > | 2 | Mark automation complete |
 > | 3 | Back to dashboard |
 
-- **1** → inform: "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible automation manually. Select option 2 when done."
+- **1** → inform: "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible automation manually in `automation/ansible/`. Select option 2 when done."
 - **2** → set complete, commit, push, close Jira (see below).
 - **3** → return to dashboard.
 
@@ -329,13 +340,13 @@ read `project.automation_type` from `spec.yaml` and show the appropriate menu:
 >
 > | # | Option |
 > |---|--------|
-> | 1 | GitOps helper (generates Helm + ArgoCD) |
+> | 1 | GitOps helper (populates Helm charts with workloads) |
 > | 2 | Ansible helper *(not yet implemented — RHDPCD-110)* |
 > | 3 | Mark automation complete |
 > | 4 | Back to dashboard |
 
 - **1** → dispatch to `rhdp-publishing-house:gitops-helper` skill. When it returns, return to dashboard.
-- **2** → inform: "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible automation manually."
+- **2** → inform: "The Ansible helper skill is not yet implemented (RHDPCD-110). Please build your Ansible automation manually in `automation/ansible/`."
 - **3** → set complete, commit, push, close Jira (see below).
 - **4** → return to dashboard.
 

@@ -19,6 +19,7 @@ See @rhdp-publishing-house/skills/automation-helper/references/automation-patter
 See @rhdp-publishing-house/skills/automation-helper/references/ansible-automation-guide.md for Ansible collection structure.
 See @rhdp-publishing-house/skills/automation-helper/references/gitops-automation-guide.md for GitOps (Helm + ArgoCD) patterns.
 See @rhdp-publishing-house/skills/automation-helper/references/automation-manifest-format.md for the automation manifest format.
+See @rhdp-publishing-house/skills/development/references/gitops-patterns.md for GitOps conventions and reference repo patterns.
 
 ## Step 1: Determine Sub-Phase
 
@@ -52,11 +53,15 @@ Do NOT call agnosticv skills — catalog automation is handled by PH-native skil
 Dispatch to the appropriate PH skill based on `automation_approach` in the manifest:
 
 - `ansible`  → Skill tool: `rhdp-publishing-house:ansible-helper`  (FUTURE — RHDPCD-110)
-- `gitops`   → Skill tool: `rhdp-publishing-house:gitops-helper`   (FUTURE — RHDPCD-111)
+- `gitops`   → Skill tool: `rhdp-publishing-house:gitops-helper`
 - `both`     → ansible-helper first, then gitops-helper
 
-**FUTURE:** These skills do not exist yet. Until they are created, refer to the reference guides
-below and write automation collaboratively with the author using the manifest as the spec.
+The automation directories (`automation/bootstrap-infra/`, etc.) are created by the config-helper's
+Automation Scaffolding during initial project scaffolding. The gitops-helper populates them with
+real workloads.
+
+**FUTURE:** The Ansible helper skill does not exist yet. Until it is created, refer to the reference
+guides below and write Ansible automation collaboratively with the author using the manifest as the spec.
 
 See the detailed guides for code structure and patterns.
 

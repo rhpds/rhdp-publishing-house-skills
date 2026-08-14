@@ -6,6 +6,10 @@ This directory contains AsciiDoc templates used by `/create-lab` and `/create-de
 
 ```
 templates/
+├── automation/    # GitOps and Ansible scaffolds for .scaffolds/
+│   ├── bootstrap-infra/   # Helm chart — cluster-scoped shared resources
+│   ├── bootstrap-tenant/  # Helm chart — per-user tenant (shared-cluster only)
+│   └── ansible/           # Placeholder for Ansible automation
 ├── demo/          # Demo (presenter-led) templates
 │   ├── 00-index.adoc
 │   ├── 01-overview.adoc
@@ -35,10 +39,19 @@ Skills that use these templates:
 
 - **`/create-lab`** - Uses workshop templates to generate multi-module hands-on labs
 - **`/create-demo`** - Uses demo templates to generate presenter-led demonstrations
+- **`config-helper`** - Uses automation templates to scaffold GitOps (Helm + ArgoCD) directories
 
 The skills automatically read these templates from the plugin's `showroom/templates/` directory when installed via the Claude Code marketplace.
 
 ## Template Purpose
+
+### Automation Templates
+
+- **bootstrap-infra/**: Helm chart for cluster-scoped shared resources with a test app (namespace + deployment) gated by `testApp.enabled`. Copied into `automation/` when `project.automation_type` is `gitops` or `both`.
+- **bootstrap-tenant/**: Helm chart for per-user tenant environments (namespace creation + RBAC). Only copied when `spec.environment.topology` is `shared-cluster`.
+- **ansible/**: Placeholder directory (`.gitkeep`) for Ansible automation (RHDPCD-110). Copied when `automation_type` is `ansible` or `both`.
+
+These templates are also included in `.scaffolds/` for new projects created through the RHDH software template.
 
 ### Demo Templates
 
