@@ -27,13 +27,15 @@ flowchart TD
     Dashboard -->|all complete| Submit["Step 3: Submit\nph-development.py"]
 
     Dashboard -->|option 1| Modules["Module sub-menu\nstart/complete modules\nph-task-complete.py"]
-    Dashboard -->|option 2| Auto["Automation sub-menu\n1. GitOps helper\n2. Ansible (placeholder)\n3. Mark complete"]
+    Dashboard -->|option 2| Auto["Automation sub-menu\nscaffold or populate"]
     Dashboard -->|option 3| E2E["E2E sub-menu\n1. Mark complete\n2. Back"]
     Dashboard -->|option 4| HC["Health Check sub-menu\n1. Mark complete\n2. Back"]
     Dashboard -->|option 5| Config["Showroom Config\n1. config-helper\n2. config-reviewer\n3. Back"]
 
-    Auto -->|option 1| GH["[Skill] gitops-helper"]
-    Auto -->|option 2| AH["Ansible helper\nFUTURE - RHDPCD-110"]
+    Auto -->|no automation/ dir| CH2["procedures/config-helper.md\nAutomation Scaffolding"]
+    Auto -->|automation/ exists| AutoMenu["1. GitOps helper\n2. Ansible (placeholder)\n3. Mark complete"]
+    AutoMenu -->|option 1| GH["[Skill] gitops-helper"]
+    AutoMenu -->|option 2| AH["Ansible helper\nFUTURE - RHDPCD-110"]
 
     Modules -.->|author invokes directly| WriterHelper["rhdp-publishing-house:writer-helper\nOPTIONAL"]
     Modules -.->|author invokes directly| ReviewerHelper["rhdp-publishing-house:reviewer-helper\nOPTIONAL"]
@@ -65,7 +67,7 @@ User
       |                                                                  |
       |   Step 2: Development Dashboard (numbered options)               |
       |   +- 1. Modules    -> module sub-menu (start/complete)           |
-      |   +- 2. Automation -> gitops-helper / ansible (placeholder)      |
+      |   +- 2. Automation -> config-helper scaffold / gitops-helper        |
       |   +- 3. E2E Tests  -> mark complete (placeholder)               |
       |   +- 4. Health Check -> mark complete (placeholder)              |
       |   +- 5. Showroom Config -> config-helper / config-reviewer       |
