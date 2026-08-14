@@ -169,10 +169,8 @@ Include these rows **only if incomplete**:
 - **Modules** — show if any module is not `complete` (display "N of M complete")
 - **GitOps Automation** — show if `automation_type` is `gitops` or `both` AND `development.automation.gitops.status` is not `complete`
 - **Ansible Automation** — show if `automation_type` is `ansible` or `both` AND `development.automation.ansible.status` is not `complete`
-
-Include these rows **only if all automation children are complete AND the workstream is incomplete**:
-- **E2E Tests *(optional)*** — show if `development.e2e.status` is not `complete`
-- **Health Check *(optional)*** — show if `development.healthCheck.status` is not `complete`
+- **E2E Tests** — show if `development.e2e.status` is not `complete`
+- **Health Check** — show if `development.healthCheck.status` is not `complete`
 
 Always include:
 - **Showroom Config** — always shown (set up / review)
@@ -180,9 +178,6 @@ Always include:
 Number rows sequentially starting at 1 based on what is shown.
 
 > Type a number to work on that item.
-
-If E2E or Health Check rows are shown, append:
-> E2E Tests and Health Check are optional — you can submit without completing them.
 
 **If this is the first visit** (all modules `not_started` and all development fields `not_started`),
 append:
@@ -193,15 +188,14 @@ append:
 
 ### Step 4 — Submission gate
 
-**Trigger:** Required workstreams are complete:
+**Trigger:** All required workstreams are complete:
 - All modules have `status: complete`
 - All applicable automation children have `status: complete` (gitops and/or ansible based on `project.automation_type`)
-
-E2E Tests and Health Check are **not required** for submission.
+- `development.e2e.status` is `complete`
+- `development.healthCheck.status` is `complete`
 
 **Required complete →**
-> "Modules and automation are complete. Would you like to submit development?"
-> *(If E2E or Health Check are incomplete, add: "E2E Tests and Health Check are still incomplete but are optional.")*
+> "All workstreams are complete. Would you like to submit development?"
 
 - **Yes** →
   1. Run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
@@ -364,7 +358,7 @@ Otherwise, check if `automation/ansible/` directory exists.
   Return to dashboard.
 - **3** → return to dashboard.
 
-#### Option — E2E Tests (only shown when all automation children are complete)
+#### Option — E2E Tests
 
 If `development.e2e.status` is already `complete`:
 > "E2E tests are already complete. Would you like to reopen?"
@@ -390,7 +384,7 @@ Otherwise, set `development.e2e.status: in_progress` if currently `not_started`,
   4. Return to dashboard.
 - **2** → return to dashboard.
 
-#### Option — Health Check (only shown when all automation children are complete)
+#### Option — Health Check
 
 If `development.healthCheck.status` is already `complete`:
 > "Health check is already complete. Would you like to reopen?"
