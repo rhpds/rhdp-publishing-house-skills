@@ -333,18 +333,18 @@ Extract from `publishing-house/spec.yaml`:
 
 If `project.automation_type` is empty, unset, or unrecognised → skip automation scaffolding silently.
 
-If `automation/` directory already exists → skip silently (already scaffolded). To re-scaffold,
-the user must delete the directory first.
+If the target directory already exists for a given type (`automation/gitops/` or `automation/ansible/`),
+skip that type silently (already scaffolded). To re-scaffold, the user must delete the directory first.
 
 ### GitOps scaffolding (automation_type: gitops or both)
 
-Copy `.scaffolds/automation/bootstrap-infra/` to `automation/bootstrap-infra/`.
+Copy `.scaffolds/automation/gitops/bootstrap-infra/` to `automation/gitops/bootstrap-infra/`.
 
 This creates a minimal Helm chart with a single test namespace that proves the ArgoCD
 Application deploys correctly. The author replaces this with real workloads during development.
 
 **If `spec.environment.topology` is `shared-cluster`**, also copy
-`.scaffolds/automation/bootstrap-tenant/` to `automation/bootstrap-tenant/`.
+`.scaffolds/automation/gitops/bootstrap-tenant/` to `automation/gitops/bootstrap-tenant/`.
 
 This creates a per-user tenant chart with a single namespace and edit RoleBinding.
 The deployer creates one ArgoCD Application per user, injecting `username` and `deployer.domain`.
@@ -370,8 +370,8 @@ git commit -m "feat: scaffold automation directories"
 
 Summarise what was created:
 > **Automation skeleton created:**
-> - `automation/bootstrap-infra/` — Helm chart with a test namespace (replace with real workloads)
-> [If tenant:] - `automation/bootstrap-tenant/` — per-user namespace and RBAC
+> - `automation/gitops/bootstrap-infra/` — Helm chart with a test namespace (replace with real workloads)
+> [If tenant:] - `automation/gitops/bootstrap-tenant/` — per-user namespace and RBAC
 > [If ansible:] - `automation/ansible/` — placeholder for Ansible automation (RHDPCD-110)
 >
 > See the [GitOps patterns reference](references/gitops-patterns.md) for sync-wave ordering,
