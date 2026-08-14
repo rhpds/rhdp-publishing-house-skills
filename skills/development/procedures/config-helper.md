@@ -7,6 +7,7 @@ configure tabs, and create automation directory skeletons.
 See @rhdp-publishing-house/skills/development/references/showroom-patterns.md for the three lab patterns and their complete config examples.
 See @rhdp-publishing-house/skills/development/references/config-files.md for the full reference on every config file.
 See @rhdp-publishing-house/skills/development/references/gitops-patterns.md for GitOps (Helm + ArgoCD) conventions and patterns.
+See @rhdp-publishing-house/skills/development/references/ansible-conventions.md for Ansible collection naming rules and how to fill in the starter collection.
 
 ## Step 1 — Detect Repo Context
 
@@ -366,9 +367,45 @@ If the target directory already exists for a given type (`automation/gitops/` or
   `deployer.domain`. Only created when `spec.environment.topology` is `shared-cluster` — for
   `per-student` or `cnv-pool` topologies, each student gets their own cluster, so there is no
   multi-tenant deployment and this should NOT be created.
-- **`automation/ansible/`** — placeholder starter Ansible collection. Tell the author:
-  > Ansible automation is not yet implemented (RHDPCD-110). The `automation/ansible/` directory
-  > is a placeholder — build your Ansible automation there when ready.
+- **`automation/ansible/`** — starter Ansible collection. Its `galaxy.yml`, example role, and
+  READMEs still have `<placeholder>` tokens after scaffolding — fill them in immediately after
+  (see below) rather than leaving them for the author to find.
+
+### Filling in the Ansible collection
+
+Immediately after `scaffold.py` creates `automation/ansible/` (whether from `--automation ansible`
+or `--automation both`), fill in its placeholders using real project values. Full rules and
+rationale are in @rhdp-publishing-house/skills/development/references/ansible-conventions.md —
+follow it exactly rather than improvising the derivation or the naming validation.
+
+1. **Read project identity.** From `catalog-info.yaml`: `metadata.name` (repo name), annotation
+   `ph.rhdp.io/github-user`, annotation `ph.rhdp.io/owner` (email). Fall back to
+   `publishing-house/spec.yaml` (`project.slug`, `project.owner_email`) for whichever fields
+   `catalog-info.yaml` doesn't have. If neither source has a value, ask the author directly —
+   never write a placeholder into a real file.
+
+2. **Derive and validate the namespace.** Replace `-` with `_` in the repo name. If the result
+   starts with a digit, is under 3 characters, or has consecutive underscores, it fails Ansible's
+   naming rules — stop and ask the author for a valid namespace instead of writing a broken one:
+   > The repo name `<repo-name>` doesn't map to a valid Ansible namespace (`<reason>`). What
+   > namespace would you like to use? Lowercase letters/digits/underscores only, 3+ characters,
+   > can't start with a digit or underscore, no double underscores.
+
+3. **Fill `automation/ansible/galaxy.yml`:**
+   - `namespace: "<derived-or-provided>"`
+   - `authors: ["<github-user> <owner-email>"]`
+   - `repository: "https://github.com/rhpds/<repo-name>"`
+   - Leave `name` alone — it already ships as `"automation"`, not a placeholder. Leave `license`
+     untouched too — there's no signal for which license the org wants.
+
+4. **Fill `automation/ansible/roles/example/meta/main.yml`** — set `galaxy_info.author` to the
+   GitHub username. Leave `license` untouched, same reasoning.
+
+5. **Update the FQCN examples** in `automation/ansible/README.md` and
+   `automation/ansible/roles/example/README.md` — both ship with `<your_namespace>.automation.*`
+   placeholders; replace `<your_namespace>` with the derived namespace in each.
+
+Include the resulting namespace in the overall scaffolding summary (below), not as a separate message.
 
 ### Adding bootstrap-tenant/ after the fact
 
@@ -391,7 +428,9 @@ Summarise what was created:
 > **Automation skeleton created:**
 > - `automation/gitops/bootstrap-infra/` — Helm chart with a test namespace (replace with real workloads)
 > [If tenant:] - `automation/gitops/bootstrap-tenant/` — per-user namespace and RBAC
-> [If ansible:] - `automation/ansible/` — placeholder for Ansible automation (RHDPCD-110)
+> [If ansible:] - `automation/ansible/` — namespace `<namespace>`, collection `automation`,
+>   author `<github-user> <owner-email>`. Still needs: pick a `license`, then rename or replace
+>   `roles/example/` with real automation.
 >
 > See the [GitOps patterns reference](references/gitops-patterns.md) for sync-wave ordering,
 > operator quirks, and deployment conventions.

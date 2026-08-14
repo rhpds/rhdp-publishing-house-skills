@@ -7,6 +7,7 @@ severity-rated findings and fix suggestions.
 See @rhdp-publishing-house/skills/development/references/validation-rules.md for all rules, severity definitions, and the report format.
 See @rhdp-publishing-house/skills/development/references/showroom-patterns.md for pattern detection and config expectations.
 See @rhdp-publishing-house/skills/development/references/config-files.md for file format reference.
+See @rhdp-publishing-house/skills/development/references/ansible-conventions.md for Ansible collection naming rules (used by G-rules).
 
 ## Step 1 — Read Config Files
 
@@ -27,6 +28,7 @@ Also check for the presence of:
 - `setup-automation/` directory (indicates ZT Guided)
 - `lab-metadata.yml` at repo root (indicates ZT Guided — required for ZT catalog integration)
 - `publishing-house/spec.yaml` (indicates PH project)
+- `automation/ansible/galaxy.yml` (indicates Ansible automation was scaffolded — gates G-rules)
 
 **For PH projects only** (`publishing-house/spec.yaml` present), also read:
 - `spec.modules` from `spec.yaml` — the `id`/`title`/`status` of each module, needed to gate J-02 and J-04
@@ -108,6 +110,15 @@ Run X-1 through X-6. Key checks:
 - **X-2** (HIGH): Zerotouch modules match page filenames
 - **X-3** (HIGH): Zerotouch has runtime-automation per module
 - **X-6** (MEDIUM): Tab terminal syntax matches infra type
+
+### Ansible collection (G-rules) — skip if `automation/ansible/galaxy.yml` is absent
+
+Run G-1 through G-4. Key checks:
+- **G-1** (HIGH): `namespace`/`authors` in `galaxy.yml` are not still placeholders
+- **G-2** (CRITICAL): `namespace` and `name` satisfy Ansible's collection naming rules — see
+  @rhdp-publishing-house/skills/development/references/ansible-conventions.md
+- **G-3** (LOW): `repository` points to the real repo, not the placeholder
+- **G-4** (LOW): each role's `meta/main.yml` `galaxy_info.author` is not a placeholder
 
 ### Module & page coverage (J-rules) — PH projects only
 
