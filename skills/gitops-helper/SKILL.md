@@ -1,13 +1,18 @@
 ---
 name: rhdp-publishing-house:gitops-helper
-description: This skill should be used when the user asks to "write GitOps automation", "create Helm charts", "set up ArgoCD for this lab", "generate GitOps manifests", "build GitOps deployment", or "deploy with Helm and ArgoCD". Generates GitOps (Helm + ArgoCD) automation for RHDP lab environments following rhdp-gitops-patterns conventions.
+description: This skill should be used when the user asks to "write GitOps automation", "create Helm charts", "set up ArgoCD for this lab", "generate GitOps manifests", "build GitOps deployment", or "deploy with Helm and ArgoCD". Populates existing GitOps automation directories (Helm + ArgoCD) with real workloads for RHDP lab environments following rhdp-gitops-patterns conventions.
 context: main
 ---
 
 # GitOps Helper
 
-You generate GitOps automation (Helm charts + ArgoCD manifests) for RHDP lab and demo environments.
-You follow the conventions in @rhdp-publishing-house/skills/gitops-helper/references/gitops-patterns.md.
+You populate existing GitOps automation directories with real workloads (Helm templates + ArgoCD
+manifests) for RHDP lab and demo environments. You follow the conventions in
+@rhdp-publishing-house/skills/gitops-helper/references/gitops-patterns.md.
+
+The `automation/bootstrap-infra/` (and optionally `bootstrap-tenant/`) directories are created
+by the config-helper's Automation Scaffolding during initial project scaffolding. This skill
+works with those existing directories — it does NOT create them.
 
 ## Tool Boundaries
 
@@ -64,9 +69,24 @@ python publishing-house/tools/ph-sync.py
 
 ---
 
-## Step 3 — Clone reference repo
+## Step 3 — Verify automation directories exist
 
-Clone the RHDP GitOps patterns repo. This is required — the skeleton and examples
+Check that the automation directories are already scaffolded:
+
+```bash
+test -d automation/bootstrap-infra && echo "infra:yes" || echo "infra:no"
+test -d automation/bootstrap-tenant && echo "tenant:yes" || echo "tenant:no"
+```
+
+- `infra:no` → STOP. Tell the author:
+  > "The `automation/bootstrap-infra/` directory doesn't exist yet. Run the
+  > **development** skill and select **Automation** to scaffold the automation
+  > directories first, then come back here to populate them with workloads."
+- `infra:yes` → proceed. Note whether `tenant:yes` for later steps.
+
+## Step 4 — Clone reference repo
+
+Clone the RHDP GitOps patterns repo. This is required — the examples
 are the foundation for all generated automation.
 
 ```bash
@@ -75,9 +95,9 @@ git clone --depth 1 https://github.com/rhpds/rhdp-gitops-patterns.git /tmp/rhdp-
 
 **If the clone fails → STOP.** Tell the user:
 > "Cannot clone the rhdp-gitops-patterns reference repo. This skill requires it for
-> the skeleton and examples. Check your network connection and try again."
+> examples. Check your network connection and try again."
 
-## Step 4 — Additional reference repos
+## Step 5 — Additional reference repos
 
 Use `AskUserQuestion` with two options:
 
@@ -85,7 +105,7 @@ Use `AskUserQuestion` with two options:
 - **"Add additional reference repos"** — free text where the user can provide extra repo URLs
   to use as examples alongside the default patterns repo.
 
-Additional repos are for **examples only** — they do not replace the skeleton or the default
+Additional repos are for **examples only** — they do not replace the default
 examples. Clone each one to `/tmp/user-gitops-ref-N/`:
 
 ```bash
@@ -94,34 +114,34 @@ git clone --depth 1 REPO_URL /tmp/user-gitops-ref-1 2>&1
 
 If any additional clone fails, warn the user and continue with whatever succeeded.
 
-## Step 5 — Gather inputs
+## Step 6 — Gather inputs
 
 Collect inputs in this priority order, combining all sources:
 
-### 5a. Automation manifest
+### 6a. Automation manifest
 
 Look for `publishing-house/spec/automation-manifest.yaml` (PH mode) or any YAML file the
 user points to. If it exists, read it.
 This is one input — not a contract. Do not require specific fields or a specific format.
 Use whatever is there to inform your work.
 
-### 5b. Skill arguments
+### 6b. Skill arguments
 
 Check if the user passed arguments when invoking the skill. Combine with manifest data.
 
-### 5c. Project context (PH mode only)
+### 6c. Project context (PH mode only)
 
 If in a Publishing House project:
 - Read `publishing-house/spec.yaml` for project metadata (products, platform, ocp_version, topology)
 - Read `publishing-house/spec/design.md` for the full design spec
 - Read module outlines in `publishing-house/spec/modules/` for what needs pre-configuration
 
-### 5d. Clarifying questions
+### 6d. Clarifying questions
 
 After analyzing all available inputs, determine what is still unclear or missing.
 Ask the user clarifying questions for anything you cannot determine from the inputs.
 
-If no manifest was found in 5a, ask the user:
+If no manifest was found in 6a, ask the user:
 > "I didn't find an automation manifest. Do you have one you'd like to point me to?"
 
 If the user provides a path, read it and combine with other inputs.
@@ -134,54 +154,6 @@ If no manifest is available at all, ask the user what they need deployed:
 
 Always combine all inputs — manifest, arguments, project context, and user answers.
 
-## Step 6 — Scaffold
-
-### 6a. Determine chart structure
-
-`bootstrap-infra` is always generated — every lab needs cluster-scoped resources.
-
-`bootstrap-tenant` is only needed for multi-user labs where per-user environments are deployed
-N times. Single-user or shared-cluster labs may only need infra.
-
-Analyze the gathered inputs to determine whether tenant is needed. Signals that suggest tenant:
-- Multiple users or per-user namespaces mentioned
-- Per-user RBAC, applications, or VMs
-- Topology is per-student or multi-user
-- Manifest has `multi_user: true` or `users_per_deployment > 1`
-
-Signals that suggest infra-only:
-- Single user or single deployment
-- No per-user resources, everything is cluster-wide
-- Lab is a shared environment with no user isolation
-
-Use `AskUserQuestion` with your recommendation based on the inputs:
-- **"Infra + Tenant (Recommended)"** or **"Infra only (Recommended)"** — whichever fits the inputs.
-- The other option as the alternative.
-
-### 6b. Run the scaffold script
-
-Use the deterministic scaffold script from the cloned reference repo:
-
-```bash
-/tmp/rhdp-gitops-patterns/scaffold.sh --target automation
-```
-
-If tenant was confirmed in 6a, add the flag:
-```bash
-/tmp/rhdp-gitops-patterns/scaffold.sh --target automation --with-tenant
-```
-
-If the script fails → STOP and show the error.
-
-### 6c. Customize values
-
-After scaffolding, edit the copied files with project-specific values:
-
-- `automation/bootstrap-infra/values.yaml` — update tenant-lifecycle config and any
-  infra-level settings from the gathered inputs.
-- If tenant was scaffolded: `automation/bootstrap-tenant/values.yaml` — set the namespace
-  list, deployer domain from the gathered inputs.
-
 ## Step 7 — Populate templates
 
 ### 7a. Classify resources
@@ -190,12 +162,12 @@ For each component from the inputs, decide:
 - **Infra** if cluster-wide or shared (operators, shared services) → `automation/bootstrap-infra/templates/`
 - **Tenant** if per-user (applications, VMs, RBAC, seed data) → `automation/bootstrap-tenant/templates/`
 
-If a resource looks tenant-scoped but no tenant chart was scaffolded, warn the user:
-> "This resource looks per-user but there's no tenant chart. Should I add bootstrap-tenant,
-> or place this in infra?"
+If a resource looks tenant-scoped but `automation/bootstrap-tenant/` does not exist, warn the user:
+> "This resource looks per-user but there's no tenant chart. Should I create
+> `automation/bootstrap-tenant/`, or place this in infra?"
 
-If the user wants to add tenant, run the scaffold script again with `--with-tenant`
-(it will only copy bootstrap-tenant since bootstrap-infra already exists).
+If the user wants tenant, copy the tenant scaffold from `.scaffolds/automation/bootstrap-tenant/`
+into `automation/bootstrap-tenant/`.
 
 ### 7b. Generate templates
 
@@ -265,7 +237,7 @@ ocp4_workload_gitops_bootstrap_helm_values:
   ...
 ```
 
-If `bootstrap-tenant` was generated, also print a tenant snippet:
+If `bootstrap-tenant` exists, also print a tenant snippet:
 ```yaml
 ocp4_workload_gitops_bootstrap_repo_url: https://github.com/ORG/REPO
 ocp4_workload_gitops_bootstrap_repo_revision: "{{ gitops_repo_revision }}"
@@ -309,8 +281,8 @@ After the user has reviewed the generated files (Step 8), ask:
 ## Rules
 
 - The rhdp-gitops-patterns repo is required. If it cannot be cloned, STOP.
+- The automation directories must already exist (created by config-helper scaffolding). This skill does not create them.
 - The automation manifest is an input, not a contract. Accept whatever format and fields are there.
-- Always generate `bootstrap-infra`. Only generate `bootstrap-tenant` when confirmed.
 - Never place tenant resources in shared namespaces.
 - Check examples before generating from scratch.
 - Ask the user when you don't have a reference for a component.

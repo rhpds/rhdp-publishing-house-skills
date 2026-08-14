@@ -6,6 +6,7 @@ configure tabs, and create automation directory skeletons.
 
 See @rhdp-publishing-house/skills/development/references/showroom-patterns.md for the three lab patterns and their complete config examples.
 See @rhdp-publishing-house/skills/development/references/config-files.md for the full reference on every config file.
+See @rhdp-publishing-house/skills/development/references/gitops-patterns.md for GitOps (Helm + ArgoCD) conventions and patterns.
 
 ## Step 1 — Detect Repo Context
 
@@ -58,9 +59,13 @@ python scaffold.py --pattern <pattern-name> --force
 
 After scaffolding, the `ui-config.yml` has placeholder tabs. Follow the Tab Advisor procedure (below) to replace them with real tabs based on the spec's infrastructure.
 
-**A.4 — Verify and adjust:**
+**A.4 — Scaffold automation directories:**
 
-After tab configuration, proceed to Route C (modification flow) if the user wants further changes.
+Follow the Automation Scaffolding procedure (below) to create automation directory skeletons based on the project's `automation_type` and topology. If `automation_type` is empty or unset, skip this step silently.
+
+**A.5 — Verify and adjust:**
+
+After tab and automation configuration, proceed to Route C (modification flow) if the user wants further changes.
 
 ### Route B: No config files exist (new repo)
 
@@ -143,6 +148,7 @@ The repo already has `site.yml` and/or `ui-config.yml`.
    - **Switch content mode** — change theme in site.yml AND format of ui-config.yml (significant change — confirm with user)
    - **Add a module** — create page file, update nav.adoc, and if zerotouch update `antora.modules` in ui-config.yml and create runtime-automation stubs
    - **Replace placeholders** — swap `/placeholder` tabs with real URLs
+   - **Set up automation** — scaffold automation directories if `automation/` doesn't exist yet (follow Automation Scaffolding below)
 
 3. Apply changes while preserving format consistency. When modifying ui-config.yml, maintain the correct format for the detected content mode.
 
@@ -309,6 +315,67 @@ After the conversation, write the complete `tabs:` list to `ui-config.yml`, repl
 ### Port note
 
 Only specify `port` on a tab if the service runs on a non-standard port (not 80 or 443). For standard HTTP/HTTPS, omit `port` entirely.
+
+## Automation Scaffolding
+
+This procedure creates the automation directory skeleton based on the project's automation type
+and cluster topology. It runs automatically during initial scaffolding (Route A, step A.4) and
+can be triggered from Route C when the user asks to set up automation.
+
+Template files live in the project's `.scaffolds/automation/` directory and are copied into
+`automation/` during scaffolding.
+
+### Read spec.yaml
+
+Extract from `publishing-house/spec.yaml`:
+- `project.automation_type` — `ansible`, `gitops`, or `both`
+- `spec.environment.topology` — `shared-cluster`, `per-student`, or `cnv-pool`
+
+If `project.automation_type` is empty, unset, or unrecognised → skip automation scaffolding silently.
+
+If `automation/` directory already exists → skip silently (already scaffolded). To re-scaffold,
+the user must delete the directory first.
+
+### GitOps scaffolding (automation_type: gitops or both)
+
+Copy `.scaffolds/automation/bootstrap-infra/` to `automation/bootstrap-infra/`.
+
+This creates a minimal Helm chart with a single test namespace that proves the ArgoCD
+Application deploys correctly. The author replaces this with real workloads during development.
+
+**If `spec.environment.topology` is `shared-cluster`**, also copy
+`.scaffolds/automation/bootstrap-tenant/` to `automation/bootstrap-tenant/`.
+
+This creates a per-user tenant chart with a single namespace and edit RoleBinding.
+The deployer creates one ArgoCD Application per user, injecting `username` and `deployer.domain`.
+
+If topology is `per-student` or `cnv-pool` → do NOT copy `bootstrap-tenant/`. Each student
+gets their own cluster, so there is no multi-tenant deployment.
+
+### Ansible scaffolding (automation_type: ansible or both)
+
+Copy `.scaffolds/automation/ansible/` to `automation/ansible/`.
+
+This creates a placeholder directory with `.gitkeep`. Tell the author:
+> Ansible automation is not yet implemented (RHDPCD-110). The `automation/ansible/` directory
+> is a placeholder — build your Ansible automation there when ready.
+
+### After scaffolding
+
+Commit the automation directories:
+```bash
+git add automation/
+git commit -m "feat: scaffold automation directories"
+```
+
+Summarise what was created:
+> **Automation skeleton created:**
+> - `automation/bootstrap-infra/` — Helm chart with a test namespace (replace with real workloads)
+> [If tenant:] - `automation/bootstrap-tenant/` — per-user namespace and RBAC
+> [If ansible:] - `automation/ansible/` — placeholder for Ansible automation (RHDPCD-110)
+>
+> See the [GitOps patterns reference](references/gitops-patterns.md) for sync-wave ordering,
+> operator quirks, and deployment conventions.
 
 ## Rules
 

@@ -38,6 +38,8 @@ Skills that use these templates:
 
 The skills automatically read these templates from the plugin's `showroom/templates/` directory when installed via the Claude Code marketplace.
 
+Automation templates (bootstrap-infra, bootstrap-tenant, ansible) live in the project template's `.scaffolds/automation/` directory, not here.
+
 ## Template Purpose
 
 ### Demo Templates
