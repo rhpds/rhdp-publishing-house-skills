@@ -8,7 +8,22 @@ context: main
 
 You create or import Ansible roles inside the project's `automation/ansible/` Ansible Collection.
 
-## Pre-flight (run silently before prompting)
+## Mode Detection
+
+Detect the mode before doing anything else:
+
+```bash
+test -f catalog-info.yaml && test -f publishing-house/spec.yaml && echo "ph" || echo "standalone"
+```
+
+- `ph` → **Publishing House mode**. Start at Step 1.
+- `standalone` → **Standalone mode**. Skip to Step 3.
+
+---
+
+## Steps 1–2 — Publishing House mode only
+
+### Step 1 — Pre-flight
 
 **Detect Python:**
 ```bash
@@ -38,6 +53,35 @@ print(f'owner_email:{email}')
 ```
 Store: `namespace`, `slug`, `owner_email`.
 
+### Step 2 — Workflow check
+
+**RULE: This sequence runs every invocation. No exceptions. No skipping.**
+
+**2a.** Get workflow data:
+```bash
+python publishing-house/tools/ph-workflow-data.py
+```
+If this fails → set `offline_mode = true`, skip to Step 3.
+If this succeeds → extract `workflow_id`. Set `offline_mode = false`.
+
+**2b.** Get workflow state (skip if offline):
+```bash
+python publishing-house/tools/ph-workflow-state.py WORKFLOW_ID
+```
+If stage is not `development` → STOP. Tell the author this skill runs during the development stage.
+If offline → assume `development`.
+
+**2c.** Sync (skip if offline):
+```bash
+python publishing-house/tools/ph-sync.py
+```
+
+---
+
+## Steps 3+ — Both modes
+
+### Step 3 — Verify collection and list roles
+
 **Verify collection directory:**
 ```bash
 test -d automation/ansible && echo "EXISTS" || echo "MISSING"
@@ -63,7 +107,7 @@ Store the result as `existing_roles`. If the directory is empty, `existing_roles
 
 ---
 
-## Step 1 — Show inventory and choose path
+## Step 4 — Show inventory and choose path
 
 **Immediately after pre-flight. Do NOT wait.**
 
