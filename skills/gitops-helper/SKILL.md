@@ -250,19 +250,19 @@ After the user has reviewed the generated files (Step 8), ask:
 > 2. Back to dashboard (I'll finish later)
 
 - **1** →
-  1. Set `development.automation.status: complete` in `publishing-house/spec.yaml`
+  1. Set `development.automation.gitops.status: complete` in `publishing-house/spec.yaml`
   2. Commit and push:
      ```bash
      git add publishing-house/spec.yaml
-     git commit -m "feat: mark automation complete"
+     git commit -m "feat: mark gitops automation complete"
      git push
      ```
   3. Close the Jira ticket:
      ```bash
      python publishing-house/tools/ph-task-complete.py write-automation
      ```
-  4. Confirm: "Automation marked complete. Returning to development dashboard."
-- **2** → Confirm: "Returning to development dashboard. You can come back to automation anytime."
+  4. Confirm: "GitOps automation marked complete. Returning to development dashboard."
+- **2** → Confirm: "Returning to development dashboard. You can come back to GitOps automation anytime."
 
 ## Rules
 
