@@ -257,10 +257,13 @@ After the user has reviewed the generated files (Step 8), ask:
      git commit -m "feat: mark gitops automation complete"
      git push
      ```
-  3. Close the Jira ticket:
+  3. Check if **all** applicable automation children are now `complete` (read `project.automation_type`
+     from spec.yaml — if `both`, check that the other child is also complete). If all complete, close the
+     Jira ticket:
      ```bash
      python publishing-house/tools/ph-task-complete.py write-automation
      ```
+     If other children are still incomplete, do not close the ticket.
   4. Confirm: "GitOps automation marked complete. Returning to development dashboard."
 - **2** → Confirm: "Returning to development dashboard. You can come back to GitOps automation anytime."
 

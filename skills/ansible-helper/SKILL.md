@@ -136,3 +136,31 @@ If `existing_roles` is empty, skip the inventory block and show only the menu.
 
 - **Option 1** → follow `procedures/new-role.md`
 - **Option 2** → follow `procedures/migrate-roles.md`
+
+## Completion confirmation (Publishing House mode only)
+
+Skip this step in standalone mode.
+
+After the procedure completes and the user declines to add/import more roles, ask:
+
+> "Ansible automation work is done. Is automation complete, or do you need to do more work?"
+> 1. Mark automation complete
+> 2. Back to dashboard (I'll finish later)
+
+- **1** →
+  1. Set `development.automation.ansible.status: complete` in `publishing-house/spec.yaml`
+  2. Commit and push:
+     ```bash
+     git add publishing-house/spec.yaml
+     git commit -m "feat: mark ansible automation complete"
+     git push
+     ```
+  3. Check if **all** applicable automation children are now `complete` (read `project.automation_type`
+     from spec.yaml — if `both`, check that the other child is also complete). If all complete, close the
+     Jira ticket:
+     ```bash
+     python publishing-house/tools/ph-task-complete.py write-automation
+     ```
+     If other children are still incomplete, do not close the ticket.
+  4. Confirm: "Ansible automation marked complete. Returning to development dashboard."
+- **2** → Confirm: "Returning to development dashboard. You can come back to Ansible automation anytime."
