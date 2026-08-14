@@ -112,7 +112,9 @@ If a child's status is `in_progress`, ask:
 - **1** →
   1. Set `development.automation.<child>.status: complete` in spec.yaml
   2. Commit and push
-  3. Close the Jira ticket: `python publishing-house/tools/ph-task-complete.py write-automation`
+  3. Check if **all** applicable automation children are now `complete`. If yes, close the Jira ticket:
+     `python publishing-house/tools/ph-task-complete.py write-automation`
+     If other children are still incomplete, do not close the ticket.
 - **2** → leave as `in_progress`, move on.
 
 Ask about each applicable child sequentially before proceeding.

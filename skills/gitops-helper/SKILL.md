@@ -243,26 +243,11 @@ Leave everything else to the chart's `values.yaml` defaults.
 
 Skip this step in standalone mode.
 
-After the user has reviewed the generated files (Step 8), ask:
+After the user has reviewed the generated files (Step 8), confirm:
+> "GitOps automation is generated. You can come back to add more workloads anytime.
+> Returning to development dashboard."
 
-> "GitOps automation is generated. Is automation complete, or do you need to do more work?"
-> 1. Mark automation complete
-> 2. Back to dashboard (I'll finish later)
-
-- **1** →
-  1. Set `development.automation.gitops.status: complete` in `publishing-house/spec.yaml`
-  2. Commit and push:
-     ```bash
-     git add publishing-house/spec.yaml
-     git commit -m "feat: mark gitops automation complete"
-     git push
-     ```
-  3. Close the Jira ticket:
-     ```bash
-     python publishing-house/tools/ph-task-complete.py write-automation
-     ```
-  4. Confirm: "GitOps automation marked complete. Returning to development dashboard."
-- **2** → Confirm: "Returning to development dashboard. You can come back to GitOps automation anytime."
+Do not mark automation complete or close Jira tickets — the development skill handles that.
 
 ## Rules
 
