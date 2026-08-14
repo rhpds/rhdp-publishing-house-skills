@@ -341,15 +341,13 @@ the user must delete the directory first.
 
 Copy `@showroom/templates/automation/bootstrap-infra/` to `automation/bootstrap-infra/`.
 
-This creates a Helm chart with a test app (namespace + minimal pod) that proves the ArgoCD
-Application deploys correctly. The test app is gated by `testApp.enabled: true` in values.yaml.
-Once the author verifies ArgoCD works, they set `testApp.enabled: false` or delete the test
-templates and replace them with real workloads.
+This creates a minimal Helm chart with a single test namespace that proves the ArgoCD
+Application deploys correctly. The author replaces this with real workloads during development.
 
 **If `spec.environment.topology` is `shared-cluster`**, also copy
 `@showroom/templates/automation/bootstrap-tenant/` to `automation/bootstrap-tenant/`.
 
-This creates a per-user tenant chart with namespace creation and RBAC (edit RoleBinding).
+This creates a per-user tenant chart with a single namespace and edit RoleBinding.
 The deployer creates one ArgoCD Application per user, injecting `username` and `deployer.domain`.
 
 If topology is `per-student` or `cnv-pool` → do NOT copy `bootstrap-tenant/`. Each student
@@ -373,8 +371,8 @@ git commit -m "feat: scaffold automation directories"
 
 Summarise what was created:
 > **Automation skeleton created:**
-> - `automation/bootstrap-infra/` — Helm chart with a test app (set `testApp.enabled: false` after verifying)
-> [If tenant:] - `automation/bootstrap-tenant/` — per-user namespace and RBAC chart
+> - `automation/bootstrap-infra/` — Helm chart with a test namespace (replace with real workloads)
+> [If tenant:] - `automation/bootstrap-tenant/` — per-user namespace and RBAC
 > [If ansible:] - `automation/ansible/` — placeholder for Ansible automation (RHDPCD-110)
 >
 > See the [GitOps patterns reference](references/gitops-patterns.md) for sync-wave ordering,

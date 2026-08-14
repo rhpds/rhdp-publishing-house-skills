@@ -47,8 +47,8 @@ The skills automatically read these templates from the plugin's `showroom/templa
 
 ### Automation Templates
 
-- **bootstrap-infra/**: Helm chart for cluster-scoped shared resources with a test app (namespace + deployment) gated by `testApp.enabled`. Copied into `automation/` when `project.automation_type` is `gitops` or `both`.
-- **bootstrap-tenant/**: Helm chart for per-user tenant environments (namespace creation + RBAC). Only copied when `spec.environment.topology` is `shared-cluster`.
+- **bootstrap-infra/**: Minimal Helm chart for cluster-scoped shared resources with a test namespace. Copied into `automation/` when `project.automation_type` is `gitops` or `both`.
+- **bootstrap-tenant/**: Minimal Helm chart for per-user tenant environments (single namespace + edit RoleBinding). Only copied when `spec.environment.topology` is `shared-cluster`.
 - **ansible/**: Placeholder directory (`.gitkeep`) for Ansible automation (RHDPCD-110). Copied when `automation_type` is `ansible` or `both`.
 
 These templates are also included in `.scaffolds/` for new projects created through the RHDH software template.
