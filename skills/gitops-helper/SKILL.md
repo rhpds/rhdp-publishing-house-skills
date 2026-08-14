@@ -118,41 +118,27 @@ If any additional clone fails, warn the user and continue with whatever succeede
 
 Collect inputs in this priority order, combining all sources:
 
-### 6a. Automation manifest
+### 6a. Skill arguments
 
-Look for `publishing-house/spec/automation-manifest.yaml` (PH mode) or any YAML file the
-user points to. If it exists, read it.
-This is one input — not a contract. Do not require specific fields or a specific format.
-Use whatever is there to inform your work.
+Check if the user passed arguments when invoking the skill.
 
-### 6b. Skill arguments
-
-Check if the user passed arguments when invoking the skill. Combine with manifest data.
-
-### 6c. Project context (PH mode only)
+### 6b. Project context (PH mode only)
 
 If in a Publishing House project:
-- Read `publishing-house/spec.yaml` for project metadata (products, platform, ocp_version, topology)
+- Read `publishing-house/spec.yaml` for project metadata (products, platform, ocp_version, topology, automation_type)
 - Read `publishing-house/spec/design.md` for the full design spec
 - Read module outlines in `publishing-house/spec/modules/` for what needs pre-configuration
 
-### 6d. Clarifying questions
+### 6c. Clarifying questions
 
 After analyzing all available inputs, determine what is still unclear or missing.
-Ask the user clarifying questions for anything you cannot determine from the inputs.
-
-If no manifest was found in 6a, ask the user:
-> "I didn't find an automation manifest. Do you have one you'd like to point me to?"
-
-If the user provides a path, read it and combine with other inputs.
-
-If no manifest is available at all, ask the user what they need deployed:
+Ask the user clarifying questions for anything you cannot determine from the inputs:
 - What namespaces does each user need?
 - What applications, operators, or services should be pre-configured?
 - Are there any VMs (KubeVirt)?
 - Does the user need their own ArgoCD instance?
 
-Always combine all inputs — manifest, arguments, project context, and user answers.
+Always combine all inputs — arguments, project context, and user answers.
 
 ## Step 7 — Populate templates
 

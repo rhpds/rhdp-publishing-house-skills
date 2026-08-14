@@ -428,7 +428,7 @@ This is option **3** when automation is not complete, or option **5** when it is
 - The development skill owns scaffolding, workstream status tracking, and Central submission
 - Writing, reviewing, and building automation are optional helper skills
   (`rhdp-publishing-house:writer-helper`, `rhdp-publishing-house:reviewer-helper`,
-  `rhdp-publishing-house:automation-helper`) that the author invokes independently
+  `rhdp-publishing-house:gitops-helper`) that the author invokes independently
 - `config-helper.md` and `config-reviewer.md` are the only procedures this skill dispatches to
 - Status transitions: `not_started` → `in_progress` (on selection) → `complete` (on explicit human confirmation only)
 - **NEVER mark a workstream complete without the author explicitly saying it is done**

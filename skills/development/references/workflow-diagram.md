@@ -83,9 +83,8 @@ User
       |   rhdp-publishing-house:reviewer-helper                          |
       |   +- [Task] rhdp-publishing-house:module-reviewer (AGENT)       |
       |                                                                  |
-      |   rhdp-publishing-house:automation-helper                       |
-      |   +- gitops  -> [Skill] gitops-helper                            |
-      |   +- ansible -> [Skill] ansible-helper (FUTURE - RHDPCD-110)    |
+      |   rhdp-publishing-house:gitops-helper                             |
+      |   rhdp-publishing-house:ansible-helper (FUTURE - RHDPCD-110)    |
       +---------------------------------------------------------------+
 ```
 
