@@ -303,17 +303,17 @@ If `development.automation.gitops.status` is already `complete`:
 > 1. Reopen (set back to `in_progress`)
 > 2. Back to dashboard
 
-Otherwise, check if `automation/` directory exists.
+Otherwise, check if `automation/gitops/` directory exists.
 
-**If `automation/` directory does not exist:**
-> "The automation skeleton hasn't been created yet. Would you like me to scaffold it?"
+**If `automation/gitops/` directory does not exist:**
+> "The GitOps automation skeleton hasn't been created yet. Would you like me to scaffold it?"
 > 1. Yes, scaffold automation directories
 > 2. Back to dashboard
 
 - **1** → follow `procedures/config-helper.md` (Automation Scaffolding section). When it completes, continue below.
 - **2** → return to dashboard.
 
-**If `automation/` directory exists**, show:
+**If `automation/gitops/` directory exists**, show:
 
 > **GitOps Automation**
 >
@@ -325,7 +325,7 @@ Otherwise, check if `automation/` directory exists.
 
 - **1** → Set `development.automation.gitops.status: in_progress` if currently `not_started`, commit, then dispatch to `rhdp-publishing-house:gitops-helper` skill. When it returns, return to dashboard.
 - **2** → Set `development.automation.gitops.status: in_progress` if currently `not_started`, commit. Tell the author:
-  > "Work on your GitOps automation in `automation/bootstrap-infra/` (and `bootstrap-tenant/` if it exists). When you're done, come back and I'll mark it complete."
+  > "Work on your GitOps automation in `automation/gitops/bootstrap-infra/` (and `bootstrap-tenant/` if it exists). When you're done, come back and I'll mark it complete."
   Return to dashboard.
 - **3** → return to dashboard.
 
@@ -338,17 +338,17 @@ If `development.automation.ansible.status` is already `complete`:
 > 1. Reopen (set back to `in_progress`)
 > 2. Back to dashboard
 
-Otherwise, check if `automation/` directory exists.
+Otherwise, check if `automation/ansible/` directory exists.
 
-**If `automation/` directory does not exist:**
-> "The automation skeleton hasn't been created yet. Would you like me to scaffold it?"
+**If `automation/ansible/` directory does not exist:**
+> "The Ansible automation skeleton hasn't been created yet. Would you like me to scaffold it?"
 > 1. Yes, scaffold automation directories
 > 2. Back to dashboard
 
 - **1** → follow `procedures/config-helper.md` (Automation Scaffolding section). When it completes, continue below.
 - **2** → return to dashboard.
 
-**If `automation/` directory exists**, show:
+**If `automation/ansible/` directory exists**, show:
 
 > **Ansible Automation**
 >

@@ -33,11 +33,11 @@ flowchart TD
     Dashboard -->|Health Check| HC["Health Check sub-menu\n1. Mark complete\n2. Back"]
     Dashboard -->|Showroom Config| Config["Showroom Config\n1. config-helper\n2. config-reviewer\n3. Back"]
 
-    GitOps -->|no automation/ dir| CH2["procedures/config-helper.md\nAutomation Scaffolding"]
+    GitOps -->|no automation/gitops/ dir| CH2["procedures/config-helper.md\nAutomation Scaffolding"]
     GitOps -->|option 1| GH["[Skill] gitops-helper\nsets gitops.status: in_progress"]
     GitOps -->|option 2| GitOpsSelf["Do it myself\nsets gitops.status: in_progress"]
 
-    Ansible -->|no automation/ dir| CH3["procedures/config-helper.md\nAutomation Scaffolding"]
+    Ansible -->|no automation/ansible/ dir| CH3["procedures/config-helper.md\nAutomation Scaffolding"]
     Ansible -->|option 1| AH["Ansible helper\nFUTURE - RHDPCD-110"]
     Ansible -->|option 2| AnsibleSelf["Do it myself\nsets ansible.status: in_progress"]
 
