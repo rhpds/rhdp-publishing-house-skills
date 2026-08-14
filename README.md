@@ -30,7 +30,7 @@ The orchestrator checks the current directory for your project manifest, syncs t
 | `/rhdp-publishing-house:development` | Showroom scaffolding, config review, module status tracking, and submission to Central |
 | `/rhdp-publishing-house:writer-helper` | *Optional* — generates module content from spec/outlines (wraps Showroom skills, module-by-module) |
 | `/rhdp-publishing-house:reviewer-helper` | *Optional* — technical editing and quality review (wraps showroom:verify-content) |
-| `/rhdp-publishing-house:automation-helper` | *Optional* — automation requirements, catalog, code, and testing gate |
+| `/rhdp-publishing-house:gitops-helper` | *Optional* — populates GitOps automation directories (Helm + ArgoCD) with real workloads |
 | `/rhdp-publishing-house:worklog` | Session bridging — notes, decisions, handoffs, summaries |
 
 ## Documentation

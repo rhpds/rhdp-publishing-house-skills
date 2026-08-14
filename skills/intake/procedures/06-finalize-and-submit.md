@@ -29,20 +29,9 @@ Present the final state to the author:
 
 - **If feedback** → address it, update files, re-present
 - **If the author flags missing fields** → ask about those specific gaps only
-- **If approved** → immediately execute Steps 2-7 WITHOUT asking again
+- **If approved** → immediately execute Steps 2-6 WITHOUT asking again
 
-## Step 2: Generate Draft Automation Manifest
-
-Generate a draft `publishing-house/spec/automation-manifest.yaml` from the spec data.
-This is a DRAFT — the automation procedure will refine it during development.
-
-Derive each field from what's already in spec.yaml and design.md:
-- **approach:** ansible (default for most OCP labs), gitops (if lab teaches GitOps), both
-- **infrastructure.type:** From topology + cloud provider (e.g., `per-student` + CNV → `ocp-cnv`)
-- **operators:** Infer from Products & Technologies — operators the learner USES but doesn't install
-- **external_services:** From `spec.environment.external_services`
-
-## Step 3: Generate mkdocs.yml
+## Step 2: Generate mkdocs.yml
 
 Generate `mkdocs.yml` at the repo root for RHDH TechDocs rendering.
 
@@ -76,9 +65,6 @@ if modules:
         mod_nav.append({f'Module {num} - {label}': f'modules/{fname}'})
     nav.append({'Modules': mod_nav})
 
-if Path('publishing-house/spec/automation-manifest.yaml').exists():
-    nav.append({'Automation Manifest': 'automation-manifest.yaml'})
-
 mkdocs = {
     'site_name': title,
     'docs_dir': 'publishing-house/spec',
@@ -91,7 +77,7 @@ print('mkdocs.yml created')
 "
 ```
 
-## Step 4: Author Checkpoint
+## Step 3: Author Checkpoint
 
 > "Your spec is ready for submission. Take a moment to review
 > `publishing-house/spec/design.md` and the module outlines in
@@ -102,9 +88,9 @@ print('mkdocs.yml created')
 **Wait for the author's response. Do NOT auto-proceed.**
 
 - **If feedback** → update the spec, re-validate, ask again
-- **If approved** → immediately execute Steps 5-7 WITHOUT asking again
+- **If approved** → immediately execute Steps 4-6 WITHOUT asking again
 
-## Step 5: Commit and push
+## Step 4: Commit and push
 
 ```bash
 git add publishing-house/ mkdocs.yml catalog-info.yaml
@@ -114,7 +100,7 @@ git push
 
 **Run this immediately. Do NOT ask the author.**
 
-## Step 6: Submit intake to Central API
+## Step 5: Submit intake to Central API
 
 **If offline → defer:**
 > "Your spec is complete and committed. When the platform is available, run
@@ -148,7 +134,7 @@ Parse by `status`:
 - **404** — No workflow found. Show `error` and **STOP.**
 - **Any other status** — Show the `error` message and **STOP.**
 
-## Step 6b: Project structure cleanup
+## Step 5b: Project structure cleanup
 
 Check `project.showroom_type` in spec.yaml:
 
@@ -161,7 +147,7 @@ Check `project.showroom_type` in spec.yaml:
   ```
 - **If `zero_touch`**: Keep `runtime-automation/` and `setup-automation/` in place.
 
-## Step 7: Report result
+## Step 6: Report result
 
 - If submission succeeded → show the review status message from the orchestrator (three pending stages: Content Review, Infra Review, Staging) and "Run `/rhdp-publishing-house` to check the current stage."
 - If submission failed → show the error from the response.

@@ -10,9 +10,9 @@ You populate existing GitOps automation directories with real workloads (Helm te
 manifests) for RHDP lab and demo environments. You follow the conventions in
 @rhdp-publishing-house/skills/gitops-helper/references/gitops-patterns.md.
 
-The `automation/bootstrap-infra/` (and optionally `bootstrap-tenant/`) directories are created
-by the config-helper's Automation Scaffolding during initial project scaffolding. This skill
-works with those existing directories — it does NOT create them.
+The `automation/gitops/bootstrap-infra/` (and optionally `bootstrap-tenant/`) directories are
+created by the config-helper's Automation Scaffolding during initial project scaffolding. This
+skill works with those existing directories — it does NOT create them.
 
 ## Tool Boundaries
 
@@ -74,13 +74,13 @@ python publishing-house/tools/ph-sync.py
 Check that the automation directories are already scaffolded:
 
 ```bash
-test -d automation/bootstrap-infra && echo "infra:yes" || echo "infra:no"
-test -d automation/bootstrap-tenant && echo "tenant:yes" || echo "tenant:no"
+test -d automation/gitops/bootstrap-infra && echo "infra:yes" || echo "infra:no"
+test -d automation/gitops/bootstrap-tenant && echo "tenant:yes" || echo "tenant:no"
 ```
 
 - `infra:no` → STOP. Tell the author:
-  > "The `automation/bootstrap-infra/` directory doesn't exist yet. Run the
-  > **development** skill and select **Automation** to scaffold the automation
+  > "The `automation/gitops/bootstrap-infra/` directory doesn't exist yet. Run the
+  > **development** skill and select **GitOps Automation** to scaffold the automation
   > directories first, then come back here to populate them with workloads."
 - `infra:yes` → proceed. Note whether `tenant:yes` for later steps.
 
@@ -118,56 +118,42 @@ If any additional clone fails, warn the user and continue with whatever succeede
 
 Collect inputs in this priority order, combining all sources:
 
-### 6a. Automation manifest
+### 6a. Skill arguments
 
-Look for `publishing-house/spec/automation-manifest.yaml` (PH mode) or any YAML file the
-user points to. If it exists, read it.
-This is one input — not a contract. Do not require specific fields or a specific format.
-Use whatever is there to inform your work.
+Check if the user passed arguments when invoking the skill.
 
-### 6b. Skill arguments
-
-Check if the user passed arguments when invoking the skill. Combine with manifest data.
-
-### 6c. Project context (PH mode only)
+### 6b. Project context (PH mode only)
 
 If in a Publishing House project:
-- Read `publishing-house/spec.yaml` for project metadata (products, platform, ocp_version, topology)
+- Read `publishing-house/spec.yaml` for project metadata (products, platform, ocp_version, topology, automation_type)
 - Read `publishing-house/spec/design.md` for the full design spec
 - Read module outlines in `publishing-house/spec/modules/` for what needs pre-configuration
 
-### 6d. Clarifying questions
+### 6c. Clarifying questions
 
 After analyzing all available inputs, determine what is still unclear or missing.
-Ask the user clarifying questions for anything you cannot determine from the inputs.
-
-If no manifest was found in 6a, ask the user:
-> "I didn't find an automation manifest. Do you have one you'd like to point me to?"
-
-If the user provides a path, read it and combine with other inputs.
-
-If no manifest is available at all, ask the user what they need deployed:
+Ask the user clarifying questions for anything you cannot determine from the inputs:
 - What namespaces does each user need?
 - What applications, operators, or services should be pre-configured?
 - Are there any VMs (KubeVirt)?
 - Does the user need their own ArgoCD instance?
 
-Always combine all inputs — manifest, arguments, project context, and user answers.
+Always combine all inputs — arguments, project context, and user answers.
 
 ## Step 7 — Populate templates
 
 ### 7a. Classify resources
 
 For each component from the inputs, decide:
-- **Infra** if cluster-wide or shared (operators, shared services) → `automation/bootstrap-infra/templates/`
-- **Tenant** if per-user (applications, VMs, RBAC, seed data) → `automation/bootstrap-tenant/templates/`
+- **Infra** if cluster-wide or shared (operators, shared services) → `automation/gitops/bootstrap-infra/templates/`
+- **Tenant** if per-user (applications, VMs, RBAC, seed data) → `automation/gitops/bootstrap-tenant/templates/`
 
-If a resource looks tenant-scoped but `automation/bootstrap-tenant/` does not exist, warn the user:
+If a resource looks tenant-scoped but `automation/gitops/bootstrap-tenant/` does not exist, warn the user:
 > "This resource looks per-user but there's no tenant chart. Should I create
-> `automation/bootstrap-tenant/`, or place this in infra?"
+> `automation/gitops/bootstrap-tenant/`, or place this in infra?"
 
-If the user wants tenant, copy the tenant scaffold from `.scaffolds/automation/bootstrap-tenant/`
-into `automation/bootstrap-tenant/`.
+If the user wants tenant, copy the tenant scaffold from `.scaffolds/automation/gitops/bootstrap-tenant/`
+into `automation/gitops/bootstrap-tenant/`.
 
 ### 7b. Generate templates
 
@@ -229,7 +215,7 @@ Generate a snippet for the cluster catalog item (`bootstrap-infra`):
 ```yaml
 ocp4_workload_gitops_bootstrap_repo_url: https://github.com/ORG/REPO
 ocp4_workload_gitops_bootstrap_repo_revision: "{{ gitops_repo_revision }}"
-ocp4_workload_gitops_bootstrap_repo_path: bootstrap-infra
+ocp4_workload_gitops_bootstrap_repo_path: automation/gitops/bootstrap-infra
 ocp4_workload_gitops_bootstrap_application_name: bootstrap-infra
 ocp4_workload_gitops_bootstrap_helm_values:
   # Only include values prone to external changes.
@@ -237,11 +223,11 @@ ocp4_workload_gitops_bootstrap_helm_values:
   ...
 ```
 
-If `bootstrap-tenant` exists, also print a tenant snippet:
+If `automation/gitops/bootstrap-tenant` exists, also print a tenant snippet:
 ```yaml
 ocp4_workload_gitops_bootstrap_repo_url: https://github.com/ORG/REPO
 ocp4_workload_gitops_bootstrap_repo_revision: "{{ gitops_repo_revision }}"
-ocp4_workload_gitops_bootstrap_repo_path: bootstrap-tenant
+ocp4_workload_gitops_bootstrap_repo_path: automation/gitops/bootstrap-tenant
 ocp4_workload_gitops_bootstrap_application_project: tenants
 ocp4_workload_gitops_bootstrap_application_name: "bootstrap-{{ guid }}"
 ocp4_workload_gitops_bootstrap_helm_values:
@@ -264,19 +250,19 @@ After the user has reviewed the generated files (Step 8), ask:
 > 2. Back to dashboard (I'll finish later)
 
 - **1** →
-  1. Set `development.automation.status: complete` in `publishing-house/spec.yaml`
+  1. Set `development.automation.gitops.status: complete` in `publishing-house/spec.yaml`
   2. Commit and push:
      ```bash
      git add publishing-house/spec.yaml
-     git commit -m "feat: mark automation complete"
+     git commit -m "feat: mark gitops automation complete"
      git push
      ```
   3. Close the Jira ticket:
      ```bash
      python publishing-house/tools/ph-task-complete.py write-automation
      ```
-  4. Confirm: "Automation marked complete. Returning to development dashboard."
-- **2** → Confirm: "Returning to development dashboard. You can come back to automation anytime."
+  4. Confirm: "GitOps automation marked complete. Returning to development dashboard."
+- **2** → Confirm: "Returning to development dashboard. You can come back to GitOps automation anytime."
 
 ## Rules
 

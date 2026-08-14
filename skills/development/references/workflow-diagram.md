@@ -22,20 +22,24 @@ flowchart TD
     Issues -->|option 1: help me| CH["procedures/config-helper.md"]
     Issues -->|option 2: I'll handle it| STOP1["STOP"]
 
-    Dashboard["Step 2: Development Dashboard\n1. Modules (N/M complete)\n2. Automation\n3. E2E Tests\n4. Health Check\n5. Showroom Config"]
+    Dashboard["Step 2: Development Dashboard\n1. Modules (N/M complete)\n2. GitOps Automation (if applicable)\n3. Ansible Automation (if applicable)\n4. E2E Tests\n5. Health Check\n6. Showroom Config"]
 
     Dashboard -->|all complete| Submit["Step 3: Submit\nph-development.py"]
 
-    Dashboard -->|option 1| Modules["Module sub-menu\nstart/complete modules\nph-task-complete.py"]
-    Dashboard -->|option 2| Auto["Automation sub-menu\nscaffold or populate"]
-    Dashboard -->|option 3| E2E["E2E sub-menu\n1. Mark complete\n2. Back"]
-    Dashboard -->|option 4| HC["Health Check sub-menu\n1. Mark complete\n2. Back"]
-    Dashboard -->|option 5| Config["Showroom Config\n1. config-helper\n2. config-reviewer\n3. Back"]
+    Dashboard -->|Modules| Modules["Module sub-menu\nstart/complete modules\nph-task-complete.py"]
+    Dashboard -->|GitOps Automation| GitOps["1. Use GitOps helper\n2. Do it myself\n3. Back"]
+    Dashboard -->|Ansible Automation| Ansible["1. Use Ansible helper\n2. Do it myself\n3. Back"]
+    Dashboard -->|E2E Tests| E2E["E2E sub-menu\n1. Mark complete\n2. Back"]
+    Dashboard -->|Health Check| HC["Health Check sub-menu\n1. Mark complete\n2. Back"]
+    Dashboard -->|Showroom Config| Config["Showroom Config\n1. config-helper\n2. config-reviewer\n3. Back"]
 
-    Auto -->|no automation/ dir| CH2["procedures/config-helper.md\nAutomation Scaffolding"]
-    Auto -->|automation/ exists| AutoMenu["1. GitOps helper\n2. Ansible (placeholder)\n3. Mark complete"]
-    AutoMenu -->|option 1| GH["[Skill] gitops-helper"]
-    AutoMenu -->|option 2| AH["Ansible helper\nFUTURE - RHDPCD-110"]
+    GitOps -->|no automation/gitops/ dir| CH2["procedures/config-helper.md\nAutomation Scaffolding"]
+    GitOps -->|option 1| GH["[Skill] gitops-helper\nsets gitops.status: in_progress"]
+    GitOps -->|option 2| GitOpsSelf["Do it myself\nsets gitops.status: in_progress"]
+
+    Ansible -->|no automation/ansible/ dir| CH3["procedures/config-helper.md\nAutomation Scaffolding"]
+    Ansible -->|option 1| AH["Ansible helper\nFUTURE - RHDPCD-110"]
+    Ansible -->|option 2| AnsibleSelf["Do it myself\nsets ansible.status: in_progress"]
 
     Modules -.->|author invokes directly| WriterHelper["rhdp-publishing-house:writer-helper\nOPTIONAL"]
     Modules -.->|author invokes directly| ReviewerHelper["rhdp-publishing-house:reviewer-helper\nOPTIONAL"]
@@ -66,14 +70,15 @@ User
       |      +- FAIL -> report issues, offer numbered options            |
       |                                                                  |
       |   Step 2: Development Dashboard (numbered options)               |
-      |   +- 1. Modules    -> module sub-menu (start/complete)           |
-      |   +- 2. Automation -> config-helper scaffold / gitops-helper        |
-      |   +- 3. E2E Tests  -> mark complete (placeholder)               |
-      |   +- 4. Health Check -> mark complete (placeholder)              |
-      |   +- 5. Showroom Config -> config-helper / config-reviewer       |
+      |   +- 1. Modules           -> module sub-menu (start/complete)   |
+      |   +- 2. GitOps Automation -> helper or DIY (if applicable)      |
+      |   +- 3. Ansible Automation -> helper or DIY (if applicable)     |
+      |   +- 4. E2E Tests         -> mark complete (placeholder)        |
+      |   +- 5. Health Check      -> mark complete (placeholder)        |
+      |   +- 6. Showroom Config   -> config-helper / config-reviewer    |
       |                                                                  |
       |   Step 3: Submission gate                                        |
-      |   +- ALL 4 workstreams complete -> ph-development.py             |
+      |   +- modules + all automation children complete -> ph-development.py |
       +---------------------------------------------------------------+
       |
       +- optional helper skills (NOT dispatched by development) --------+
@@ -83,9 +88,8 @@ User
       |   rhdp-publishing-house:reviewer-helper                          |
       |   +- [Task] rhdp-publishing-house:module-reviewer (AGENT)       |
       |                                                                  |
-      |   rhdp-publishing-house:automation-helper                       |
-      |   +- gitops  -> [Skill] gitops-helper                            |
-      |   +- ansible -> [Skill] ansible-helper (FUTURE - RHDPCD-110)    |
+      |   rhdp-publishing-house:gitops-helper                             |
+      |   rhdp-publishing-house:ansible-helper (FUTURE - RHDPCD-110)    |
       +---------------------------------------------------------------+
 ```
 
