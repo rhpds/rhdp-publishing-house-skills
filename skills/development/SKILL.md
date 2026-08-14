@@ -354,11 +354,11 @@ Otherwise, check if `automation/ansible/` directory exists.
 >
 > | # | Option |
 > |---|--------|
-> | 1 | Use Ansible helper *(not yet implemented — RHDPCD-110)* |
+> | 1 | Use Ansible helper |
 > | 2 | Do it myself |
 > | 3 | Back to dashboard |
 
-- **1** → Inform: "The Ansible helper skill is not yet implemented (RHDPCD-110)." Fall through to option 2.
+- **1** → Set `development.automation.ansible.status: in_progress` if currently `not_started`, commit, then dispatch to `rhdp-publishing-house:ansible-helper` skill. When it returns, return to dashboard.
 - **2** → Set `development.automation.ansible.status: in_progress` if currently `not_started`, commit. Tell the author:
   > "Build your Ansible automation manually in `automation/ansible/`. When you're done, come back and I'll mark it complete."
   Return to dashboard.
