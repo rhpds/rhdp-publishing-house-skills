@@ -197,7 +197,9 @@ Number rows sequentially starting at 1 based on what is shown.
 append:
 
 > Your showroom is scaffolded and ready for content. Each workstream has optional AI helpers
-> available when you select it. Write your content however you prefer — when required workstreams
+> available when you select it, or you can write everything yourself — the helpers are a starting
+> point, not a substitute for your own review. Don't rely on AI output alone; read through and
+> verify whatever a helper produces before marking a workstream complete. When required workstreams
 > are done, I'll submit to Central.
 
 ### Step 4 — Submission gate
@@ -451,7 +453,8 @@ Otherwise, set `development.healthCheck.status: in_progress` if currently `not_s
 - The development skill owns scaffolding, workstream status tracking, and Central submission
 - Writing, reviewing, and building automation are optional helper skills
   (`rhdp-publishing-house:writer-helper`, `rhdp-publishing-house:reviewer-helper`,
-  `rhdp-publishing-house:gitops-helper`) that the author invokes independently
+  `rhdp-publishing-house:gitops-helper`) that the author invokes independently — they're a
+  starting point, not a substitute for the author's own manual review
 - `config-helper.md` and `config-reviewer.md` are the only procedures this skill dispatches to
 - Status transitions: `not_started` → `in_progress` (on selection) → `complete` (on explicit human confirmation only)
 - **NEVER mark a workstream complete without the author explicitly saying it is done**
