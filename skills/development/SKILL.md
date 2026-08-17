@@ -66,7 +66,15 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 Follow `procedures/config-reviewer.md` automatically against the project's content directory.
 
 - **PASS** → proceed to Step 2
-- **FAIL** → report the specific issues to the author, then ask:
+- **FAIL, project not yet scaffolded** (`.scaffolds/` directory still present) → the author has no way
+  to know the required directory/file structure yet — that's exactly what scaffolding is for. Do NOT
+  ask permission or offer to let them handle it themselves. Briefly report what's missing, then go
+  straight into `procedures/config-helper.md` (which detects `.scaffolds/` and runs Route A
+  automatically). Route A's own scaffold-plan confirmation is the only checkpoint the author needs to
+  see. Proceed to Step 2 once it returns.
+- **FAIL, project already scaffolded** (`.scaffolds/` is gone, but config is genuinely missing or
+  invalid) → the author already has the real structure and may be mid-edit intentionally, so report
+  the specific issues and ask:
   > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
   - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2
   - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
