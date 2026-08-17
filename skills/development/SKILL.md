@@ -390,8 +390,9 @@ Otherwise, set `development.e2e.status: in_progress` if currently `not_started`,
 
 > **E2E Tests**
 >
-> The E2E test helper skill is not yet implemented. Please write your E2E tests manually in
-> `qa-automation/`.
+> Write your E2E tests manually in `qa-automation/e2e.yml`. See the
+> [E2E Tests docs](https://rhpds.github.io/rhdp-publishing-house/user/qa-automation/#e2eyml) for
+> requirements and guidance.
 >
 > | # | Option |
 > |---|--------|
@@ -416,8 +417,9 @@ Otherwise, set `development.healthCheck.status: in_progress` if currently `not_s
 
 > **Health Check**
 >
-> The health check helper skill is not yet implemented. Please write your health check playbook
-> in `qa-automation/`.
+> Write your health check playbook manually in `qa-automation/healthcheck.yml`. See the
+> [Health Check docs](https://rhpds.github.io/rhdp-publishing-house/user/qa-automation/#healthcheckyml)
+> for requirements and guidance.
 >
 > | # | Option |
 > |---|--------|
