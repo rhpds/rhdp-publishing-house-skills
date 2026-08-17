@@ -48,19 +48,27 @@ If `project.showroom_type` is empty, unset, or unrecognised, fall back to asking
 
 **A.2 — Confirm and run scaffold.py:**
 
-Confirm the detected pattern with the user before running:
-> Your spec has `showroom_type: <value>` — I'll scaffold as **<pattern description>**. Proceed?
+Read everything needed to build the full scaffold plan before showing anything to the user:
 
-Also read `project.automation_type` from `publishing-house/spec.yaml`. This is the only chance to
-scaffold automation directories automatically — `scaffold.py` deletes `.scaffolds/` (including
-`.scaffolds/automation/`) once it completes, so automation scaffolding must happen in this same
-invocation, not as a later separate step. See the Automation Scaffolding reference (below) for
-what each value creates.
+- `project.showroom_type` (already mapped to a pattern in A.1)
+- `project.automation_type` from `publishing-house/spec.yaml`. This is the only chance to scaffold
+  automation directories automatically — `scaffold.py` deletes `.scaffolds/` (including
+  `.scaffolds/automation/`) once it completes, so automation scaffolding must happen in this same
+  invocation, not as a later separate step. See the Automation Scaffolding reference (below) for what
+  each value creates. If `automation_type` is empty, unset, or unrecognised, omit `--automation`
+  entirely.
+- `spec.environment.topology` — if it already happens to be `shared-cluster` at this point, also pass
+  `--topology shared-cluster` (usually it won't be known yet — topology is normally decided later
+  during intake).
 
-If `automation_type` is empty, unset, or unrecognised, omit `--automation` entirely. If
-`spec.environment.topology` already happens to be `shared-cluster` at this point, also pass
-`--topology shared-cluster` (usually it won't be known yet — topology is normally decided later
-during intake).
+Show the author the **entire** plan in a single confirmation, then proceed automatically — never ask
+whether they'd rather scaffold it themselves; that's what this step exists to do for them:
+
+> Based on your spec, I'll scaffold this project as:
+> - **Pattern:** `showroom_type: <value>` → **<pattern description>** (`<pattern-name>`)
+> - **Automation:** <"none" | "`<automation_type>` → `automation/<...>/`" (+ `bootstrap-tenant/` if topology is `shared-cluster`)>
+>
+> Proceed?
 
 Then run:
 ```bash

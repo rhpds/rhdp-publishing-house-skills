@@ -16,6 +16,7 @@ Use it whenever the author wants an AI quality pass, whether the content was wri
 `rhdp-publishing-house:writer-helper` or by the author themselves.
 
 See @rhdp-publishing-house/skills/reviewer-helper/references/editing-checklist.md for the full editing checklist.
+See @rhdp-publishing-house/skills/common/user-interaction.md for how to present multi-option choices to the author.
 
 ## Step 1: Determine Scope
 

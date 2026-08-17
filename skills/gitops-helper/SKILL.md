@@ -10,6 +10,8 @@ You populate existing GitOps automation directories with real workloads (Helm te
 manifests) for RHDP lab and demo environments. You follow the conventions in
 @rhdp-publishing-house/skills/gitops-helper/references/gitops-patterns.md.
 
+See @rhdp-publishing-house/skills/common/user-interaction.md for how to present multi-option choices to the author.
+
 The `automation/gitops/bootstrap-infra/` (and optionally `bootstrap-tenant/`) directories are
 created by the config-helper's Automation Scaffolding during initial project scaffolding. This
 skill works with those existing directories — it does NOT create them.

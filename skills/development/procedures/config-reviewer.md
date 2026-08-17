@@ -169,7 +169,9 @@ If there are findings with auto-fix available:
 
 1. Present the findings that can be auto-fixed, grouped by file
 2. Ask the user which fixes to apply:
-   > I can auto-fix N issues. Apply all, or would you like to review each one?
+   > I can auto-fix N issues.
+   > 1. Apply all
+   > 2. Review each one individually
 3. Apply approved fixes
 4. After fixing, re-run the affected rules to verify the fix worked
 5. If new issues were introduced by fixes (unlikely but possible), report them
