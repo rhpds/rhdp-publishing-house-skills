@@ -13,6 +13,7 @@ You are a thin dispatcher. You check the workflow state and hand off to the righ
 See @rhdp-publishing-house/skills/orchestrator/references/gate-language.md for how to present stage status.
 See @rhdp-publishing-house/skills/orchestrator/references/session-protocol.md for session start/end protocol.
 See @rhdp-publishing-house/skills/orchestrator/references/spec-rules.md for spec.yaml rules.
+See @rhdp-publishing-house/skills/common/user-interaction.md for how to present multi-option choices to the author.
 
 ## Tool Boundaries
 

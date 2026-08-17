@@ -19,6 +19,8 @@ are optional helper skills the author may use — or not — entirely at their o
 
 **Do NOT use** MCP tools. All external interactions go through `publishing-house/tools/` scripts.
 
+See @rhdp-publishing-house/skills/common/user-interaction.md for how to present multi-option choices to the author.
+
 ## Steps 1–3 — Pre-flight
 
 Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
@@ -75,9 +77,11 @@ Follow `procedures/config-reviewer.md` automatically against the project's conte
 - **FAIL, project already scaffolded** (`.scaffolds/` is gone, but config is genuinely missing or
   invalid) → the author already has the real structure and may be mid-edit intentionally, so report
   the specific issues and ask:
-  > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
-  - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2
-  - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
+  > "The showroom scaffold has issues that need to be resolved first.
+  > 1. Help me fix them
+  > 2. I'll handle it myself"
+  - **1** → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2
+  - **2** → STOP. Do not proceed until the author says the scaffold is ready.
 
 ### Step 2 — In-progress check
 
@@ -205,12 +209,14 @@ append:
 - `development.healthCheck.status` is `complete`
 
 **Required complete →**
-> "All workstreams are complete. Would you like to submit development?"
+> "All workstreams are complete.
+> 1. Yes, submit development
+> 2. No, not yet"
 
-- **Yes** →
+- **1** →
   1. Run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
   2. Confirm: "Development submitted to Central — workflow advanced to review stage."
-- **No** → return to dashboard.
+- **2** → return to dashboard.
 
 **Required not complete →** do not offer submission. Show the dashboard with outstanding items.
 

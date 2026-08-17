@@ -20,6 +20,8 @@ You handle migration intake by coordinating two agents: a **content reader** tha
 
 **Do NOT use** MCP tools. All external interactions go through `publishing-house/tools/` scripts.
 
+See @rhdp-publishing-house/skills/common/user-interaction.md for how to present multi-option choices to the author.
+
 ## Steps 1–3 — Pre-flight
 
 Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).

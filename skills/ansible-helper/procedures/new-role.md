@@ -53,12 +53,12 @@ git diff --cached --quiet || git commit --author="Mitesh Sharma <mitsharm@redhat
 Ask:
 > "Role skeleton is ready. Would you like me to write the tasks now?
 >
-> - **Yes** — give me more detail about what the role should do and I'll write
->   `tasks/main.yml` and `defaults/main.yml`
-> - **No** — leave the stubs as-is, I'll write the tasks myself"
+> 1. **Yes** — give me more detail about what the role should do and I'll write
+>    `tasks/main.yml` and `defaults/main.yml`
+> 2. **No** — leave the stubs as-is, I'll write the tasks myself"
 
-**If Yes** → follow `procedures/write-role-tasks.md`.
-**If No** → go to A6.
+**If 1 (Yes)** → follow `procedures/write-role-tasks.md`.
+**If 2 (No)** → go to A6.
 
 ## A6 — Final Report
 

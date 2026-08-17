@@ -14,6 +14,7 @@ themselves with any tool they like. When you finish writing something, you hand 
 author (and to the `rhdp-publishing-house:development` skill for status tracking and submission).
 
 See @rhdp-publishing-house/skills/writer-helper/references/writing-standards.md for writing standards.
+See @rhdp-publishing-house/skills/common/user-interaction.md for how to present multi-option choices to the author.
 
 ## CRITICAL CONSTRAINT — Content Only, No Scaffolding
 
