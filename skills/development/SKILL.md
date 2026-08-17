@@ -227,18 +227,23 @@ The dashboard rows are dynamic — match the user's selection to the workstream 
 
 #### Option 1 — Modules
 
-Show only incomplete modules (not_started or in_progress) with numbered options:
+Always list **every** module from `spec.modules`, in order, regardless of status. Assign
+sequential selectable numbers (1, 2, 3, ...) only to modules that are `not_started` or
+`in_progress`. For modules with `status: complete`, show `—` in the `#` column instead of a
+number — there is no digit for the author to type to select it. Number "Back to dashboard" as
+`(count of selectable modules) + 1`.
 
 > **Modules**
 >
 > | # | Module | Status |
 > |---|--------|--------|
 > | 1 | [title] | not_started / in_progress |
+> | — | [title] | complete |
 > | 2 | [title] | not_started / in_progress |
 > | ... | ... | ... |
 > | N+1 | Back to dashboard | |
 >
-> Type a number to select a module.
+> Type a number to select a module. Completed modules are shown for reference and can't be selected.
 
 When the author selects a module:
 
