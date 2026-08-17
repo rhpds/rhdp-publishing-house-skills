@@ -19,6 +19,8 @@ are optional helper skills the author may use — or not — entirely at their o
 
 **Do NOT use** MCP tools. All external interactions go through `publishing-house/tools/` scripts.
 
+See @rhdp-publishing-house/skills/common/user-interaction.md for how to present multi-option choices to the author.
+
 ## Steps 1–3 — Pre-flight
 
 Follow @rhdp-publishing-house/skills/common/pre-flight.md (Steps 1–3: verify project, read identity, check auth).
@@ -66,10 +68,20 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 Follow `procedures/config-reviewer.md` automatically against the project's content directory.
 
 - **PASS** → proceed to Step 2
-- **FAIL** → report the specific issues to the author, then ask:
-  > "The showroom scaffold has issues that need to be resolved first. Would you like me to help fix them, or will you handle it?"
-  - "help me" → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2
-  - "I'll handle it" → STOP. Do not proceed until the author says the scaffold is ready.
+- **FAIL, project not yet scaffolded** (`.scaffolds/` directory still present) → the author has no way
+  to know the required directory/file structure yet — that's exactly what scaffolding is for. Do NOT
+  ask permission or offer to let them handle it themselves. Briefly report what's missing, then go
+  straight into `procedures/config-helper.md` (which detects `.scaffolds/` and runs Route A
+  automatically). Route A's own scaffold-plan confirmation is the only checkpoint the author needs to
+  see. Proceed to Step 2 once it returns.
+- **FAIL, project already scaffolded** (`.scaffolds/` is gone, but config is genuinely missing or
+  invalid) → the author already has the real structure and may be mid-edit intentionally, so report
+  the specific issues and ask:
+  > "The showroom scaffold has issues that need to be resolved first.
+  > 1. Help me fix them
+  > 2. I'll handle it myself"
+  - **1** → follow `procedures/config-helper.md` to fix the scaffold, then proceed to Step 2
+  - **2** → STOP. Do not proceed until the author says the scaffold is ready.
 
 ### Step 2 — In-progress check
 
@@ -185,7 +197,9 @@ Number rows sequentially starting at 1 based on what is shown.
 append:
 
 > Your showroom is scaffolded and ready for content. Each workstream has optional AI helpers
-> available when you select it. Write your content however you prefer — when required workstreams
+> available when you select it, or you can write everything yourself — the helpers are a starting
+> point, not a substitute for your own review. Don't rely on AI output alone; read through and
+> verify whatever a helper produces before marking a workstream complete. When required workstreams
 > are done, I'll submit to Central.
 
 ### Step 4 — Submission gate
@@ -197,12 +211,14 @@ append:
 - `development.healthCheck.status` is `complete`
 
 **Required complete →**
-> "All workstreams are complete. Would you like to submit development?"
+> "All workstreams are complete.
+> 1. Yes, submit development
+> 2. No, not yet"
 
-- **Yes** →
+- **1** →
   1. Run `python publishing-house/tools/ph-development.py`. If it fails, STOP and show the error.
   2. Confirm: "Development submitted to Central — workflow advanced to review stage."
-- **No** → return to dashboard.
+- **2** → return to dashboard.
 
 **Required not complete →** do not offer submission. Show the dashboard with outstanding items.
 
@@ -213,18 +229,23 @@ The dashboard rows are dynamic — match the user's selection to the workstream 
 
 #### Option 1 — Modules
 
-Show only incomplete modules (not_started or in_progress) with numbered options:
+Always list **every** module from `spec.modules`, in order, regardless of status. Assign
+sequential selectable numbers (1, 2, 3, ...) only to modules that are `not_started` or
+`in_progress`. For modules with `status: complete`, show `—` in the `#` column instead of a
+number — there is no digit for the author to type to select it. Number "Back to dashboard" as
+`(count of selectable modules) + 1`.
 
 > **Modules**
 >
 > | # | Module | Status |
 > |---|--------|--------|
 > | 1 | [title] | not_started / in_progress |
+> | — | [title] | complete |
 > | 2 | [title] | not_started / in_progress |
 > | ... | ... | ... |
 > | N+1 | Back to dashboard | |
 >
-> Type a number to select a module.
+> Type a number to select a module. Completed modules are shown for reference and can't be selected.
 
 When the author selects a module:
 
@@ -371,8 +392,9 @@ Otherwise, set `development.e2e.status: in_progress` if currently `not_started`,
 
 > **E2E Tests**
 >
-> The E2E test helper skill is not yet implemented. Please write your E2E tests manually in
-> `qa-automation/`.
+> Write your E2E tests manually in `qa-automation/e2e.yml`. See the
+> [E2E Tests docs](https://rhpds.github.io/rhdp-publishing-house/user/qa-automation/#e2eyml) for
+> requirements and guidance.
 >
 > | # | Option |
 > |---|--------|
@@ -397,8 +419,9 @@ Otherwise, set `development.healthCheck.status: in_progress` if currently `not_s
 
 > **Health Check**
 >
-> The health check helper skill is not yet implemented. Please write your health check playbook
-> in `qa-automation/`.
+> Write your health check playbook manually in `qa-automation/healthcheck.yml`. See the
+> [Health Check docs](https://rhpds.github.io/rhdp-publishing-house/user/qa-automation/#healthcheckyml)
+> for requirements and guidance.
 >
 > | # | Option |
 > |---|--------|
@@ -430,7 +453,8 @@ Otherwise, set `development.healthCheck.status: in_progress` if currently `not_s
 - The development skill owns scaffolding, workstream status tracking, and Central submission
 - Writing, reviewing, and building automation are optional helper skills
   (`rhdp-publishing-house:writer-helper`, `rhdp-publishing-house:reviewer-helper`,
-  `rhdp-publishing-house:gitops-helper`) that the author invokes independently
+  `rhdp-publishing-house:gitops-helper`) that the author invokes independently — they're a
+  starting point, not a substitute for the author's own manual review
 - `config-helper.md` and `config-reviewer.md` are the only procedures this skill dispatches to
 - Status transitions: `not_started` → `in_progress` (on selection) → `complete` (on explicit human confirmation only)
 - **NEVER mark a workstream complete without the author explicitly saying it is done**

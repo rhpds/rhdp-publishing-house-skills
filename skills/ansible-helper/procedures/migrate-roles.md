@@ -80,7 +80,10 @@ test -d automation/ansible/roles/<role_name> && echo "EXISTS" || echo "NEW"
 
 For each that EXISTS, ask:
 > "`<role_name>` already exists at `automation/ansible/roles/<role_name>/`.
-> Overwrite, skip, or rename?"
+>
+> 1. Overwrite
+> 2. Skip
+> 3. Rename"
 
 Apply the user's choice before proceeding to copy.
 

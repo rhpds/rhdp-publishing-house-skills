@@ -18,9 +18,11 @@ flowchart TD
     Dev --> S1["Step 1: Scaffold check gate"]
     S1 --> CR["Run procedures/config-reviewer.md"]
     CR -->|PASS| Dashboard
-    CR -->|FAIL| Issues["Report issues to user"]
+    CR -->|"FAIL, .scaffolds/ present\n(not yet scaffolded)"| AutoCH["procedures/config-helper.md\nRoute A, no ask — auto-scaffold"]
+    CR -->|"FAIL, .scaffolds/ gone\n(scaffolded but broken)"| Issues["Report issues to user"]
     Issues -->|option 1: help me| CH["procedures/config-helper.md"]
     Issues -->|option 2: I'll handle it| STOP1["STOP"]
+    AutoCH --> Dashboard
 
     Dashboard["Step 2: Development Dashboard\n1. Modules (N/M complete)\n2. GitOps Automation (if applicable)\n3. Ansible Automation (if applicable)\n4. E2E Tests\n5. Health Check\n6. Showroom Config"]
 
@@ -67,7 +69,11 @@ User
       |   Step 1: Scaffold check gate                                    |
       |   +- Run procedures/config-reviewer.md                          |
       |      +- PASS -> proceed to Dashboard                            |
-      |      +- FAIL -> report issues, offer numbered options            |
+      |      +- FAIL, .scaffolds/ present (not yet scaffolded)          |
+      |      |    -> auto-scaffold via config-helper.md Route A          |
+      |      |       (no ask; single scaffold-plan confirmation only)    |
+      |      +- FAIL, .scaffolds/ gone (scaffolded but broken)          |
+      |           -> report issues, offer numbered options               |
       |                                                                  |
       |   Step 2: Development Dashboard (numbered options)               |
       |   +- 1. Modules           -> module sub-menu (start/complete)   |

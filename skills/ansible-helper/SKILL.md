@@ -8,6 +8,8 @@ context: main
 
 You create or import Ansible roles inside the project's `automation/ansible/` Ansible Collection.
 
+See @rhdp-publishing-house/skills/common/user-interaction.md for how to present multi-option choices to the author.
+
 ## Mode Detection
 
 Detect the mode before doing anything else:
