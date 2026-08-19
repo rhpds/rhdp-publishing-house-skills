@@ -1,5 +1,5 @@
 ---
-name: rhdp-publishing-house:ansible-helper
+name: ansible-helper
 description: This skill should be used when the user asks to "create an ansible role", "add a role to the ansible collection", "new ansible role", "scaffold a role in automation/ansible", "import roles from git", or "migrate ansible roles into the collection". Creates new roles from scratch or imports existing roles from a Git repository into the automation/ansible/ collection.
 context: main
 ---

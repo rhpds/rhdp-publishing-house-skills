@@ -1,5 +1,5 @@
 ---
-name: rhdp-publishing-house:migrate
+name: migrate
 description: This skill handles migration intake for existing Showroom repos imported into the Publishing House. It reads the content/ folder, site.yml, and ui-config.yml to reverse-engineer spec.yaml, design.md, and module outlines, then submits for review.
 ---
 

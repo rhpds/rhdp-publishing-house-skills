@@ -1,5 +1,5 @@
 ---
-name: rhdp-publishing-house:intake
+name: intake
 description: This skill should be used when the user asks to "create a spec", "write a design doc", "start a new lab project", "I have an idea for a lab", "I have a Jira issue with requirements", or "pull requirements from Jira". It handles intake for RHDP Publishing House projects.
 context: main
 ---
