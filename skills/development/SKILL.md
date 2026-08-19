@@ -1,5 +1,5 @@
 ---
-name: rhdp-publishing-house:development
+name: development
 description: This skill should be used when the user asks to "set up showroom", "configure showroom tabs", "create site.yml", "scaffold the showroom structure", "add a tab", "review my showroom config", "check site.yml", "validate ui-config.yml", "development dashboard", "what's next to develop", or "submit to central". Handles showroom scaffolding, config review, workstream status tracking, and submission to Central during the development stage.
 context: main
 ---
