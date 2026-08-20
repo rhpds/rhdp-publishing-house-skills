@@ -86,7 +86,11 @@ If no adjustments → proceed.
 
 ## Write Point
 
-Write RCARS results and differentiation to spec.yaml:
+The `poll` command automatically enriches each candidate with its workload mappings
+(AgnosticD roles/collections) from the RCARS catalog. Candidates with AgD v2 workloads
+will include a `workloads` array; others will not.
+
+Write RCARS results, workloads, and differentiation to spec.yaml:
 
 ```yaml
 approval_checklist:
@@ -98,6 +102,9 @@ approval_checklist:
         url: "https://catalog.demo.redhat.com/catalog?item=[ci_name]"
         relevance_score: [score]
         why_it_fits: "[why_it_fits]"
+        workloads:
+          - role: "[workload_role]"
+            collection: "[workload_collection]"
     catalog_gap: "[derived from RCARS results — summarize what this design covers that existing catalog items don't]"
 ```
 
