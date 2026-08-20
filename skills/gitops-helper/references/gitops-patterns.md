@@ -71,7 +71,7 @@ Use ArgoCD sync-wave annotations to control deployment order:
 
 | Wave | Resources |
 |------|-----------|
-| -2 | Namespaces, OperatorGroups, Subscriptions |
+| -2 | Namespaces, OperatorGroups, CatalogSources, Subscriptions |
 | -1 | RBAC (RoleBindings, ClusterRoleBindings), ServiceAccounts |
 | 0 | ConfigMaps, Secrets, Deployments, Services, standard workloads |
 | 1+ | CRs that depend on operator-installed CRDs, Routes |
@@ -89,6 +89,11 @@ argocd.argoproj.io/sync-options: SkipDryRunOnMissingResource=true
 This prevents ArgoCD from failing the dry-run when the CRD does not yet exist.
 
 ## Known Operator Quirks
+
+This section covers operators that are **not in a standard OLM catalog** at all, or that
+need install-mode handling beyond a normal Subscription. For a `redhat-operators` package,
+don't document its channel here — verify and pin it per "Verifying and Pinning Operator
+Channels" below instead.
 
 ### Gitea Operator (RHPDS)
 
@@ -134,6 +139,102 @@ spec:
 
 The Gitea CR (kind: Gitea) can be created in any namespace. Apply `SkipDryRunOnMissingResource`
 to the Gitea CR since its CRD is installed by the operator.
+
+## Verifying and Pinning Operator Channels
+
+**Never write an operator Subscription's `channel:` from memory** — a plausible-sounding
+name (`stable`, `fast-1.8`) may not exist, and even a correct one can be renamed later,
+breaking the lab long after it was authored.
+
+`quay.io/rhpds/olm_snapshot_redhat_catalog` is a weekly, per-OCP-version snapshot of
+`redhat-operators` — the catalog AgnosticD's `install_operator` role actually pins
+installs to (`install_operator_catalogsource_image`, agnosticd-v2). As a versioned,
+public OCI image, this skill can check it directly: no live cluster, no MCP tools, same
+category of read as cloning the patterns repo in Step 1.
+
+### Mechanism
+
+Use the bundled `scripts/verify_operator_channel.py` (path: see SKILL.md) — it already
+handles caching and FBC parsing; don't hand-roll the quay.io/podman calls. The target OCP
+version is already resolved by SKILL.md Step 3c before any of this runs.
+
+1. **For each Subscription sourced from `redhat-operators`**, verify:
+
+   ```bash
+   python3 <path-to-this-skill>/scripts/verify_operator_channel.py verify \
+     --ocp-version 4.22 \
+     --package openshift-pipelines-operator-rh --channel latest
+   ```
+
+   (`<path-to-this-skill>` — resolve relative to wherever this SKILL.md was loaded from,
+   same as Step 3c.)
+
+2. **Act on the result:**
+   - `verified: true` → the requested channel is real. Keep it.
+   - `verified: false` → the requested channel doesn't exist. Use `resolved_channel`
+     (the catalog's real `default_channel`) instead, and note the correction for the
+     Step 5c summary: *"channel changed from 'X' (not found in vY.Z snapshot) to 'W'"*.
+   - `package_found: false` → the package isn't in `redhat-operators`. Fall back to
+     "Known Operator Quirks" handling, or ask the user.
+   - Exit code 2 (`error` is one of `podman_unavailable`, `quay_unreachable`,
+     `invalid_ocp_version`, `no_snapshot_for_version`, `extraction_failed`,
+     `malformed_catalog_data`) → verification couldn't run. Do not guess. Write the
+     Subscription with the best-available channel and flag it explicitly as
+     **unverified** in Step 5c — an honest gap beats a silent guess.
+
+3. **Pin, don't just verify.** Generate a `CatalogSource` in `bootstrap-infra/templates/`
+   pointing at the exact `catalog_image` returned (sync-wave `-2`), and point the
+   Subscription's `source`/`sourceNamespace` at it instead of the cluster default.
+   **One `CatalogSource` for every `redhat-operators` Subscription in the lab** — a
+   single snapshot image contains the whole catalog (100+ packages).
+
+   ```yaml
+   # Generated from quay.io/rhpds/olm_snapshot_redhat_catalog — pinned for reproducibility
+   apiVersion: operators.coreos.com/v1alpha1
+   kind: CatalogSource
+   metadata:
+     name: rhpds-redhat-operators
+     namespace: openshift-marketplace
+     annotations:
+       argocd.argoproj.io/sync-wave: "-2"
+   spec:
+     sourceType: grpc
+     image: quay.io/rhpds/olm_snapshot_redhat_catalog:v4.22_2026_08_10
+     displayName: RHPDS Pinned Snapshot (redhat-operators)
+     publisher: Red Hat GPTE
+   ---
+   apiVersion: operators.coreos.com/v1alpha1
+   kind: Subscription
+   metadata:
+     name: openshift-pipelines-operator
+     namespace: openshift-operators
+     annotations:
+       argocd.argoproj.io/sync-wave: "-2"
+   spec:
+     channel: latest
+     installPlanApproval: Automatic
+     name: openshift-pipelines-operator-rh
+     source: rhpds-redhat-operators
+     sourceNamespace: openshift-marketplace
+   ```
+
+   Name it `rhpds-redhat-operators` — unambiguous and reusable across every
+   `redhat-operators` Subscription in the chart.
+
+   CatalogSource and Subscriptions share wave `-2`; ArgoCD doesn't order within a wave,
+   so the registry pod may not be ready yet. OLM retries resolution until it is — same
+   behavior the Gitea quirk above already relies on, not a failure to fix.
+
+This only applies to `redhat-operators`. Custom catalogs (Gitea's `redhat-gpte-gitea`)
+stay documented under "Known Operator Quirks" above.
+
+### Pinning to a specific CSV instead of a channel
+
+Pinning the `CatalogSource` freezes which catalog the Subscription resolves against, but
+it still tracks the latest CSV in its channel. To freeze the exact build too, use
+`installPlanApproval: Manual` with a `startingCSV` from the verified package's bundle
+list, and approve the InstallPlan out-of-band (or via an Ansible-in-Job step) —
+independent of channel verification; decide Automatic vs. Manual+startingCSV separately.
 
 ## S2I Builder Images
 
@@ -244,7 +345,7 @@ each as its own AgnosticV catalog item.
 **Cluster catalog item** calls the role with `repo_path: bootstrap-infra`:
 ```yaml
 ocp4_workload_gitops_bootstrap_repo_url: https://github.com/org/repo
-ocp4_workload_gitops_bootstrap_repo_revision: "{{ gitops_repo_revision }}"
+ocp4_workload_gitops_bootstrap_repo_revision: main
 ocp4_workload_gitops_bootstrap_repo_path: bootstrap-infra
 ocp4_workload_gitops_bootstrap_application_name: bootstrap-infra
 ```
@@ -253,7 +354,7 @@ ocp4_workload_gitops_bootstrap_application_name: bootstrap-infra
 application name per user:
 ```yaml
 ocp4_workload_gitops_bootstrap_repo_url: https://github.com/org/repo
-ocp4_workload_gitops_bootstrap_repo_revision: "{{ gitops_repo_revision }}"
+ocp4_workload_gitops_bootstrap_repo_revision: main
 ocp4_workload_gitops_bootstrap_repo_path: bootstrap-tenant
 ocp4_workload_gitops_bootstrap_application_project: tenants
 ocp4_workload_gitops_bootstrap_application_name: "bootstrap-{{ guid }}"
@@ -268,8 +369,6 @@ these manually.
 ### What belongs in helm_values
 
 Only pass values that are **prone to external changes**:
-- Git revisions and version pins (`targetRevision`, `gitops_repo_revision`)
-- Operator channels and CSVs (`channel: fast-1.8`, `startingCSV: ...`)
 - Container image tags
 - Secrets (Ansible Vault encrypted)
 - User count and prefix (`user.count`, `user.prefix`)
@@ -278,16 +377,9 @@ Only pass values that are **prone to external changes**:
 Everything else should have sensible defaults in the chart's `values.yaml`. This keeps
 the AgnosticV config minimal and prevents the deployer from needing to know chart internals.
 
-### Version pinning
-
-Use a `gitops_repo_revision` variable in the AgnosticV config that maps to a git tag:
-```yaml
-gitops_repo_revision: v1.0.0
-
-ocp4_workload_gitops_bootstrap_repo_revision: "{{ gitops_repo_revision }}"
-```
-
-Pin to tags in production (`event.yaml`), use `main` in development (`dev.yaml`).
+Operator channels are **not** deployer-managed values — they're verified and pinned into
+the chart's defaults at generation time (see "Verifying and Pinning Operator Channels"
+above), so there's nothing for the deployer to override.
 
 ## Flat Chart — No Intra-Repo App-of-Apps
 
