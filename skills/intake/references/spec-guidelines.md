@@ -27,7 +27,7 @@ Capture what you know now — guesstimates are fine during intake. Spec refineme
 
 ### Base Infrastructure
 - Which base CI type: `ocp4-cluster`, `ocp-workloads`, `cloud-vms-base`, or existing CI name
-- `cloud_provider`: `cnv` (default), `aws`, or `troshka`. CNV unless exception granted. Troshka for bare-metal or nested virtualization requirements. Stored in `spec.environment.cloud_provider`.
+- `cloud_provider`: `cnv` (default), `aws`, `troshka`, `azure`, `aro`, or `rosa`. CNV unless exception granted. Troshka for bare-metal or nested virtualization requirements. Azure/ARO/ROSA for cloud-specific deployments. Stored in `spec.environment.cloud_provider`.
 - Automation approach: Ansible, GitOps (Helm + ArgoCD), or combo
 
 ### Cluster Sizing
