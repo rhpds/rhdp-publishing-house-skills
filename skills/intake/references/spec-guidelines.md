@@ -27,7 +27,7 @@ Capture what you know now — guesstimates are fine during intake. Spec refineme
 
 ### Base Infrastructure
 - Which base CI type: `ocp4-cluster`, `ocp-workloads`, `cloud-vms-base`, or existing CI name
-- `cloud_provider`: `cnv` (default), `aws`, `troshka`, `azure`, `aro`, `rosa`, `gcp`, or `google`. CNV unless exception granted. Troshka for bare-metal or nested virtualization requirements. Azure/ARO/ROSA for cloud-specific deployments. GCP/Google for Google Cloud. Stored in `spec.environment.cloud_provider`.
+- `cloud_provider`: `cnv` (default), `aws`, `troshka`, `azure`, `aro`, `rosa`, `gcp`, or `google`. CNV unless exception granted. **Automatically set to `aws` when `ai_requirement: gpu` (overwrites existing value).** Troshka for bare-metal or nested virtualization requirements. Azure/ARO/ROSA for cloud-specific deployments. GCP/Google for Google Cloud. Stored in `spec.environment.cloud_provider`.
 - Automation approach: Ansible, GitOps (Helm + ArgoCD), or combo
 
 ### Cluster Sizing
