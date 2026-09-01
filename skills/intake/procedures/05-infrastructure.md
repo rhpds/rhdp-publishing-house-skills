@@ -43,7 +43,6 @@ RHEL-based labs. Those fields are irrelevant.
 | No AI keywords | `ai_requirement: none` |
 | AI requirement is GPU | `cloud_provider: aws` (overwrites existing value) |
 | No specific cloud reason | `cloud_provider: cnv` (platform default) |
-| Bare-metal or nested virt requirements | `cloud_provider: troshka` |
 | Azure-based deployments | `cloud_provider: azure` |
 | ARO (Azure Red Hat OpenShift) | `cloud_provider: aro` |
 | ROSA (Red Hat OpenShift Service on AWS) | `cloud_provider: rosa` |
