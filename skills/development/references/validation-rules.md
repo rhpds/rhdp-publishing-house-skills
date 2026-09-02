@@ -39,9 +39,15 @@ The Antora component descriptor (`antora.yml`) lives in the `content/` directory
 ### S-4 — Mermaid and tabs Antora extensions should be registered
 
 - **Severity:** MEDIUM
-- **Auto-fix:** Yes — add missing extension blocks
+- **Auto-fix:** Yes — add missing extension blocks (Open and Guided patterns only)
+- **Skip entirely for ZT Guided** — do NOT flag as a finding and do NOT offer to auto-fix.
+  Project Zero infra doesn't support these extensions yet, so `zt-guided` scaffolding
+  intentionally omits them. Adding them would produce a broken build for the author, not a fix.
 
-Check for `@sntke/antora-mermaid-extension` and `@andrew-jones/antora-tabs-extension` in `antora.extensions`.
+Check for `@sntke/antora-mermaid-extension` and `@andrew-jones/antora-tabs-extension` in
+`antora.extensions` — only for Open and Guided patterns (detected per
+`showroom-patterns.md` Step 2). If the detected pattern is ZT Guided, skip this rule
+entirely rather than reporting it as PASSED or FAILED.
 
 ### S-5 — Output directory should be `./www`
 

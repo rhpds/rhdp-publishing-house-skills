@@ -78,7 +78,8 @@ Apply all rules from @rhdp-publishing-house/skills/development/references/valida
 Run S-1 through S-8. Key checks:
 - **S-1** (CRITICAL): Bundle URL matches a known theme
 - **S-2** (HIGH): `start_page` component matches `antora.yml` `name`
-- **S-4** (MEDIUM): Mermaid and tabs extensions registered
+- **S-4** (MEDIUM): Mermaid and tabs extensions registered — Open and Guided only; skip
+  entirely for ZT Guided (Project Zero infra doesn't support them yet)
 - **S-8** (MEDIUM): Zerotouch patterns should have dev-mode extension
 
 ### ui-config.yml (U-rules)
