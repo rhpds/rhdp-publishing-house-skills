@@ -216,7 +216,10 @@ The `antora.modules` entries in ui-config.yml must match the page filenames in `
 
 - Same as Guided but with additional infrastructure config
 - `type: zerotouch`, nookbag-bundle theme
-- Same site.yml as Guided
+- site.yml is otherwise the same as Guided, **except** it does NOT include the
+  `@sntke/antora-mermaid-extension` / `@andrew-jones/antora-tabs-extension` entries under
+  `antora.extensions` — Project Zero infra doesn't support these extensions yet. The author can
+  add them back manually once it does; do not add them during scaffolding.
 - ui-config.yml same format as Guided but terminal tab uses `url: /wetty` (NOT `path` + `port` — ZT networking differs)
 - Additional directories beyond Guided:
   - `config/instances.yaml` — VM definitions (image, memory, cores, tags, networks)
@@ -224,6 +227,28 @@ The `antora.modules` entries in ui-config.yml must match the page filenames in `
   - `config/firewall.yaml` — egress rules
   - `setup-automation/setup.yml` — environment setup playbook (runs once on pod creation)
 - Best for: labs running on Project Zero infrastructure
+
+### Complete ZT site.yml
+
+```yaml
+---
+site:
+  title: Showroom Template Demo
+  url: https://github.com/rhpds/showroom-template
+  start_page: modules::index.adoc
+content:
+  sources:
+    - url: .
+      start_path: content
+ui:
+  bundle:
+    url: https://github.com/rhpds/nookbag-bundle/releases/download/v0.0.3/ui-bundle.zip
+    snapshot: true
+output:
+  dir: ./www
+```
+
+Note the absence of an `antora.extensions` block — see above.
 
 ### Complete ZT ui-config.yml
 
@@ -315,6 +340,27 @@ Note: `agd-guided` is not currently offered during intake. Only `classic` and `z
 - config-helper confirms the detected pattern with the user, then runs `scaffold.py --pattern <name> --force`
 - scaffold.py copies pattern-specific stubs, sets `showroom_type` and `infrastructure` in spec.yaml, deletes `.scaffolds/`
 - After scaffold.py runs, config-helper operates in modification mode on the generated files
+
+### Migrated repos (`project.intake_type: migration`)
+
+A migrated repo already has real `content/`, `runtime-automation/`, `setup-automation/`,
+`config/`, and `ui-config.yml` — imported from the source repo before intake ran. config-helper
+passes `--migration` to `scaffold.py` for these projects (see `config-helper.md` Route A, steps
+A.1b and A.2):
+
+- `scaffold.py --migration` never overwrites a file that already exists — it only fills in what's
+  genuinely missing from `common/` and the pattern dir, and never wipes/recreates
+  `runtime-automation/`, `setup-automation/`, or `config/`.
+- If `.scaffolds/<pattern>-migration/` exists (today only `zt-guided-migration/`), its contents
+  are overlaid on top afterward, always overwriting — this is what swaps in the migration-aware
+  `qa-automation/` (drives the legacy `runtime-automation/<module>/{solve,validation}-<host>.sh`
+  shell scripts a migrated repo already ships, instead of the ansible-playbook-per-module style
+  `qa-automation/` that fresh scaffolds get).
+- Before scaffold.py runs, **A.1b** renames the already-imported `content/` pages,
+  `runtime-automation/` dirs, and `ui-config.yml` module names to match the `module-NN-<slug>`
+  outlines intake just generated in `publishing-house/spec/modules/` — positionally, using
+  `ui-config.yml`'s existing `antora.modules` order (excluding `index`) zipped against the sorted
+  outline filenames.
 
 ---
 
