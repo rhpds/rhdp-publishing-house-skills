@@ -99,9 +99,13 @@ Read everything needed to build the full scaffold plan before showing anything t
 
 - `project.showroom_type` (already mapped to a pattern in A.1)
 - `project.intake_type` (already read in A.1) — if `migration`, pass `--migration`. In migration
-  mode, `scaffold.py` never overwrites existing content — it only fills in files that are
-  genuinely missing and overlays the migration-specific `qa-automation/` on top. Requires A.1b to
-  have already run so the existing content is aligned to the right names first.
+  mode, `scaffold.py` never overwrites existing content. `runtime-automation/`,
+  `setup-automation/`, and `config/` are fully hands-off (never wiped, never filled in — the
+  migrated repo's shell-script-based automation there is structured completely differently
+  from the fresh scaffold's ansible-playbook-per-module stubs). Other pattern files still get
+  genuinely-missing files filled in, and the migration-specific `qa-automation/` is overlaid on
+  top. Requires A.1b to have already run so the existing content is aligned to the right names
+  first.
 - `project.automation_type` from `publishing-house/spec.yaml`. This is the only chance to scaffold
   automation directories automatically — `scaffold.py` deletes `.scaffolds/` (including
   `.scaffolds/automation/`) once it completes, so automation scaffolding must happen in this same
@@ -118,7 +122,7 @@ whether they'd rather scaffold it themselves; that's what this step exists to do
 > Based on your spec, I'll scaffold this project as:
 > - **Pattern:** `showroom_type: <value>` → **<pattern description>** (`<pattern-name>`)
 > - **Automation:** <"none" | "`<automation_type>` → `automation/<...>/`" (+ `bootstrap-tenant/` if topology is `shared-cluster`)>
-> [If migration:] - **Migration:** existing `runtime-automation/`, `setup-automation/`, `config/`, and `ui-config.yml` are preserved as-is — only missing files are filled in, and `qa-automation/` is replaced with the migration-aware version
+> [If migration:] - **Migration:** existing `runtime-automation/`, `setup-automation/`, and `config/` are preserved as-is, untouched — `ui-config.yml` and other pattern files only have genuinely missing files filled in, and `qa-automation/` is replaced with the migration-aware version
 >
 > Proceed?
 

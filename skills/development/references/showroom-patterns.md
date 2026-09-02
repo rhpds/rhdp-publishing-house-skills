@@ -348,9 +348,12 @@ A migrated repo already has real `content/`, `runtime-automation/`, `setup-autom
 passes `--migration` to `scaffold.py` for these projects (see `config-helper.md` Route A, steps
 A.1b and A.2):
 
-- `scaffold.py --migration` never overwrites a file that already exists — it only fills in what's
-  genuinely missing from `common/` and the pattern dir, and never wipes/recreates
-  `runtime-automation/`, `setup-automation/`, or `config/`.
+- `scaffold.py --migration` never overwrites a file that already exists. `runtime-automation/`,
+  `setup-automation/`, and `config/` are fully hands-off — never wiped/recreated, and never even
+  scanned for fill-in — since a migrated repo structures them completely differently from the
+  fresh scaffold (shell scripts in real `module-NN-<slug>/` folders, not the
+  ansible-playbook-per-module placeholders `zt-guided` ships). Other pattern files (`site.yml`,
+  `ui-config.yml`) still get filled in from `common/` and the pattern dir if genuinely missing.
 - If `.scaffolds/<pattern>-migration/` exists (today only `zt-guided-migration/`), its contents
   are overlaid on top afterward, always overwriting — this is what swaps in the migration-aware
   `qa-automation/` (drives the legacy `runtime-automation/<module>/{solve,validation}-<host>.sh`
