@@ -56,15 +56,17 @@ Only runs when `project.intake_type` is `migration` **and** the pattern resolved
 point (pages are created lazily during development, already using the right names), and no other
 pattern has a `-migration` scaffold overlay today.
 
-A migrated repo's `content/`, `runtime-automation/`, and `ui-config.yml` already exist —
-imported from the source repo before intake ran — but under whatever naming the source repo
-used. Intake has since generated the canonical `module-NN-<slug>` outlines. Align the existing
-files to that naming *before* `scaffold.py` runs, since `scaffold.py --migration` never touches
-files that already exist:
+The `rhdp-publishing-house-skills:migrate` skill's Phase 2 (see `migrate/procedures/02-module-outlines-from-content.md`)
+already renames `content/modules/ROOT/pages/*.adoc`, `runtime-automation/*/` folders, and
+`nav.adoc` xrefs to the canonical `module-NN-<slug>` names *during intake*, right when the
+outlines are generated. **It does not touch `ui-config.yml`** — that file isn't read or written
+by the migrate skill at all. So by the time this step runs, `ui-config.yml`'s `antora.modules`
+list is normally the *only* thing still using the pre-migration names. Fix that, and only fall
+back to renaming files/folders yourself for anything migrate's Phase 2 missed (e.g. repos
+migrated before that step existed, or a page added after intake completed):
 
 1. Read the existing `ui-config.yml`'s `antora.modules` list, in order, **excluding** the
-   `index` entry — this is the current module stem order (already validated to match `nav.adoc`
-   and `content/modules/ROOT/pages/*.adoc`).
+   `index` entry — this is the pre-migration module stem order.
 2. List `publishing-house/spec/modules/module-*.md`, sorted numerically, and take each file's
    stem (`module-01-<slug>`, `module-02-<slug>`, ...) — one per `spec.modules[]` entry, in the
    same order.
@@ -73,18 +75,23 @@ files that already exist:
    > The migrated content has `<N>` modules (`<old names>`) but intake generated `<M>` module
    > outlines (`<new names>`). I can't safely auto-align these — how would you like to map them?
 4. For each `(old, new)` pair where `old != new`:
-   - `git mv content/modules/ROOT/pages/<old>.adoc content/modules/ROOT/pages/<new>.adoc`
-   - `git mv runtime-automation/<old> runtime-automation/<new>` (skip silently if that directory
-     doesn't exist)
-   - Update the `xref:` target for that page in `content/modules/ROOT/nav.adoc`
-   - Update that entry's `name:` field in `ui-config.yml`. Also offer to sync `label:` to the
-     matching outline's title from `spec.modules[]`, but only with author confirmation — never
-     silently rewrite a label the author may have already tuned.
+   - **Always** update that entry's `name:` field in `ui-config.yml` to `<new>` — this is the
+     one thing intake never does. Also offer to sync `label:` to the matching outline's title
+     from `spec.modules[]`, but only with author confirmation — never silently rewrite a label
+     the author may have already tuned.
+   - **Only if** `content/modules/ROOT/pages/<old>.adoc` still exists (migrate's Phase 2 didn't
+     already rename it): `git mv` it to `<new>.adoc` and update its `xref:` target in
+     `content/modules/ROOT/nav.adoc`. If `<new>.adoc` already exists instead, skip — it's already
+     aligned.
+   - **Only if** `runtime-automation/<old>/` still exists: `git mv` it to
+     `runtime-automation/<new>/`. If `runtime-automation/<new>/` already exists instead, skip.
 5. Commit:
    ```bash
    git add -A
    git commit -m "chore: align migrated module naming with intake outlines"
    ```
+   Skip the commit if nothing changed (e.g. migrate's Phase 2 already handled everything and
+   `ui-config.yml` was already correct too).
 
 **A.2 — Confirm and run scaffold.py:**
 

@@ -356,9 +356,12 @@ A.1b and A.2):
   `qa-automation/` (drives the legacy `runtime-automation/<module>/{solve,validation}-<host>.sh`
   shell scripts a migrated repo already ships, instead of the ansible-playbook-per-module style
   `qa-automation/` that fresh scaffolds get).
-- Before scaffold.py runs, **A.1b** renames the already-imported `content/` pages,
-  `runtime-automation/` dirs, and `ui-config.yml` module names to match the `module-NN-<slug>`
-  outlines intake just generated in `publishing-house/spec/modules/` — positionally, using
+- The `migrate` skill's Phase 2 already renames `content/` pages, `runtime-automation/` dirs,
+  and `nav.adoc` xrefs to match the `module-NN-<slug>` outlines *during intake*, as soon as
+  they're generated (see `migrate/procedures/02-module-outlines-from-content.md`) — but it
+  never touches `ui-config.yml`. Before scaffold.py runs, **A.1b** aligns `ui-config.yml`'s
+  `antora.modules` names to match (the one thing intake doesn't do), falling back to renaming
+  files/folders itself only for anything intake's Phase 2 missed — positionally, using
   `ui-config.yml`'s existing `antora.modules` order (excluding `index`) zipped against the sorted
   outline filenames.
 

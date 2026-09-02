@@ -252,6 +252,11 @@ For each module in the Module Map table:
    - Replace old filename references with new names
    - Example: `* xref:old-name.adoc[Old Title]` → `* xref:module-01-pipeline-setup.adoc[Pipeline Setup]`
 
+Note: this does NOT touch `ui-config.yml`, even though a migrated repo's copy of it (imported
+from the source repo) already exists at this point and still has the old names. It's aligned
+later, during the `development` stage — `config-helper` Route A step A.1b matches its
+`antora.modules` names to whatever renames happened here.
+
 After writing outlines and renaming files:
 
 1. Add `status: not_started` to each module in `spec.modules` (if not already present). Example:
