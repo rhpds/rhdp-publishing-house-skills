@@ -230,13 +230,29 @@ Validate design.md against spec guidelines:
 ### Phase 2 — Module Outlines
 Read the module outline template at <project_root>/publishing-house/spec/module-outline-template.md.
 
-For each module in the Module Map table, generate one outline file:
-- Output directory: <project_root>/publishing-house/spec/modules/
-- Naming: module-01-<short-title>.md, module-02-<short-title>.md
-- Follow the template structure exactly
-- Derive content from the corresponding module in the content analysis report
+For each module in the Module Map table:
 
-After writing outlines:
+1. Generate one outline file:
+   - Output directory: <project_root>/publishing-house/spec/modules/
+   - Naming: module-01-<short-title>.md, module-02-<short-title>.md
+   - Follow the template structure exactly
+   - Derive content from the corresponding module in the content analysis report
+
+2. Rename the content file to match the outline name:
+   - Old: <project_root>/content/modules/ROOT/pages/old-name.adoc
+   - New: <project_root>/content/modules/ROOT/pages/module-01-<short-title>.adoc
+   - The base name MUST match exactly (e.g., module-01-pipeline-setup)
+
+3. Rename the runtime-automation folder to match:
+   - Old: <project_root>/runtime-automation/old-name/
+   - New: <project_root>/runtime-automation/module-01-<short-title>/
+   - Skip if the folder doesn't exist
+
+4. Update <project_root>/content/modules/ROOT/nav.adoc:
+   - Replace old filename references with new names
+   - Example: `* xref:old-name.adoc[Old Title]` → `* xref:module-01-pipeline-setup.adoc[Pipeline Setup]`
+
+After writing outlines and renaming files:
 
 1. Add `status: not_started` to each module in `spec.modules` (if not already present). Example:
    ```yaml
@@ -254,7 +270,9 @@ After writing outlines:
 Commit:
 ```bash
 git add publishing-house/spec/modules/ publishing-house/spec.yaml
-git diff --cached --quiet || git commit -m "feat: module outlines generated from imported content" 2>/dev/null || true
+git add content/modules/ROOT/pages/ content/modules/ROOT/nav.adoc
+git add runtime-automation/
+git diff --cached --quiet || git commit -m "feat: module outlines generated and content files renamed to match" 2>/dev/null || true
 ```
 
 Do NOT proceed past Phase 2. Return a summary of what was written:
