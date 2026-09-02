@@ -47,7 +47,7 @@ output:
 | `content.sources[].start_path` | Path to the directory containing `antora.yml`. Always `content` |
 | `ui.bundle.url` | Theme bundle URL. Must match the content mode |
 | `ui.bundle.snapshot` | `true` to re-fetch the bundle on `--fetch` |
-| `antora.extensions` | Registered Antora extensions |
+| `antora.extensions` | Registered Antora extensions — see "Mermaid + tabs extensions" and "Dev-mode extension" below; **not every pattern gets the same set** |
 | `output.dir` | Build output directory. Must match `antora.dir` in `ui-config.yml` for zerotouch patterns |
 
 ### Theme bundle options
@@ -73,9 +73,10 @@ site:
 
 Options for `navbar_logo`: `summit`, `rhdp`, or omit entirely for default RHDP branding.
 
-### Dev-mode extension (zerotouch patterns only)
+### Mermaid + tabs extensions (Open and Guided patterns — NOT ZT Guided)
 
-Zerotouch site.yml files include the dev-mode extension:
+`Open` (agd-open) and `Guided` (agd-guided) site.yml files register the mermaid and tabs
+extensions:
 
 ```yaml
 antora:
@@ -86,6 +87,19 @@ antora:
       mermaid_initialize_options:
         start_on_load: true
     - require: '@andrew-jones/antora-tabs-extension'
+```
+
+**ZT Guided (`zt-guided`) does NOT get this block during scaffolding** — Project Zero infra
+doesn't support these extensions yet. The author can add it back manually to `site.yml` once
+support lands; do not add it during scaffolding in the meantime.
+
+### Dev-mode extension (zerotouch patterns only)
+
+Zerotouch site.yml files include the dev-mode extension:
+
+```yaml
+antora:
+  extensions:
     - require: /antora/lib/dev-mode.js
       enabled: true
 ```
