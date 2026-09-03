@@ -107,7 +107,14 @@ Tabs without names appear as blank tab headers.
 - **Severity:** HIGH
 - **Auto-fix:** Partial — can warn about the issue but needs author to decide the correct value
 
-Using both is ambiguous. Using neither produces a broken tab. `port` is only needed when a service runs on a non-standard port (not 80 or 443) — do not flag missing `port` on standard-port `path` tabs.
+Using both is ambiguous. Using neither produces a broken tab.
+
+### U-4b — path-based tabs should include an explicit port for backward compatibility
+
+- **Severity:** MEDIUM
+- **Auto-fix:** Yes — add `port: 443` (or `secondary_port: 443`) when missing
+
+Every `path`/`secondary_path` tab should set an explicit `port`/`secondary_port` — typically `443` — even though 443 is technically the default. Older/production Showroom UI builds don't reliably support omitting it, so relying on the default causes tabs (e.g. `/wetty` terminals) to fail to load in some environments. Only use a different value when the service genuinely runs on a non-standard port. `url` tabs are exempt — the URL is already fully specified and doesn't use this mechanism.
 
 ### U-5 — Placeholder tabs should be replaced before deployment
 
@@ -257,12 +264,12 @@ A module directory with at least one solve file AND one validate file passes. Mo
 
 `config/` directory must exist with `instances.yaml`, `networks.yaml`, and `firewall.yaml`. `setup-automation/` must exist with `setup.yml`. These are required for Project Zero infrastructure provisioning.
 
-### X-6 — Tab terminal syntax must match infrastructure type
+### X-6 — Terminal tabs must use path + port syntax, not url
 
 - **Severity:** MEDIUM
-- **Auto-fix:** Yes — can convert between `path`+`port` and `url` syntax
+- **Auto-fix:** Yes — convert `url: /wetty` to `path: /wetty` + `port: 443`
 
-AgD environments (OCP/VM) use `path: /wetty`. ZT environments use `url: /wetty`. Using the wrong syntax causes the terminal tab to fail to load. Detection: ZT is identified by presence of `config/` directory.
+All patterns (AgD Open/Guided and ZT Guided alike) use `path: /wetty` + `port: 443` for terminal tabs — there is no longer an infra-specific variant. A tab with `url: /wetty` (instead of `path`) is outdated and should be converted; see U-4b for the port requirement itself.
 
 ---
 
@@ -409,6 +416,7 @@ The config-reviewer produces a report organized by severity:
 - [J-02] No matching page for outline `module-02-secure-agent-workspace-deploy-explore.md` (module status: complete)
 
 ### MEDIUM
+- [U-4b] Tab "Terminal" has `path: /wetty` but no `port` — add `port: 443`
 - [U-6] Tab "OCP Console" uses `{DOMAIN}` — should be `${DOMAIN}`
 - [A-5] `experimental: true` not set — UI macros will not render
 
