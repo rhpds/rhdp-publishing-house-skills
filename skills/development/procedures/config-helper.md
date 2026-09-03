@@ -99,9 +99,13 @@ Read everything needed to build the full scaffold plan before showing anything t
 
 - `project.showroom_type` (already mapped to a pattern in A.1)
 - `project.intake_type` (already read in A.1) — if `migration`, pass `--migration`. In migration
-  mode, `scaffold.py` never overwrites existing content — it only fills in files that are
-  genuinely missing and overlays the migration-specific `qa-automation/` on top. Requires A.1b to
-  have already run so the existing content is aligned to the right names first.
+  mode, `scaffold.py` never overwrites existing content. `runtime-automation/`,
+  `setup-automation/`, and `config/` are fully hands-off (never wiped, never filled in — the
+  migrated repo's shell-script-based automation there is structured completely differently
+  from the fresh scaffold's ansible-playbook-per-module stubs). Other pattern files still get
+  genuinely-missing files filled in, and the migration-specific `qa-automation/` is overlaid on
+  top. Requires A.1b to have already run so the existing content is aligned to the right names
+  first.
 - `project.automation_type` from `publishing-house/spec.yaml`. This is the only chance to scaffold
   automation directories automatically — `scaffold.py` deletes `.scaffolds/` (including
   `.scaffolds/automation/`) once it completes, so automation scaffolding must happen in this same
@@ -118,7 +122,7 @@ whether they'd rather scaffold it themselves; that's what this step exists to do
 > Based on your spec, I'll scaffold this project as:
 > - **Pattern:** `showroom_type: <value>` → **<pattern description>** (`<pattern-name>`)
 > - **Automation:** <"none" | "`<automation_type>` → `automation/<...>/`" (+ `bootstrap-tenant/` if topology is `shared-cluster`)>
-> [If migration:] - **Migration:** existing `runtime-automation/`, `setup-automation/`, `config/`, and `ui-config.yml` are preserved as-is — only missing files are filled in, and `qa-automation/` is replaced with the migration-aware version
+> [If migration:] - **Migration:** existing `runtime-automation/`, `setup-automation/`, and `config/` are preserved as-is, untouched — `ui-config.yml` and other pattern files only have genuinely missing files filled in, and `qa-automation/` is replaced with the migration-aware version
 >
 > Proceed?
 
@@ -296,6 +300,7 @@ Bastion terminal:
 ```yaml
 - name: ">_ terminal"
   path: /wetty
+  port: 443
 ```
 
 OCP Terminal:
@@ -308,8 +313,10 @@ Both (stacked):
 ```yaml
 - name: ">_ Terminals"
   path: /wetty
+  port: 443
   secondary_name: OCP Terminal
   secondary_path: /codeserver
+  secondary_port: 443
 ```
 
 **Application tabs** — ask about deployed services:
@@ -354,16 +361,20 @@ Separate tabs example:
 ```yaml
 - name: ">_ Bastion"
   path: /wetty
+  port: 443
 - name: ">_ Worker"
   path: /terminal2
+  port: 443
 ```
 
 Stacked example:
 ```yaml
 - name: ">_ Terminals"
   path: /wetty
+  port: 443
   secondary_name: Worker
   secondary_path: /terminal2
+  secondary_port: 443
 ```
 
 ### Vertical split (stacked terminals)
@@ -395,7 +406,7 @@ After the conversation, write the complete `tabs:` list to `ui-config.yml`, repl
 
 ### Port note
 
-Only specify `port` on a tab if the service runs on a non-standard port (not 80 or 443). For standard HTTP/HTTPS, omit `port` entirely.
+Every `path`/`secondary_path` tab should set an explicit `port`/`secondary_port` — typically `443` for standard HTTPS — for backward compatibility with older/production Showroom UI builds that don't reliably support omitting it. Only use a different value when the service genuinely runs on a non-standard port. `url` tabs never need `port` — the URL is already fully specified.
 
 ## Automation Scaffolding
 

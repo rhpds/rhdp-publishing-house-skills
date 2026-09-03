@@ -87,6 +87,7 @@ Run S-1 through S-8. Key checks:
 Run U-1 through U-7. Key checks:
 - **U-1** (CRITICAL): Format matches content mode
 - **U-4** (HIGH): Tabs have `url` or `path` (not both, not neither)
+- **U-4b** (MEDIUM): `path`/`secondary_path` tabs have an explicit `port`/`secondary_port` (typically `443`)
 - **U-6** (MEDIUM): Variable substitution uses `${VAR}` not `{VAR}`
 - **U-6b** (LOW): Non-built-in variables in tab URLs should be defined in `content/antora.yml` `asciidoc.attributes.environment_variables` for local development
 - **U-7** (HIGH): Zerotouch `antora.modules` match page filenames
@@ -110,7 +111,7 @@ Run X-1 through X-6. Key checks:
 - **X-4** (CRITICAL): Theme and content mode consistent
 - **X-2** (HIGH): Zerotouch modules match page filenames
 - **X-3** (HIGH): Zerotouch has runtime-automation per module
-- **X-6** (MEDIUM): Tab terminal syntax matches infra type
+- **X-6** (MEDIUM): Terminal tabs use `path` + `port` syntax, not `url`
 
 ### Ansible collection (G-rules) — skip if `automation/ansible/galaxy.yml` is absent
 
