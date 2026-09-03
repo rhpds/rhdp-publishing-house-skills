@@ -23,9 +23,9 @@ Theme MUST match content mode. Mismatch produces duplicate or missing navigation
 
 ### Infrastructure variants
 
-**Open OCP**: tabs include OCP Console (`url: 'https://console-openshift-console.${DOMAIN}'`), terminal (`path: /wetty`)
+**Open OCP**: tabs include OCP Console (`url: 'https://console-openshift-console.${DOMAIN}'`), terminal (`path: /wetty` + `port: 443`)
 
-**Open VM**: tabs include stacked terminals (primary Bastion `path: /wetty` + secondary Worker `secondary_path: /terminal2`)
+**Open VM**: tabs include stacked terminals (primary Bastion `path: /wetty` + `port: 443`, secondary Worker `secondary_path: /terminal2` + `secondary_port: 443`)
 
 ### Complete Open OCP ui-config.yml
 
@@ -45,6 +45,7 @@ tabs:
     url: 'https://console-openshift-console.${DOMAIN}'
   - name: Bastion ${USER}
     path: /wetty
+    port: 443
   - name: Placeholder
     url: /placeholder
 ```
@@ -65,8 +66,10 @@ view_switcher:
 tabs:
   - name: Bastion
     path: /wetty
+    port: 443
     secondary_name: Worker
     secondary_path: /terminal2
+    secondary_port: 443
   - name: Placeholder
     url: /placeholder
 ```
@@ -113,9 +116,9 @@ output:
 
 ### Infrastructure variants
 
-**Guided OCP**: tabs include OCP Console + terminal (`path: /wetty`)
+**Guided OCP**: tabs include OCP Console + terminal (`path: /wetty` + `port: 443`)
 
-**Guided VM**: tabs include stacked terminals (Bastion `path: /wetty` + Worker `secondary_path: /terminal2`)
+**Guided VM**: tabs include stacked terminals (Bastion `path: /wetty` + `port: 443`, Worker `secondary_path: /terminal2` + `secondary_port: 443`)
 
 ### Complete Guided OCP ui-config.yml
 
@@ -137,6 +140,7 @@ tabs:
     url: 'https://console-openshift-console.${DOMAIN}'
   - name: ">_ terminal"
     path: /wetty
+    port: 443
   - name: Placeholder
     url: /placeholder
 ```
@@ -159,8 +163,10 @@ antora:
 tabs:
   - name: ">_ Bastion"
     path: /wetty
+    port: 443
     secondary_name: Worker
     secondary_path: /terminal2
+    secondary_port: 443
   - name: Placeholder
     url: /placeholder
 ```
@@ -220,7 +226,7 @@ The `antora.modules` entries in ui-config.yml must match the page filenames in `
   `@sntke/antora-mermaid-extension` / `@andrew-jones/antora-tabs-extension` entries under
   `antora.extensions` — Project Zero infra doesn't support these extensions yet. The author can
   add them back manually once it does; do not add them during scaffolding.
-- ui-config.yml same format as Guided but terminal tab uses `url: /wetty` (NOT `path` + `port` — ZT networking differs)
+- ui-config.yml same format as Guided, including the terminal tab — `path: /wetty` + `port: 443`, same as every other pattern
 - Additional directories beyond Guided:
   - `config/instances.yaml` — VM definitions (image, memory, cores, tags, networks)
   - `config/networks.yaml` — network definitions
@@ -267,7 +273,8 @@ antora:
 
 tabs:
   - name: ">_ terminal"
-    url: /wetty
+    path: /wetty
+    port: 443
   - name: Placeholder
     url: /placeholder
 ```
