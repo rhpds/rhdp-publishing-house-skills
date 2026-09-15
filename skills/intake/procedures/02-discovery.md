@@ -6,7 +6,18 @@ Phase 1 of the intake flow. Capture the author's idea through conversation.
 
 ### Path A — "Build on the description"
 
-Read `project.description` from spec.yaml. Present it and ask whether to build on it:
+**Check for pre-intake data first**: If `project.preintake_outline` exists in spec.yaml, the author provided pre-intake information during the pre-intake workflow phase. Present what was captured:
+
+> "I see you provided pre-intake information during onboarding. Here's what I have:
+> - **Asset Title**: {spec.title}
+> - **Audience**: {spec.audience}
+> - **Content Type**: {project.content_type}
+> - **Duration**: {spec.duration_hours} hours
+> - **Learning Objectives**: {spec.learning_objectives}
+>
+> Would you like to build on this, or would you like to revise any of it?"
+
+If no pre-intake data exists, read `project.description` from spec.yaml and present it:
 
 > "Here's the description you provided: *'{description}'* — would you like to build on this, or would you like to take it in a different direction?"
 
@@ -44,13 +55,16 @@ and gap-fill.
 These are the things you need to learn during discovery. Do NOT ask them as a rigid
 question list — extract them naturally from the conversation and follow up on gaps.
 
-- **Goal** — What will someone be able to DO after completing this? Concrete, measurable.
-- **Target audience** — Who is this for? Role, experience level, what they already know.
+**Important**: Many of these fields may already be populated from pre-intake ProForma data (Step 4e). Check spec.yaml before asking — skip any field that already has a value.
+
+- **Goal** — What will someone be able to DO after completing this? Concrete, measurable. (→ `spec.title`)
+- **Target audience** — Who is this for? Role, experience level, what they already know. (→ `spec.audience`)
 - **Products and technologies** — Which Red Hat products are involved? Validate names against the policy's product list (with aliases). If a name isn't recognized, flag it: "I don't see that in the product list — the closest match is [X]. Is that what you mean?"
 - **Content type** — Lab (hands-on) or demo (presenter-led). Skip if `project.content_type` is already set in spec.yaml.
 - **Showroom type** — Classic or zero-touch. Skip if `project.showroom_type` is already set.
-- **Duration estimate** — How long should this take end to end?
+- **Duration estimate** — How long should this take end to end? (→ `spec.duration_hours`)
 - **Reference material** — Do they have existing docs, recorded demos, blog posts, architecture diagrams? Note these for Phase 2.
+- **Content outline** — If `project.preintake_outline` exists, review it with the author and use it to inform module structure in Phase 2.
 
 ## Behavioral Notes
 

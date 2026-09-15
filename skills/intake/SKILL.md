@@ -63,6 +63,30 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 **4d.** If `unresolved_rejections` > 0 → follow `procedures/00-rejection-handler.md`. After the rejection handler completes, continue with normal intake (Step 5 onward).
 
+**4e.** Pre-intake data import (skip if offline or if `project.jira_ticket` is empty):
+```bash
+python publishing-house/tools/ph-preintake-data.py
+```
+
+If this succeeds, parse the JSON output and populate spec.yaml fields with the following mappings:
+- `assetTitle` → `spec.title` (if not already set)
+- `projectDescription` → `project.description` (if not already set)
+- `learningObjectives` → `spec.learning_objectives` (parse as newline-separated list, if not already set)
+- `contentType` → `project.content_type` (if not already set; map "lab" → "lab", "demo" → "demo")
+- `audience` → `spec.audience` (if not already set)
+- `duration` → `spec.duration_hours` (if not already set; parse numeric value)
+- `prerequisites` → `spec.prerequisites` (if not already set)
+- `author` → `spec.authors[0]` (if not already set and not empty)
+- `contentOutline` → Store in `project.preintake_outline` for later use in design doc generation (new field)
+
+If any fields are successfully populated, commit the changes:
+```bash
+git add publishing-house/spec.yaml
+git diff --cached --quiet || git commit -m "feat: import pre-intake data from ProForma" 2>/dev/null || true
+```
+
+**Important**: After importing pre-intake data, you should still follow the normal discovery flow. The imported fields act as pre-populated values — skip asking about fields that now have values, but continue with the discovery conversation for any remaining gaps.
+
 ### Step 5 — Load policy and project files
 
 1. Fetch validation policy:
@@ -153,13 +177,23 @@ After Phase 6 completes, **return to the orchestrator** (if dispatched) or **STO
 
 ## Pre-populated Fields
 
-Before asking questions, check spec.yaml for fields already set by the RHDH template:
-- `project.slug` — project identifier
-- `project.owner_email` — author email
-- `project.content_type` — lab or demo
-- `project.deployment_mode` — rhdp_published or self_published
-- `project.initiative_key` — e.g., rh1_2027
-- `project.showroom_type` — classic or zero_touch
-- `project.description` — project description from RHDH form
+Before asking questions, check spec.yaml for fields already set by:
+1. **RHDH template** (at project creation):
+   - `project.slug` — project identifier
+   - `project.owner_email` — author email
+   - `project.content_type` — lab or demo
+   - `project.deployment_mode` — rhdp_published or self_published
+   - `project.initiative_key` — e.g., rh1_2027
+   - `project.showroom_type` — classic or zero_touch
+   - `project.description` — project description from RHDH form
+
+2. **Pre-intake ProForma data** (Step 4e, if available):
+   - `spec.title` — asset title
+   - `spec.audience` — target audience
+   - `spec.learning_objectives` — learning objectives list
+   - `spec.duration_hours` — estimated duration
+   - `spec.prerequisites` — prerequisites
+   - `spec.authors` — author information
+   - `project.preintake_outline` — content outline from pre-intake
 
 **Skip asking about any field that already has a value.**
