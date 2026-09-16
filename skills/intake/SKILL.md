@@ -108,19 +108,11 @@ or contains real content.
 Read `publishing-house/spec.yaml`. Check whether `spec.title`, `spec.learning_objectives`,
 and `spec.modules` are populated.
 
-**If design.md is mostly placeholders AND spec fields are empty → ask:**
+**If design.md is mostly placeholders AND spec fields are empty:**
 
-> Here's the description you provided: *'{project.description}'*
->
-> How would you like to start?
->
-> 1. **Build on this description** — we'll use it as a starting point and flesh out the details
-> 2. **I have a doc or outline** — share it and I'll convert it to our format
-> 3. **I already filled this out** — the design doc and spec are in the repo
+Read `~/.config/publishing-house/preintake-data.json` if it exists. The description field contains pre-intake information from the Jira epic. Use this data as input when going through the phases.
 
-- Option 1 → Full intake: Phase 1 (Path A — build on description) through Phase 6
-- Option 2 → Phase 1 variant: extract from provided doc, fill gaps, then Phase 2 onward
-- Option 3 → Gap-fill: validate what exists, fill missing fields, skip to Phase 5/6
+Proceed with Phase 1 (Discovery) through Phase 6. The pre-intake data will inform which fields are already populated and which questions to skip.
 
 **If design.md has real content (not placeholders) → resume mode:**
 
