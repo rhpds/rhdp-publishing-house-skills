@@ -63,6 +63,17 @@ git diff --cached --quiet || git commit -m "feat: sync workflow data from Centra
 
 **4d.** If `unresolved_rejections` > 0 → follow `procedures/00-rejection-handler.md`. After the rejection handler completes, continue with normal intake (Step 5 onward).
 
+**4e.** Fetch pre-intake data from Jira (skip if offline or if `project.jira_ticket` is empty):
+```bash
+python publishing-house/tools/ph-preintake-data.py > ~/.config/publishing-house/preintake-data.json 2>/dev/null || true
+```
+
+If successful, `~/.config/publishing-house/preintake-data.json` contains:
+- `epic_key` — Jira epic key
+- `description` — Raw text from the epic description (converted from ADF)
+
+Read this file before starting phases. The description contains pre-intake information that should inform your questions and populate spec.yaml fields during discovery and design phases.
+
 ### Step 5 — Load policy and project files
 
 1. Fetch validation policy:
@@ -161,5 +172,12 @@ Before asking questions, check spec.yaml for fields already set by the RHDH temp
 - `project.initiative_key` — e.g., rh1_2027
 - `project.showroom_type` — classic or zero_touch
 - `project.description` — project description from RHDH form
+
+Additionally, if `~/.config/publishing-house/preintake-data.json` exists (from Step 4e), the `description` field contains pre-intake information that can populate:
+- `spec.title` — Asset Title
+- `spec.modules[]` — Content Outline
+- `spec.learning_objectives[]` — Learning Objectives
+- `project.content_type` — Lab or Demo
+- `project.automation_type` — Automation Type
 
 **Skip asking about any field that already has a value.**
