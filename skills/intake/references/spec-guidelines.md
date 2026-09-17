@@ -42,10 +42,11 @@ Capture what you know now — guesstimates are fine during intake. Spec refineme
 ### AI / MaaS
 - `ai_requirement`: maas | gpu | none
 - `ai_model_tier`: open-source (default, no justification required) | frontier (requires justification)
-- `ai_model_name`: specific model if known
-- `ai_justification`: required if frontier or gpu — explain why open-source is insufficient
+- `ai_model_name`: specific model if known (populated from workflow `maasModels` field)
+- `ai_justification`: required if frontier or gpu — explain why open-source is insufficient (populated from workflow `gpuJustification` field)
 - **AI keyword triggers (Phase 5):** AI, RHOAI, OpenShift AI, MaaS, Granite, InstructLab, Ollama, LLM, inference, model serving
 - **Default path:** MaaS + open-source → no justification required. Frontier or GPU → justification required for infra review.
+- **Pre-intake mapping:** `canUseMaas: false` means `ai_requirement: gpu` (inverse boolean). See Phase 5 procedure for full mapping.
 
 ### External Services
 - List ALL named external services the lab needs to reach — both during provisioning/deployment and during the student session

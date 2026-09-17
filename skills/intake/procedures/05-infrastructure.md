@@ -37,10 +37,25 @@ RHEL-based labs. Those fields are irrelevant.
 
 ### Common defaults (both platforms)
 
+**AI Requirement Mapping from Pre-Intake Form:**
+
+The workflow data contains these AI-related fields from the pre-intake submission:
+- `aiRelated` (boolean) - whether the project is AI-related
+- `canUseMaas` (boolean) - whether MaaS is sufficient (defaults to `true`)
+- `maasModels` (string) - which MaaS models are needed
+- `gpuJustification` (string) - why direct GPU access is required
+
+**Map workflow data to spec.yaml `spec.environment.*` fields:**
+
+| Workflow Data | spec.environment Mapping |
+|---------------|-------------------------|
+| `aiRelated: false` | `ai_requirement: none` |
+| `aiRelated: true` AND `canUseMaas: true` | `ai_requirement: maas`<br/>`ai_model_tier: open-source` (default)<br/>`ai_model_name: <maasModels value>` |
+| `aiRelated: true` AND `canUseMaas: false` | `ai_requirement: gpu`<br/>`ai_justification: <gpuJustification value>`<br/>`cloud_provider: aws` (overwrites existing) |
+
 | Signal | Default |
 |--------|---------|
-| Products include AI keywords | `ai_requirement: maas`, `ai_model_tier: open-source` |
-| No AI keywords | `ai_requirement: none` |
+| Products include AI keywords (no pre-intake data) | `ai_requirement: maas`, `ai_model_tier: open-source` |
 | AI requirement is GPU | `cloud_provider: aws` (overwrites existing value) |
 | No specific cloud reason | `cloud_provider: cnv` (platform default) |
 | Azure-based deployments | `cloud_provider: azure` |
