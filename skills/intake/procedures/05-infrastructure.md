@@ -144,6 +144,26 @@ Only ask these if triggered — do not ask them by default:
   air-gapped with all content pre-staged. If the author is unsure, list the likely candidates
   based on their products and leave them to confirm.
 
+## Automation Approach
+
+**Ask the author which automation approach they plan to use:**
+
+> "What automation approach will you use for provisioning and deployment?"
+>
+> - **Ansible** — AgnosticD roles and workloads
+> - **GitOps** — Helm charts + ArgoCD
+> - **Both** — Hybrid approach (AgnosticD for base infrastructure, GitOps for application layer)
+
+**Map the response to `project.automation_type` in spec.yaml:**
+- Ansible → `ansible`
+- GitOps → `gitops`
+- Both → `both`
+
+**Default recommendation:**
+- Most labs and demos → `ansible` (standard RHDP pattern)
+- Cloud-native application demos → `gitops`
+- Complex multi-layer environments → `both`
+
 ## Confirmation Required
 
 **After the author provides adjustments, present the updated profile and wait for

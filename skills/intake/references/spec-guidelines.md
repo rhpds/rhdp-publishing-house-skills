@@ -37,6 +37,14 @@ The following fields from the Jira epic "Environment Configuration" section are 
 | OCP Version | `spec.environment.ocp_version` | e.g. `4.20`, `4.21`, `4.22` (only when platform=ocp) |
 | RHEL Version | Use for `vms_per_student[].version` | e.g. `8`, `9`, `10` — applies to all RHEL VMs in the list (only when platform=rhel-vms) |
 
+### Intake-Captured Fields
+
+The following fields are NOT in the epic description — they are captured during the intake conversation (Phase 5):
+
+| Field Captured | spec.yaml Field | Values |
+|----------------|----------------|--------|
+| Automation approach | `project.automation_type` | `ansible`, `gitops`, or `both` |
+
 ### Base Infrastructure
 - Which base CI type: `ocp4-cluster`, `ocp-workloads`, `cloud-vms-base`, or existing CI name
 - `cloud_provider`: Pre-populated from epic, but can be adjusted. CNV unless exception granted. **Automatically set to `aws` when `ai_requirement: gpu` (overwrites existing value).** Azure/ARO/ROSA for cloud-specific deployments. GCP/Google for Google Cloud. Stored in `spec.environment.cloud_provider`.
