@@ -25,9 +25,21 @@ A complete spec MUST have all of these (11 sections + a descriptive H1 title):
 
 Capture what you know now — guesstimates are fine during intake. Spec refinement fills gaps.
 
+### Epic Description → spec.yaml Field Mapping
+
+The following fields from the Jira epic "Environment Configuration" section are pre-populated from the onboarding form and map directly to spec.yaml:
+
+| Epic Field | spec.yaml Field | Notes |
+|------------|----------------|-------|
+| Platform | `spec.environment.platform` | `ocp` or `rhel-vms` |
+| Cloud Provider | `spec.environment.cloud_provider` | `cnv`, `aws`, `rosa`, `aro`, etc. |
+| Cluster Type | `spec.environment.cluster_type` | `sno` or `multinode` (only when platform=ocp) |
+| OCP Version | `spec.environment.ocp_version` | e.g. `4.20`, `4.21`, `4.22` (only when platform=ocp) |
+| RHEL Version | Use for `vms_per_student[].version` | e.g. `8`, `9`, `10` — applies to all RHEL VMs in the list (only when platform=rhel-vms) |
+
 ### Base Infrastructure
 - Which base CI type: `ocp4-cluster`, `ocp-workloads`, `cloud-vms-base`, or existing CI name
-- `cloud_provider`: `cnv` (default), `aws`, `azure`, `aro`, `rosa`, `gcp`, or `google`. CNV unless exception granted. **Automatically set to `aws` when `ai_requirement: gpu` (overwrites existing value).** Azure/ARO/ROSA for cloud-specific deployments. GCP/Google for Google Cloud. Stored in `spec.environment.cloud_provider`.
+- `cloud_provider`: Pre-populated from epic, but can be adjusted. CNV unless exception granted. **Automatically set to `aws` when `ai_requirement: gpu` (overwrites existing value).** Azure/ARO/ROSA for cloud-specific deployments. GCP/Google for Google Cloud. Stored in `spec.environment.cloud_provider`.
 - Automation approach: Ansible, GitOps (Helm + ArgoCD), or combo
 
 ### Cluster Sizing
