@@ -1,5 +1,5 @@
 ---
-name: rhdp-publishing-house:reviewer-helper
+name: reviewer-helper
 description: This skill should be used when the user asks to "review my content", "review module N", "review again", "re-review", "check it again", "technical edit", or "review all". Optional helper that reviews Showroom AsciiDoc content against Red Hat quality standards and Publishing House spec alignment. Not mandatory — authors may skip review or use their own process.
 context: main
 ---

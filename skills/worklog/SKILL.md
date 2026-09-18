@@ -1,5 +1,5 @@
 ---
-name: rhdp-publishing-house:worklog
+name: worklog
 description: This skill should be used when the user asks to "leave a note", "what's outstanding", "worklog", "resolve item", "what did we do last session", "add a worklog entry", "squash the worklog", or "session summary". It manages the human-context layer in publishing-house/worklog.yaml.
 context: main
 ---

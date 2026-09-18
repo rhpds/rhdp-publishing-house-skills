@@ -1,5 +1,5 @@
 ---
-name: rhdp-publishing-house:writer-helper
+name: writer-helper
 description: This skill should be used when the user asks to "write a module", "draft content", "start writing", "write module N", "write all", "generate the index", "generate the conclusion", or "continue writing". Optional helper that generates Showroom AsciiDoc content from a project's spec/design/module outlines. Not mandatory — authors may write content themselves instead.
 context: main
 ---
