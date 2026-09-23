@@ -1,5 +1,5 @@
 ---
-name: rhdp-publishing-house:gitops-helper
+name: gitops-helper
 description: This skill should be used when the user asks to "write GitOps automation", "create Helm charts", "set up ArgoCD for this lab", "generate GitOps manifests", "build GitOps deployment", or "deploy with Helm and ArgoCD". Generates GitOps (Helm + ArgoCD) automation for RHDP lab environments following rhdp-gitops-patterns conventions.
 context: main
 ---
