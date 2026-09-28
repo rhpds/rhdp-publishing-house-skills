@@ -53,7 +53,41 @@ git add publishing-house/spec.yaml catalog-info.yaml
 git diff --cached --quiet || git commit -m "feat: sync workflow data from Central API" 2>/dev/null || true
 ```
 
-**4d.** If `unresolved_rejections` > 0 → show the unresolved rejection reasons to the author (read from `approval_checklist.content.rejections` and `approval_checklist.infra.rejections` in spec.yaml). Help the author address each one, then continue with normal development.
+**4d.** Jira reconciliation (skip if offline):
+
+**RULE: This step runs every invocation after sync. It is idempotent — safe to call even if tickets are already closed.**
+
+Read `spec.yaml` and reconcile Jira tickets for all completed workstreams. This catches cases
+where a previous session was interrupted after updating spec.yaml but before calling
+`ph-task-complete.py`.
+
+1. For each module in `spec.modules` with `status: complete`:
+   ```bash
+   python publishing-house/tools/ph-task-complete.py module-NN
+   ```
+   (where NN is the zero-padded module number: `module-01`, `module-02`, etc.)
+
+2. Read `project.automation_type` from spec.yaml. For each applicable automation child
+   (`gitops` if type is `gitops` or `both`; `ansible` if type is `ansible` or `both`),
+   if `development.automation.<child>.status` is `complete` AND all applicable children
+   are `complete`:
+   ```bash
+   python publishing-house/tools/ph-task-complete.py write-automation
+   ```
+
+3. If `development.e2e.status` is `complete`:
+   ```bash
+   python publishing-house/tools/ph-task-complete.py write-e2e-tests
+   ```
+
+4. If `development.healthCheck.status` is `complete`:
+   ```bash
+   python publishing-house/tools/ph-task-complete.py write-health-check
+   ```
+
+Do not show output to the author unless a script fails. This is a silent background reconciliation.
+
+**4e.** If `unresolved_rejections` > 0 → show the unresolved rejection reasons to the author (read from `approval_checklist.content.rejections` and `approval_checklist.infra.rejections` in spec.yaml). Help the author address each one, then continue with normal development.
 
 ### Step 5 — Read project context
 
